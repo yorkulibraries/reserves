@@ -1,0 +1,10 @@
+development:
+  mail:
+    from_name: "reserves"
+    from_email: "noreply@reserves"
+
+production:
+  mail:
+    from_name: "reserves"
+    from_email: "noreply@reserves"
+

@@ -1,7 +1,7 @@
 module Searchable
   extend ActiveSupport::Concern
 
-  if Setting.search_elastic_enabled.to_s == "true"
+  if defined?(Setting) && Setting.search_elastic_enabled.to_s == "true"
     included do
       ## INCLUSIONS
       include Elasticsearch::Model

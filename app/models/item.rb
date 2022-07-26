@@ -37,7 +37,7 @@ class Item < ApplicationRecord
 
 
   ## COPYRIGHT OPTIONS
-  COPYRIGHT_OPTIONS = Setting.item_copyright_options
+  COPYRIGHT_OPTIONS = defined?(Setting) ? Setting.item_copyright_options : nil
 
 
   ## STATUSES
