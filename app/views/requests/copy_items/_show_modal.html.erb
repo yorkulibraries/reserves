@@ -1,0 +1,44 @@
+<div class="modal" id="copy_items_modal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h5 class="modal-title">
+          Copy Items To This Request
+        </h5>
+      </div>
+      <div class="modal-body">
+
+        <p>Copy Items from one of your requests:</p>
+        <hr/>
+        <% if @user_requests.size == 0 %>
+          <p class="trivial">You have no requests from which to copy items.</p>
+          <hr/>
+        <% end %>
+        <% @user_requests.each do |r| %>
+          <p><span class="strong"><%= r.course.name rescue nil %></strong> <br/>
+          <span class='trivial'><%= r.course.code %></span>
+
+            <a href="<%= new_request_copy_items_path(@request, from_request_id: r.id)%>"
+              data-remote="true" class="btn btn-xs btn-success pull-right">
+              Copy Items
+            </a></p>
+            <hr/>
+        <% end %>
+
+        <% if current_user.admin? %>
+          <p>Enter ID of request to copy items from:</p>
+          <%= form_tag new_request_copy_items_path(@request), method: :get, remote: true do %>
+            <%= text_field_tag :custom_id %>
+            <button type="submit"  class="btn btn-xs btn-primary pull-right">Copy From This Request</button>
+          <% end %>
+        <% end %>
+      </div>
+
+
+      <div class="modal-footer">
+        <%= button_tag "Cancel", class: "btn btn-default", data: { dismiss: "modal"} %>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->

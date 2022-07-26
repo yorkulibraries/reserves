@@ -1,0 +1,24 @@
+<% page_header do %>
+	<h1>Inactive Users</h1>
+<% end %>
+<p><%= link_to "Active Users", users_path, class: "pull-right" %></p>
+<br/>
+<hr/>
+
+<% if @users.size > 0 %>
+  <p>The following users have been made inactive and will not be able to user this application.</p>
+	<div class="row">
+		<div class="col-md-6">
+			<ol>
+				<% @users.each do |u| %>
+				<li><%= u.name %>
+						<%= link_to "<span class='fa fa-check-circle'></span> Reactivate".html_safe, reactivate_user_url(u),
+								method: :post, class: "pull-right", data: { confirm: "Are you sure?" } %>
+				</li>
+				<% end %>
+			</ol>
+		</div>
+	</div>
+<% else %>
+  <p>Currently there are no inactive users.</p>
+<% end %>

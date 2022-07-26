@@ -1,0 +1,49 @@
+<h1>Listing requests</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Requester</th>
+      <th>Course</th>
+      <th>Items</th>
+      <th>Department</th>
+      <th>Assigned To</th>
+      <th>Requested On</th>
+      <th>Completed On</th>
+      <th>Cancelled On</th>
+      <th>Reserve Start Date</th>
+      <th>Reserve End Date</th>
+      <th>Due Date</th>
+      <th>Status</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @requests.each do |request| %>
+      <tr>
+        <td><%= request.id %></td>
+        <td><%= request.requester_id %></td>        
+        <td><%= request.course_id %></td>
+        <td><%= request.assigned_to_id %></td>
+        <td><%= request.requested_date %></td>
+        <td><%= request.completed_date %></td>
+        <td><%= request.cancelled_date %></td>
+        <td><%= request.reserve_start_date %></td>
+        <td><%= request.reserve_end_date %></td>
+        <td><%= request.reserve_location.name %></td>
+        <td><%= request.status %></td>        
+        <td><%= link_to 'Show', request %></td>
+        <td><%= link_to 'Edit', edit_request_path(request) %></td>
+        <td><%= link_to 'Destroy', request, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Request', new_request_step_one_path %>

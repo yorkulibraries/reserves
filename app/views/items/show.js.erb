@@ -1,0 +1,3 @@
+$("#modal_item_<%= @item.id %>").remove();
+$("body").append("<%= j render partial: "items/item_modal", locals: { item: @item }, formats: [:html] %>");
+$("#modal_item_<%= @item.id %>").modal("show");

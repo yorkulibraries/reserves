@@ -1,0 +1,59 @@
+<ul class="nav nav-tabs" role="tablist">
+  <li class="active">
+		<a href="#general_email_settings" role="tab" data-toggle="tab">General</a>
+	</li>
+  <li><a href="#welcome_email_settings" role="tab" data-toggle="tab">Welcome Email</a></li>
+  <li><a href="#status_change_email_settings" role="tab" data-toggle="tab">Status Change Email</a></li>
+  <li><a href="#expiry_notice_email_settings" role="tab" data-toggle="tab">Expiry Notice Email</a></li>
+  <li><a href="#helpful_tags_settings" role="tab" data-toggle="tab">Helpful Tags</a></li>
+</ul>
+<hr/>
+<!-- Tab panes -->
+<div class="tab-content">
+  <div class="tab-pane active" id="general_email_settings">
+		<%= f.input :email_allow, as: :radio_buttons, label: "Enable Email Communication?" %>
+		<%= f.input :email_from, label: "From Address" %>
+  </div>
+  <div class="tab-pane" id="welcome_email_settings">
+		<h4>Welcome Email</h4>
+		<%= f.input :email_welcome_subject, label: "Subject" %>
+		<%= f.input :email_welcome_body, as: :text, label: "Body", input_html: { rows: 20 } %>
+		<p class="help-block">Available Tags:
+			{{requestor_name}} | {{date}} | {{application_url}} | {{all_locations}}</p>
+  </div>
+  <div class="tab-pane" id="status_change_email_settings">
+			<h4>Status Change Email</h4>
+			<%= f.input :email_status_change_subject, label: "Subject" %>
+			<%= f.input :email_status_change_body, as: :text, label: "Body", input_html: { rows: 20 } %>
+			<p class="help-block">Available Tags:
+				{{request_url}} | {{requestor_name}} | {{date}} | {{status}} | {{admin_user_email}} | {{admin_user_name}} | {{course_name}} | {{location_name}} | {{location_email}} | {{all_locations}}</p>
+  </div>
+  <div class="tab-pane" id="expiry_notice_email_settings">
+      <h4>Expiry Notice Email</h4>
+      <%= f.input :email_request_expiry_notice_subject, label: "Subject" %>
+      <%= f.input :email_request_expiry_notice_body, as: :text, label: "Body", input_html: { rows: 20 } %>
+      <p class="help-block">Available Tags:
+        {{request_url}} | {{rollover_url}} | {{requestor_name}} | {{date}} | {{status}} | {{course_name}} | {{location_name}} | {{location_email}} | {{all_locations}}</p>
+  </div>
+  <div class="tab-pane" id="helpful_tags_settings">
+		<h4>Useful Tags For Email Text</h4>
+		<p>These tags will be processed and replace with the actual value before the email is sent out.</p>
+
+		<ul>
+			<li><strong>{{requestor_name}}</strong> - Name of the requestor user</li>
+			<li><strong>{{date}}</strong> - Today's date in Aug  1, 2014</li>
+			<li><strong>{{date-short}}</strong> - Today's date in 08-01-2014</li>
+			<li><strong>{{status}}</strong> - Status of the request</li>
+			<li><strong>{{current_user_email}}</strong> - Logged in user's email address</li>
+			<li><strong>{{current_user_name}}</strong> - Logged in user's full name</li>
+			<li><strong>{{course_name}}</strong> - The full name of the course</li>
+			<li><strong>{{location_name}}</strong> - Name of Pickup location of the request</li>
+			<li><strong>{{all_locations}}</strong> - List of pickup locations. i.e. (Scott, Bronfman...)</li>
+
+			<hr/>
+			<li><strong>{{application_url}}</strong> - Link to <%= Setting.app_name %> application. -- <%= root_url %></li>
+			<li><strong>{{request_url}}</strong> - Direct link to request details. -- <%= requests_url%>/:id</li>
+      <li><strong>{{rollover_url}}</strong> - Direct link to request rollover page. -- <%= rollover_confirm_request_url(1)%></li>
+		</ul>
+  </div>
+</div>

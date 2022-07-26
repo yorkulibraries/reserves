@@ -1,0 +1,10 @@
+// Place all the styles related to the Search/Primo controller here.
+// They will automatically be included in application.css.
+// You can use Sass (SCSS) here: http://sass-lang.com/
+.primo-result {
+  .result-field {
+    color: #111;
+    span {color: #555; width: 100px; display: inline-block; }
+    strong { font-weight: bold; }
+  }
+}

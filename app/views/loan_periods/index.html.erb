@@ -1,0 +1,24 @@
+<% title "Loan Periods" %>
+
+<table class="table table-bordered">
+  <thead>
+    <tr>
+      <th>Duration</th>
+      <th></th> 
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @loan_periods.each do |loan_period| %>
+      <tr>
+        <td><%= loan_period.duration %></td>
+     
+        <td><%= link_to 'Make Changes', edit_loan_period_path(loan_period) %></td>     
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<hr/>
+
+<%= link_to '<i class="fa fa-plus"></i> Add a new loan period'.html_safe, new_loan_period_path, class: "btn btn-primary" %>

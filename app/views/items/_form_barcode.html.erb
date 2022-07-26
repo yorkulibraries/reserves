@@ -1,0 +1,21 @@
+<div class="modal sfade" id="item_form">
+  <div class="modal-dialog">
+    <div class="modal-content">
+			<%= simple_form_for [@request, @item], remote: true do |f| %>
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h4 class="modal-title">Update ILS Barcode</h4>
+      </div>
+      <div class="modal-body">
+				<%= f.input :ils_barcode, class: "form-control", label: "ILS Barcode", hint: "A Barcode has 14 numbers"  %>
+        <input type="hidden" name="show_barcode_form" value="true" />
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Barcode Not Requried</button>
+        <%= f.button :submit, "Save Barcode", class: "btn btn-success" %>
+      </div>
+			<% end %>
+
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->

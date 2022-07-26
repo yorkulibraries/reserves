@@ -1,0 +1,7 @@
+<% title "Update Course Subject" %>
+
+<%= render 'form' %>
+<hr>
+<%= link_to settings_subject_path(@subject), method: :delete, data: { confirm: 'Are you sure?' }, class: "red" do %>
+  <i class="fa fa-trash"></i> Remove Course Subject
+<% end %>

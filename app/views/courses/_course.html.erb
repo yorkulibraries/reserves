@@ -1,0 +1,24 @@
+<div class="row">
+	<div class="col-md-3">
+		<span class="field">Instructor Name</span><br/>
+		<%= course.instructor %>
+	</div>
+	<div class="col-md-3">
+		<span class="field">Course Name</span><br/>
+		<%= course.name %>
+	</div>
+	<div class="col-md-3">
+		<span class="field"> Course Enrollment</span><br/>
+		<%= course.student_count %>
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-3">
+		<span class="field">Instructor Email</span><br/>
+		<%= comm_email @request %>
+	</div>
+	<div class="col-md-6">
+		<span class="field">Course Code</span><br/>
+		<%= course.code %>
+	</div>
+</div>

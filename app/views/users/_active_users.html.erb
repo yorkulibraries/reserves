@@ -1,0 +1,53 @@
+<% page_header do %>
+	<div class="pull-right">
+		<%= link_to "Add New Regular User", new_user_path, class: "btn btn-success" %>
+	</div>
+	<h1>Active User List</h1>
+<% end %>
+
+<p><%= link_to "Inactive Users", users_path(inactive: true), class: "pull-right" %></p>
+<br/>
+
+<hr/>
+  <form action="<%= users_path %>" xdata-remote="true" id="" method="get">
+
+		<div class="input-group">
+	  	<span class="input-group-addon" id="basic-addon1"><i class="fa fa-search"></i></span>
+			<input type="text" class="form-control search_auto_submitx"  autocomplete="off"
+					placeholder="Type user's name and press enter to search" name="term" value="<%= @query if @query %>" title="search field">
+		</div>
+
+		<input type="hidden" name="type" value="users"/>
+		<input type="submit" value="search" class="hidden">
+	</form>
+
+<hr/>
+<h3 class='text-center'>Most recent 100 Instructors</h3>
+
+<div class="panel panel-default">
+	<div class="table-responsive">
+  	<table class="table table-bordered">
+
+
+      	<tr class="active">
+      		<td><h3 class="panel-title">Instructors</h3></td>
+      		<th>User Type</th>
+      		<th>Department</th>
+      		<th>Office</th>
+      		<th>Phone</th>
+      		<th>Email</th>
+      		<th width="10%"></th>
+      	</tr>
+
+				<tbody id="users">
+	      	<% for user in @users %>
+	      		<%= render user %>
+	      	<% end %>
+				</tbody>
+
+
+
+  	</table>
+	</div>
+
+</div>

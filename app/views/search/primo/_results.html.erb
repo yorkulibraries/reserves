@@ -1,0 +1,14 @@
+<div id="search_primo_results">
+  <div class="panel-heading">
+    Search Results:
+    <a href="#" onclick="clear_primo_search();" class="pull-right">Clear Results</a>
+  </div>
+
+  <ul class="list-group">
+    <% @records.each do |record| %>
+      <li class="single-result list-group-item ">
+        <%= render "search/primo/primo_result", record: record %>
+      </li>
+    <% end %>
+  </ul>
+</div>

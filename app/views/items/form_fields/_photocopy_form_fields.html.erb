@@ -1,0 +1,22 @@
+<!-- PHOTOCOPY -->
+<div class="row required">
+	<div class="col-md-12">
+			<%= f.input :title, required: true %>
+	</div>
+
+</div>
+<div class="row required">
+	<div class="col-md-6"><%= f.input :author, required: true %></div>
+	<div class="col-md-6"><%= f.input :loan_period, collection: LoanPeriod.all.collect { |p| p.duration }, required: true %></div>
+</div>
+<div class="row required">
+	<div class="col-md-6"><%= f.input :copyright_options, collection: Setting.item_copyright_options, required: true %></div>	
+	<div class="col-md-6"><%= f.input :other_copyright_options, as: :text, required: true %></div>
+</div>
+<hr/>
+<div class="row">
+	<div class="col-md-12"><%= f.input :description, as: :text %></div>
+</div>
+
+<%= f.hidden_field :provided_by_requestor, value: true %>
+<%= f.hidden_field :format, value: Item::FORMAT_OTHER  %>

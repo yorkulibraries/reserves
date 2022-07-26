@@ -1,0 +1,24 @@
+<%= simple_form_for(@loan_period, :defaults => { :input_html => { :class => "form-horizontal", role: "form" } }) do |f| %>
+
+	<fieldset>
+	  <legend>Loan Period Details</legend>
+
+	  <div class="form-group">
+	    <div class="col-sm-4">
+	      <%= f.input :duration, as: :string %>
+	    </div>
+	  </div>
+	</fieldset>
+
+	<hr/>
+	<%= f.button :submit, class: 'btn btn-success' %>
+	<%= link_to "Cancel Changes", loan_periods_path, class: "btn btn-link" %>
+
+
+	<% unless @loan_period.new_record? %>
+		<%= link_to @loan_period, method: :delete, data: { confirm: 'Are you sure?' }, class: "red pull-right btn btn-link btn-xs" do %>
+			<span class="fa fa-trash-o"></span> Remove this loan period?
+		<% end %>
+	<% end %>
+
+<% end %>

@@ -1,0 +1,19 @@
+<% title "Update Elastic Search Settings" %>
+
+<%= simple_form_for Setting, url: settings_path, method: :patch do |f| %>
+
+
+  <div class="panel panel-success">
+    <div class="panel-heading">
+      <h3 class="panel-title">Elastic Search Settings Settings</h3>
+    </div>
+    <div class="panel-body">
+      <%= f.input :search_elastic_enabled, as: :radio_buttons, label: "Use Elastic Search to search requests" %>
+      <%= f.input :search_elastic_server %>
+      <%= f.input :search_elastic_index_prefix %>
+    </div>
+  </div>
+
+  <input type="hidden" name="return_to" value="elastic_search"/>
+  <%= f.submit "Save Catalog Search Settings", class: "btn btn-success" %>
+<% end %>

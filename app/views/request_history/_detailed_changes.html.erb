@@ -1,0 +1,40 @@
+ <% event.audited_changes.each do |field, value| %>
+
+   <% if value.kind_of?(Array) %>
+
+      <!-- Special display conditions -->
+      <% if field == "reserve_location_id" %>
+        <% value[0] = @locations.where(id: value[0]).pluck(:name).first %>
+        <% value[1] = @locations.where(id: value[1]).pluck(:name).first %>
+      <% end %>
+
+      <% if field == "assigned_to_id" %>
+        <% value[0] = @users.where(id: value[0]).pluck(:name).first %>
+        <% value[1] = @users.where(id: value[1]).pluck(:name).first %>
+      <% end %>
+
+      <% if field == "status" %>
+        <% value[0] = value[0].humanize.titleize rescue nil %>
+        <% value[1] = value[1].humanize.titleize rescue nil %>
+      <% end %>
+
+       <span class="royalblue"><%= field.humanize %></span>
+       <span class="small blend">Changed from:</span>
+       <span class="red"> <%= value[0] == nil ? "Empty" : value[0] %></span>
+       <span class="small blend"> to:</span>
+       <span class="green"> <%= value[1] rescue nil %> </span><br/>
+   <% else %>
+      <!-- Special display conditions -->
+      <% if field == "requester_id" %>
+        <% value = @users.where(id: value).pluck(:name).first %>
+      <% end %>
+
+      <% if field == "course_id" %>
+        <% value = Course.where(id: value).pluck(:name).first %>
+      <% end %>
+
+       <span class="royalblue"><%= field.humanize %>: </span>
+       <span class="green small"><%= value %></span><br/>
+
+   <% end %> <!-- if value nil close -->
+ <% end %> <!-- audited_changes loop -->

@@ -1,0 +1,49 @@
+<% title "Update Application Settings" %>
+
+<%= simple_form_for Setting, url: settings_path, method: :patch do |f| %>
+
+	<div class="panel panel-info">
+	  <div class="panel-heading">
+	    <h3 class="panel-title">General Settings</h3>
+	  </div>
+	  <div class="panel-body">
+			<%= f.input :app_name %>
+			<%= f.input :app_owner %>
+	  </div>
+	</div>
+
+	<div class="panel panel-success">
+		<div class="panel-heading">
+			<h3 class="panel-title">Expiry Notices Settings</h3>
+		</div>
+		<div class="panel-body">
+			<%= f.input :request_expiry_notice_interval, include_blank: false, collection: [["2 weeks", 2.weeks], ["3 weeks", 3.weeks], ["4 weeks", 4.weeks]]%>
+		</div>
+	</div>
+
+	<div class="panel panel-primary">
+		<div class="panel-heading">
+			<h3 class="panel-title">Reports Settings</h3>
+		</div>
+		<div class="panel-body">
+			<% interval = [["30 days", 30.days], ["60 days", 60.days], ["90 days", 90.days]] %>
+			<%= f.input :reports_default_interval, label: "Default Report Interval", include_blank: false, collection: interval %>
+			<%= f.input :reports_fiscal_year_start, label: "Fiscal Year Start", input_html: { class: "day_picker" } %>
+		</div>
+	</div>
+
+	<div class="panel panel-danger">
+		<div class="panel-heading">
+			<h3 class="panel-title">Application Maintenance Settings</h3>
+		</div>
+		<div class="panel-body">			
+			<%= f.input :app_maintenance, as: :radio_buttons %>
+			<%= f.input :app_maintenance_message %>
+		</div>
+	</div>
+
+
+	<%= f.submit "Save Settings", class: "btn btn-success" %>
+<% end %>
+
+<!-- Nav tabs -->

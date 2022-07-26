@@ -1,0 +1,130 @@
+<% title "Dashboard" %>
+<% page_header do %>
+	<h1>Dashboard <small><%= @which.humanize %> Requests</small></h1>
+<% end %>
+
+<div class="dashboard request">
+
+
+		<div class="btn-group pull-right">
+
+		  <div class="btn-group btn-group-sm">
+		    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+	        <!-- User.where(assigned_to: @assigned_to).name -->
+		      <strong> Assigned to:</strong> <%= @assigned_to == nil ? "Any" : @assigned_to.name %>
+		      <span class="caret"></span>
+		    </button>
+
+		    <ul class="dropdown-menu" role="menu">
+	        <li><a href="<%= root_path(which: @which, location: params[:location])  %>">Any</a></li>
+					<li><a href="<%= root_path(which: @which, location: params[:location], assigned_to: "unassigned")  %>">Nobody</a></li>
+					<li class="divider"></li>
+		      <% @admin_users.each do |u| %>
+		       <li><a href="<%= root_path(which: @which, location: params[:location], assigned_to: u.id)  %>"><%= u.name %></a></li>
+		      <% end %>
+		    </ul>
+
+		  </div>
+
+			<% if current_user.role != User::STAFF_ROLE %>
+		  <div class="btn-group btn-group-sm">
+		    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+		      <%= @location.name %>
+					<% if @location.id == current_user.location.id %>
+						<span class="fa fa-home"></span>
+					<% end %>
+		      <span class="caret"></span>
+		    </button>
+		    <ul class="dropdown-menu" role="menu">
+	        <li><a href="<%= root_path(which: @which, location: "all", assigned_to: @assigned_to)  %>">All Locations</a></li>
+					<li class="divider"></li>
+		      <% @locations.each do |loc| %>
+		        <li><a href="<%= root_path(which: @which, location: loc.id, assigned_to: @assigned_to)  %>">
+							<%= loc.name %>
+							<% if loc.id == current_user.location.id %>
+								<span class="fa fa-home"></span>
+							<% end %>
+						</a>
+					</li>
+		      <% end %>
+		    </ul>
+			</div>
+			<% end %>
+		</div>
+
+
+	<ul class="nav nav-tabs bigger">
+	  <li class="<%= "active" if @which == Request::OPEN %> ">
+			<a href="<%= root_path(location: @location) %>">
+				<span class="label status-open">New Requests</span>
+			</a>
+		</li>
+		<li class="<%= "active" if @which == Request::INCOMPLETE %>">
+			<a href="<%= root_path(which: Request::INCOMPLETE, location: @location) %>">
+				<span class="label status-incomplete">Incomplete</span>
+			</a>
+		</li>
+	  <li class="<%= "active" if @which == Request::INPROGRESS %>">
+			<a href="<%= root_path(which: Request::INPROGRESS, location: @location) %>">
+				<span class="label status-in-progress">In Progress</span>
+			</a>
+		</li>
+	  <li class="<%= "active" if @which == Request::COMPLETED %>">
+			<a href="<%= root_path(which: Request::COMPLETED, location: @location) %>">
+				<span class="label status-completed">Completed</span>
+			</a>
+		</li>
+
+
+		<li class="<%= "active" if ["expiring", Request::REMOVED, Request::CANCELLED, Request::UPCYCLED].include? @which %>">
+			<a name="more requests" id="more_requests" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				<% if ["expiring", Request::REMOVED, Request::CANCELLED, Request::UPCYCLED].include? @which %>
+					<span class="label status-<%= @which %>">
+						<%= @which == Request::REMOVED ? "Removed" : @which.humanize %> Requests
+					</span>
+				<% else %>
+							<span class="label label-default">More Requests</span>
+				<% end %>
+	 			<span class="caret"></span>
+			</a>
+			<ul class="dropdown-menu" aria-labelledby="more_requests">
+				<li class="<%= "active" if @which == "expiring" %>">
+					<a href="<%= root_path(which: "expiring", location: @location) %>">
+						<span class="label status-expiring">Expiring</span>
+					</a>
+				</li>
+				<li class="<%= "active" if @which == Request::REMOVED %>">
+					<a href="<%= root_path(which: Request::REMOVED, location: @location) %>">
+						<span class="label status-removed">Removed</span>
+					</a>
+				</li>
+				<li class="<%= "active" if @which == Request::CANCELLED %>">
+					<a href="<%= root_path(which: Request::CANCELLED, location: @location) %>">
+						<span class="label status-cancelled">Cancelled</span>
+					</a>
+				</li>
+				<li class="hide <%= "active" if @which == Request::UPCYCLED %>" sstyle="display: none;">
+					<a href="<%= root_path(which: Request::UPCYCLED, location: @location) %>">
+						<span class="label status-upcycled">Upcycled</span>
+					</a>
+				</li>
+	  	</ul>
+		</li>
+
+
+	</ul>
+
+	<% if @requests.size > 0 %>
+		<%= render "requests_list", request: @requests %>
+
+		<%= paginate @requests %>
+
+	<% else %>
+		<br/>
+		<div class="alert alert-warning alert-dismissable">
+		  <strong>Hi!</strong> So sorry, there are no <strong><%= @which %></strong> requests.
+		</div>
+
+	<% end %>
+
+</div>

@@ -1,0 +1,18 @@
+<% if @item.errors.size == 0 %>
+
+	if ($(".items-empty-slate").size() > 0) {
+		$(".items-empty-slate").before("<div class='items'></div>");
+		$(".items-empty-slate").remove();
+		$("#submit_request_button").removeClass("hide");
+	}
+
+	bootstrap_modal_close("item_form");
+
+	$(".items").prepend("<%= j render @item, locals: { item: @item } %>");
+	$("#item_<%= @item.id %>").effect("highlight",2000);
+	$("#item_<%= @item.id %> span.item-type").after("<span class='green pull-right fa fa-floppy-o'></span>");
+
+<% else %>
+  searchRecords();
+	bootstrap_modal_replace_content("item_form", "<%= j render "form_modal", formats: [:html] %>")
+<% end %>

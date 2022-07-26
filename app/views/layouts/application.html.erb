@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title><%= content_for?(:title) ? yield(:title) : "Untitled" %> | <%= Setting.app_name %></title>
+  <%= stylesheet_link_tag    "application", media: "all", "data-turbolinks-track" => true %>
+  <%= javascript_include_tag "application", "data-turbolinks-track" => true %>
+  <%= csrf_meta_tags %>
+</head>
+<body>
+   <div class="container">
+
+   <%= render template: "layouts/navbar"%>
+
+
+
+	<div class="heading">
+	 	<%= content_tag :h1, yield(:title) if show_title? && !content_for?(:page_header) %>
+
+		<%= yield (:page_header) if content_for?(:page_header)%>
+	</div>
+
+	<% flash.each do |name, msg| %>
+	  <div class="alert alert-<%= name == "notice" ? "success" : "info" %>">
+	    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+	    <%= msg %>
+	  </div>
+	<% end %>
+
+  <% if Setting.app_maintenance == "true" %>
+    <div class="alert alert-danger">
+      <%= Setting.app_maintenance_message %>
+    </div>
+  <% end %>
+
+	<div class="content">
+		<div class="inner">
+  		<%= yield %>
+		</div>
+	</div>
+
+	<% if content_for?(:sidebar) %>
+		<div class="sidebar">
+				<%=  yield (:sidebar) %>
+		</div>
+	<% end %>
+
+   <footer class="footer">
+      <div class="container">
+         <p><%= app_name %> <%= app_version%> &copy; <%= Date.today.year %>. <%= Setting.app_owner %>. All rights reserved.</p>
+      </div>
+   </footer>
+
+</div> <!-- Container -->
+  <%= render partial: "layouts/help_modal"%>
+
+</body>
+</html>

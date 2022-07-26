@@ -1,0 +1,68 @@
+<% if can? :change_status, @request %>
+	<div class="panel panel-warning">
+	  <div class="panel-heading">
+	    <h3 class="panel-title">Change Status</h3>
+	  </div>
+	</div>
+
+	<div class="btn-group btn-group-justified status-buttons">
+
+			<% if @request.status == Request::OPEN %>
+
+				<%= link_to "Start", change_status_request_path(@request, status: Request::INPROGRESS), class: "btn btn-primary", role: "button",
+				data: { confirm: "Are you sure? This request will be assigned to you."} %>
+
+				<% link_to "Complete", change_status_request_path(@request, status: Request::COMPLETED), class: "completed btn btn-success", role: "button",
+				data: { confirm: "Are you sure? "}, disabled: true %>
+
+				<%= link_to "Cancel", change_status_request_path(@request, status: Request::CANCELLED), class: "btn btn-danger", role: "button",
+				data: { confirm: "Are you sure?"} %>
+
+			<% elsif @request.status == Request::INPROGRESS %>
+				<%= link_to "Add More Items / Re Open", change_status_request_path(@request, status: Request::OPEN), class: "btn btn-primary", role: "button",
+				data: { confirm: "Are you sure? "} %>
+
+				<%= link_to "In Progress", "#", class: "btn btn-info", role: "button", disabled: true %>
+
+				<%= link_to "Complete", change_status_request_path(@request, status: Request::COMPLETED), class: "completed btn btn-success", role: "button",
+				data: { confirm: "Are you sure? "}, disabled: @request.items.not_ready.size > 0 %>
+
+				<%= link_to "Cancel", change_status_request_path(@request, status: Request::CANCELLED), class: "btn btn-danger", role: "button",
+				data: { confirm: "Are you sure? "} %>
+
+			<% elsif @request.status == Request::COMPLETED || @request.status == Request::REMOVED %>
+				<%= link_to "Add More Items / Re Open", change_status_request_path(@request, status: Request::OPEN), class: "btn btn-primary", role: "button",
+				data: { confirm: "Are you sure? "} %>
+				<%= link_to "Completed", "#", class: "btn btn-success", role: "button", disabled: true %>
+
+				<%= link_to "Removed", "#", class: "btn btn-default", role: "button", disabled: true if @request.status == Request::REMOVED%>
+
+			<% elsif @request.status == Request::CANCELLED %>
+				<%= link_to "Add More Items / Re Open", change_status_request_path(@request, status: Request::OPEN), class: "btn btn-primary", role: "button",
+				data: { confirm: "Are you sure? "} %>
+				<%= link_to "Cancelled", "#", class: "btn btn-danger", role: "button", disabled: true %>
+
+			<% elsif @request.status == Request::INCOMPLETE %>
+				<% if @request.items.size > 0 %>
+					<%= link_to "Open", change_status_request_path(@request, status: Request::OPEN), class: "btn btn-primary", role: "button",
+					data: { confirm: "Are you sure? "} %>
+				<% else %>
+					<a href="<%= new_request_step_two_path(@request) %>" class="btn btn-success">Click here, to go back to step two</a>
+				<% end %>
+
+			<% elsif @request.status == Request::UPCYCLED %>
+				<a href="<%= request_path(@request) %>" class="btn btn-default" disabled="true">Request is Upcycled. See rollover(s): </a>
+				<% @request.rollovers.each do |rollover| %>
+					<%= link_to request_path(rollover), class:"btn btn-link", role: "button" do %>
+						Request # <%= rollover.id %>
+					<% end %>
+				<% end %>
+			<% end %>
+
+	</div>
+
+	<% if @request.items.not_ready.size > 0 %>
+		<hr/>
+		<p class="red">*A request can not be completed unless all items are ready.</p>
+	<% end %>
+<% end %>

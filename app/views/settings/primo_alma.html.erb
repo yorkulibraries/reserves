@@ -1,0 +1,33 @@
+<% title "Update Primo and Alama Settings" %>
+
+<%= simple_form_for Setting, url: settings_path, method: :patch do |f| %>
+
+
+  <div class="panel panel-success">
+    <div class="panel-heading">
+      <h3 class="panel-title">Elastic Search Settings Settings</h3>
+    </div>
+    <div class="panel-body">
+
+      <h4>Primo</h4>
+
+      <%= f.input :primo_apikey %>
+      <%= f.input :primo_inst %>
+      <%= f.input :primo_vid %>
+      <%= f.input :primo_region %>
+      <%= f.input :primo_enable_loggable, as: :radio_buttons %>
+      <%= f.input :primo_scope %>
+      <%= f.input :primo_pcavailability, as: :radio_buttons %>
+
+      <hr/>
+      <h4>Alma</h4>
+
+      <%= f.input :alma_apikey %>
+      <%= f.input :alma_region %>
+
+    </div>
+  </div>
+
+  <input type="hidden" name="return_to" value="primo_alma"/>
+  <%= f.submit "Save Primo and Alma Settings", class: "btn btn-success" %>
+<% end %>

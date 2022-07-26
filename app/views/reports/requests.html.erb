@@ -1,0 +1,95 @@
+<% title "Reports: Requests" %>
+<%= link_to "Reports Home", reports_path %>
+<hr/>
+
+<%= form_for :r, url: requests_reports_path, html: { class: "form-inline", method: "get"} do |f| %>
+  <div class="form-group">
+    <%= f.label "Expiring Before" %>
+    <%= f.text_field "expiring_before", class: "datepicker", value: @expiring_before %>
+  </div>
+  <div class="form-group">
+    <%= f.label "Location" %>
+    <%= f.select "location", Location.active.collect {|p| [ p.name, p.id ] }, {include_blank: 'All',  selected: @location} %>
+  </div>
+  <div class="form-group">
+    <%= f.label "Faculty" %>
+    <%= f.select "faculty", Course::FACULTIES, {include_blank: 'All', selected: @faculty} %>
+  </div>
+  <div class="form-group">
+    <%= f.label "Department" %>
+    <%= f.select "department", Course::SUBJECTS, {include_blank: 'All', selected: @department} %>
+  </div>
+  <div class="form-group">
+    <%= f.label "Term" %>
+    <%= f.select "term", Course::TERMS, {include_blank: 'All', selected: @term} %>
+  </div>
+  <div class="form-group">
+    <%= f.label "Status" %>
+    <%= f.select "status", Request::STATUSES, {include_blank: 'All', selected: @status} %>
+  </div>
+  <div class="form-group">
+    <%= f.label "Created After" %>
+    <%= f.text_field "created_after", class: "datepicker", value: @created_after %>
+  </div>
+  <div class="form-group">
+    <%= f.label "Created Before" %>
+    <%= f.text_field "created_before", class: "datepicker", value: @created_before %>
+    <%= f.submit "Generate", data: { disable_with: "Processing"} %>
+  </div
+
+<% end %>
+
+<hr/>
+
+
+<div class="collapse" id="to_sql">
+  <div class="well">
+    <p><%= @courses.to_sql if @courses%></p>
+    <p><%= @requests.to_sql if @requests %></p>
+  </div>
+</div>
+
+<div class="requests">
+  <h3>Total Found: <%= @requests.size %>
+    <div class="pull-right">
+      <a href="<%= requests_reports_path(params: request.query_parameters, format: "xlsx") %>" class="btn btn-xs btn-default">
+        <span class="fa fa-download"></span> Exel
+      </a>
+      <button class="btn btn-xs btn-default" type="button" data-toggle="collapse" data-target="#to_sql">
+        <span class="fa fa-database"></span> Sql</button>
+    </div>
+  </h3>
+  <ul class="list-group">
+    <% @requests_grouped.each do |id, requests| %>
+      <li class="list-group-item list-group-item-info">
+        <span class="badge"><%= requests.size %> requests</span>
+        <%= requests.first.reserve_location.name %>
+      </li>
+
+      <% requests.each do |r| %>
+        <li class="list-group-item request">
+          <span class="badge"><%= r.items.size %> items</span>
+          <div class="row">
+            <div class="col-md-1 col-sm-1">
+              <%= link_to r.id, r %>
+            </div>
+            <div class="col-md-3">
+              <%= r.course.code rescue nil%>
+            </div>
+            <div class="col-md-3">
+              By <%= r.requester.name %>
+            </div>
+            <div class="col-md-2">
+              <span class="label label-default status-<%= r.status.parameterize %>">
+                <%= r.status.upcase %>
+              </span>
+            </div>
+          </div>
+        </li>
+      <% end %>
+
+    <% end %>
+  </ul>
+
+
+</div>

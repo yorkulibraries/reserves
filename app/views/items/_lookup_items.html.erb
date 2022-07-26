@@ -1,0 +1,38 @@
+<div id="lookup-containter" class="well">
+  <div class="row">
+    <div class="col-md-12">
+      <h4>Look up the record in the catalogue.</h4>
+    </div>
+  </div>
+
+  <div class="row">
+      <div class="col-md-12">
+        <div class="input-group input-group-md">
+          <input type="text" title="Search a title or author" class="search-string form-control" placeholder="Search a title or author." data-type="<%= @item.item_type %>">
+          <span class="input-group-btn">
+            <button class="btn btn-default search_button" type="button" id="search_button">Go!</button>
+          </span>
+        </div>
+      </div>
+  </div>
+</div>
+  <!-- <div class="row"> -->
+
+<div class="search-panel row">
+  <div class="col-md-12">
+
+    <div class="panel panel-default">
+      <!-- Default panel contents -->
+      <div class="panel-heading">Search Results:<i class="search-close btn fa fa-times"></i></div>
+      <ul class="list-group loading-results">
+        <li class="list-group-item">
+          <h3>Searching....</h3>
+          <p>Please wait while we retrieve results.</p>
+        </li>
+      </ul>
+      <!-- List group -->
+      <div class="search_results"></div>
+
+    </div>
+  </div>
+</div>

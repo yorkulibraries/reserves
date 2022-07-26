@@ -1,0 +1,78 @@
+<% title "My Requests" %>
+
+<% if @requests.size > 0 %>
+	<div class="dashboard my_requests panel panel-default">
+	  <div class="table-responsive">
+  		<table class="table table-bordered request">
+  			<thead>
+  				<tr>
+  					<th>#</th>
+  					<th>When</th>
+  					<th>Course</th>
+  					<th style="text-align: center;">Items</th>
+  					<th>Location</th>
+  				</tr>
+  			</thead>
+  			<% [Request::INCOMPLETE, Request::OPEN, Request::REMOVED, Request::INPROGRESS, Request::COMPLETED, Request::CANCELLED].each do |status| %>
+
+					<% if @requests_groups[status] != nil %>
+	  				<tr>
+	  					<td colspan="5" class="status-<%= status.parameterize %>">
+								<%= status == Request::REMOVED ? "REMOVED"  : status.upcase %>
+								<% if status == Request::INCOMPLETE %>
+									<span class="small">You must complete these requests before we can process them.</span>
+								<% end %>
+							</td>
+	  				</tr>
+					<% end %>
+
+
+  				<% @requests_groups[status].try(:each) do |request| %>
+  					<tr data-id="<%= request.id %>">
+
+  						<td class="id"><%= request.id %></td>
+  						<td class="requested_date"><%= request.created_at.strftime("%b %d, %Y") rescue nil %></td>
+  						<td class="course">
+								<% if request.status == Request::INCOMPLETE %>
+									<%= request.course.name rescue nil %>
+
+
+									<div class="pull-right">
+										<a href="<%= new_request_step_two_path(request) %>" class="btn btn-xs btn-success">Continue</a>
+										<a href="<%= request_path(request) %>" class="btn btn-xs btn-danger"
+											data-confirm="Are you sure? This action can't be undone." name="delte"
+											data-method="delete" arial-label="Delete Request" role="button">
+											<i class="fa fa-trash" aria-label="Delete Request"></i> Delete
+										</a>
+									</div>
+
+								<% else %>
+									<a class="name" href="<%= request_path(request) %>">
+										<%= request.course.name rescue nil%>
+									</a>
+								<% end %>
+  						</td>
+  						<td class="items text-center">
+								<%= request.items.active.size %>
+								<% if request.status == Request::INPROGRESS %>
+									<div class="green small">[<%= request.items.ready.size %> ready]  </div>
+								<% end %>
+  						</td>
+  						<td class="location">
+  							<%= request.reserve_location.name %>
+  						</td>
+  					</tr>
+  				<% end %>
+  			<% end %>
+  		</table>
+ 	  </div>
+	</div>
+<% else %>
+
+	<!-- blank slate -->
+	<div class="items-empty-slate">
+		<span class="fa fa-book"></span>
+		<h1>No Reserve Requests Yet?</h1>
+		<p><%= link_to "Click here", new_request_step_one_path %> or at the top to begin a new request.</p>
+	</div>
+<% end %>

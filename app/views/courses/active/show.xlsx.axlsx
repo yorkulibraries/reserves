@@ -1,0 +1,34 @@
+wb = xlsx_package.workbook
+wb.add_worksheet(name: "Items Report") do |sheet|
+  sheet.add_row ["Course ID", "Type", "Title", "Author",
+    "ISBN", "CALLNUMBER", "Publisher", "Publication Date",  "URL",
+    "Format", "Edition", "Journal Title", "Journal Page Number", "Journal Volume",
+    "Map Index Num", "Description"]
+
+  course_code = @course.code
+
+  @items.each do |item|
+    type = item.item_type
+    title = item.title
+    author = item.author
+    isbn = item.isbn
+    callnumber = item.callnumber
+    publisher = item.publisher
+    p_date = item.publication_date
+    url = item.url
+    format = item.format
+    edition = item.edition
+    j_title = item.journal_title
+    j_page = item.page_number
+    j_vol = item.volume
+    map_index = item.map_index_num
+    desc = item.description
+
+
+
+    sheet.add_row [course_code, type, title, author, isbn, callnumber, publisher, p_date,
+        url, format, edition, j_title, j_page, j_vol, map_index, desc]
+
+
+  end
+end

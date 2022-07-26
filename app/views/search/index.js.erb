@@ -1,0 +1,13 @@
+<% if @type == "users" %>
+  $("#users").empty();
+
+  <% if @users.size == 0 %>
+    $("#users").append("<tr><td colspan='12'>Looking for user records....Haven't found anything yet....</td></tr>");
+  <% end %>
+
+  <% @users.each do |u| %>
+    $("#users").append("<%= j render u %>");
+  <% end %>
+<% else %>
+
+<% end %>

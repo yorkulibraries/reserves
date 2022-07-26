@@ -1,0 +1,7 @@
+<% title "Update Course Faculty" %>
+
+<%= render 'form' %>
+<hr>
+<%= link_to settings_faculty_path(@faculty), method: :delete, data: { confirm: 'Are you sure?' }, class: "red" do %>
+  <i class="fa fa-trash"></i> Remove Course Faculty
+<% end %>

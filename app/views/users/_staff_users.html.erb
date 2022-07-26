@@ -1,0 +1,61 @@
+<% page_header do %>
+	<div class="pull-right">
+		<%= link_to "Add New Admin User", staff_new_user_path, class: "btn btn-success" %>
+	</div>
+	<h1>Admin List</h1>
+<% end %>
+
+
+<hr/>
+
+<div class="panel panel-default">
+	<div class="table-responsive">
+  	<table class="table table-bordered">
+      <% @user_groups.each do |role, users| %>
+
+      	<tr class="<%= @staff_list ? "danger" : "active" %>">
+      		<td colspan="4"><h3 class="panel-title"><%= role != User::STAFF_ROLE ? role.humanize.pluralize : "Staff" %></h3></td>
+      	</tr>
+
+      	<% for user in users %>
+
+      	<tr class="user">
+      		<td>
+      			<strong><%= link_to user.name, user %></strong><br/>
+      				<strong class="blend small">Location:</strong> <%= user.location.name rescue nil %>
+      		</td>
+      		<td>
+      			<strong class="blend small">Department:</strong> <%= user.department %><br/>
+      			<strong class="blend small">Office Address:</strong> <%= user.office %><br/>
+      		</td>
+      		<td>
+      			<strong class="blend small">Phone:</strong> <%= user.phone %><br/>
+      			<strong class="blend small">Email:</strong> <%= user.email %>
+      		</td>
+      		<td class="actions">
+      			<% if can? :manage, User %>
+      				<a href="<%= edit_user_path(user) %>" class="black">
+      					<span class="fa fa-pencil"></span> Update details
+      				</a><br/>
+      				<% if current_user.id != user.id %>
+      					<%= link_to user_url(user), method: :delete, data: { confirm: "Are you sure? "}  do %>
+      					<span class="fa fa-ban"></span> Block user access
+      					<% end %><br/>
+
+      					<a href="<%= change_role_user_url(user, admin: false) %>" data-method="post" class="red" data-confirm="Are you sure?">
+      						<span class="fa fa-arrow-down"></span> Change to regular user
+      					</a>
+      				<% end %>
+      			<% end %>
+      		</td>
+
+      	</tr>
+      	<% end %>
+
+      <% end %>
+
+
+  	</table>
+	</div>
+
+</div>

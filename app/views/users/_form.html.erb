@@ -1,0 +1,96 @@
+<%= simple_form_for @user, defaults: { input_html: { class: "form-horizontal" } }  do |f| %>
+
+	<!-- USER INFO -->
+
+	<div class="panel panel-default">
+	  <div class="panel-body">
+			<% if @user.admin? %>
+		    Fields required when adding or updating staff details are:
+				<span class="label label-primary">name</span> <span class="label label-primary">email</span>
+				<span class="label label-primary">uid</span>	<span class="label label-primary">role</span> and <span class="label label-primary">user type</span>
+			<% else %>
+		    Fields required when adding or updating staff details are:
+				<span class="label label-primary">name</span> <span class="label label-primary">email</span>
+				<span class="label label-primary">uid</span>	<span class="label label-primary">role</span>
+				<span class="label label-primary">office</span>	<span class="label label-primary">phone</span>
+				<span class="label label-primary">department</span>
+				<% if can? :manage, User %> and <span class="label label-primary">user type</span><% end %>
+			<% end %>
+
+	  </div>
+	</div>
+
+	<div class="panel panel-<%= @user.admin? ? "danger" : "default" %>">
+	  <div class="panel-heading">
+	    <h3 class="panel-title"><%= @user.admin? ? "Staff" : "User" %> Information</h3>
+	  </div>
+	  <div class="panel-body">
+		  <div class="row">
+		    <div class="col-md-4">
+		    	<%= f.input :name, readonly: cannot?(:update, @user) %>
+		    </div>
+		    <div class="col-md-4">
+		        <%= f.input :email, readonly: cannot?(:update, @user) %>
+		    </div>
+		    <div class="col-md-4">
+		    	<%= f.input :uid, readonly: cannot?(:manage, @user), hint: "passport york username" %>
+		    </div>
+				<div class="col-md-4">
+		    	<%= f.input :library_uid, readonly: cannot?(:manage, @user), hint: "library id" %>
+		    </div>
+		  </div> <!-- row end -->
+
+
+		  <div class="row">
+		    <div class="col-md-4">
+		    	<%= f.input :office, label: "Office", required: true%>
+		    </div>
+		    <div class="col-md-4">
+		    	<%= f.input :phone, required: true %>
+		    </div>
+		    <div class="col-md-4">
+					<%= f.input :department, required: true %>
+		    </div>
+		  </div> <!-- row end -->
+
+			<div class="row">
+				<% if @user.admin? %>
+					<div class="col-md-4">
+						<%= f.association :location, collection: Location.active, required: @user.admin? %>
+					</div>
+
+					<div class="col-md-4">
+						<%= f.input :role, label: "Staff Role", collection: User::STAFF_ROLES, required: @user.admin? %>
+					</div>
+				<% end %>
+				<% if can?(:manage, User) %>
+					<div class="col-md-4">
+						<%= f.input :user_type, label: "Type", collection: User::TYPES, required: @user.admin? %>
+					</div>
+				<% end %>
+			</div> <!-- row end -->
+
+	  </div>
+	</div>
+
+	<div class="hide"><%= @user.errors.messages %></div>
+
+	<div class="row">
+	  <div class="col-md-4">
+	     <%= f.button :submit, value: "Save User Details", class: "btn btn-success" %>
+
+			 <%= f.hidden_field :admin %>
+
+			 <% if current_user.admin? && @user.admin? %>
+         <%= link_to "Cancel Changes", admin_users_users_path, class: "btn btn-link" %>
+
+       <% elsif current_user.admin? && !@user.admin? %>
+         <%= link_to "Cancel Changes", users_path, class: "btn btn-link" %>
+
+       <% else %>
+         <%= link_to "Cancel Changes", @user, class: "btn btn-link" %>
+
+       <% end %>
+	  </div>
+	</div>
+<% end %>

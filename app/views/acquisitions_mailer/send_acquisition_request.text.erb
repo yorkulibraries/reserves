@@ -1,0 +1,69 @@
+
+<%= @template.render %>
+
+
+============================
+ACQUISITION REQUEST #<%= @acquisition_request.id %>
+ACQUISITION REASON: <%= format @acquisition_request.acquisition_reason %>
+Sent By <%= @user.name %> on <%= Date.today %>
+Reserve Location: <%= @request.reserve_location.name %>
+Address: <%= @request.reserve_location.address %>
+Phone: <%= @request.reserve_location.contact_phone %>
+Contact Email: <%= @request.reserve_location.contact_email %>
+
+++++++++++++++++++++++++++++
+Item Information
+----------------------------
+
+TITLE: <%= @item.title %>
+TYPE:  <%= @item.item_type.humanize.upcase %>
+ITEM ID:    <%= @item.id %>
+REQUEST ID: <%= @request.id %>
+ACQUISITION REASON: <%= @acquisition_request.acquisition_reason %>
+ACQUISITION NOTES: <%= @acquisition_request.acquisition_notes %>
+
+<% show_field? @item, "author" do %>
+AUTHOR:         <%=  @item.author %>
+<% end %>
+<% show_field? @item, "isbn" do %>
+ISBN:           <%=  @item.isbn %>
+<% end %>
+<% show_field? @item, "callnumber" do %>
+CALL NUMBER:    <%=  @item.callnumber %>
+<% end %>
+<% show_field? @item, "map_index_num" do%>
+MAP INDEX #:    <%=  @item.map_index_num %>
+<% end %>
+<% show_field? @item, "format" do%>
+FORMAT:         <%=  @item.format %>
+<% end %>
+
+<% show_field? @item, "publisher" do%>
+PUBLISHER:      <%=  @item.publisher %>
+<% end %>
+<% show_field? @item, "publication_date" do%>
+DATE PUBLISHED: <%=  @item.publication_date %>
+<% end %>
+<% show_field? @item, "edition" do%>
+EDITION:        <%=  @item.edition %>
+<% end %>
+<% show_field? @item, "issue" do %>
+ISSUE:          <%=  @item.issue %>
+<% end %>
+
+<% show_field? @item, "journal_title" do %>
+
+JOURNAL TITLE:  <%=  @item.journal_title %>
+PAGE NUMBER:    <%=  @item.page_number %>
+VOLUME:         <%=  @item.volume %>
+
+<% end %>
+
+*******************************
+Course Information
+-------------------------------
+
+NAME: <%= @course.name %>
+CODE: <%= @course.code %>
+INSTRUCTOR: <%= @course.instructor %>
+EMAIL:  <%= comm_email @request %>

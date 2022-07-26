@@ -1,0 +1,5 @@
+<% title "Submit New Request - Step One" %>
+
+<%= simple_form_for @request, url: new_request_step_one_save_path,  defaults: { input_html: { class: "form-horizontal" } }  do |f| %>
+	<%= render 'requests/form_fields', f: f %>
+<% end %>

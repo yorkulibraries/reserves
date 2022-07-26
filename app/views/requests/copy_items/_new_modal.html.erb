@@ -1,0 +1,48 @@
+<div class="modal" id="copy_items_modal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h5 class="modal-title">
+          Copy Items To This Request
+        </h5>
+      </div>
+      <div class="modal-body">
+
+
+        <% if @from_request %>
+        <p>Copying Items From Request ID: <%= @from_request.id %></p>
+        <hr/>
+        <p><span class="strong"><%= @from_request.course.name rescue nil %></strong> <br/>
+           <span class='trivial'><%= @from_request.course.code %></span>
+        </p>
+        <% else %>
+          <p class="trivial">We couldn't find the request you selected.</p>
+        <% end %>
+        <hr/>
+        <p class="small">The following items are going to be copied:</p>
+        <% @items.each do |i| %>
+          <p><span class="trivial"><%= i.title%></span> <br/>
+          <span class='weak'><%= i.item_type %></span>
+
+            <span class="weak pull-right">
+              <%= i.callnumber %> |
+              <%= i.isbn %>
+            </span>
+          </p>
+          <hr/>
+        <% end %>
+        
+        <% if @from_request %>
+          <%= link_to "Copy These Items?", request_copy_items_path(@request, from_request_id: @from_request.id),
+            method: :post, class: "btn btn-primary", data: { confirm: "Are you sure?" } %>
+        <% end %>
+      </div>
+
+
+      <div class="modal-footer">
+        <%= button_tag "Cancel", class: "btn btn-default", data: { dismiss: "modal"} %>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->

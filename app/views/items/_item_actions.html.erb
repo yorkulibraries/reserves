@@ -1,0 +1,83 @@
+<% if can?(:create, AcquisitionRequest) && is_request_active(@request) && item.status != Item::STATUS_DELETED %>
+<div class="acquisition_request">
+  <div class="dropdown">
+    <button class="btn btn-default btn-xs dropdown-toggle" type="button" data-toggle="dropdown">
+      Acquisition Requests
+      <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu" role="menu">
+      <li>
+        <%= link_to  new_acquisition_request_path(item_id: item.id), remote: true do %>
+          <span class="fa fa-shopping-cart"></span> New Request
+        <% end %>
+      </li>
+      <li class="divider"></li>
+      <% item.acquisition_requests.each do |acquisition_request| %>
+        <% if can? :read, acquisition_request %>
+        <li role="presentation">
+          <%= link_to  acquisition_request_path(acquisition_request) do%>
+            <small>By <%= acquisition_request.requested_by.name %></small>
+            <span class="xsmall label label-default status-<%= acquisition_request.status %>">
+              <%= acquisition_request.status %>
+            </span>
+          <% end %>
+        </li>
+        <% end %>
+      <% end %>
+    </ul>
+  </div>
+</div>
+<% end %>
+
+<% if can?(:update, item) && is_request_active(@request) && item.status != Item::STATUS_DELETED %>
+
+  <% if item.acquisition_requests.acquired.size > 0 %>
+    <div class="acquisition_request"><span class="label label-default status-acquired">Item Aqcuired</span></div>
+  <% end %>
+
+  <div class="btn-group">
+    <button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown">
+      <span class="fa fa-cog"></span> Update Item  <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu" role="menu">
+      <li>
+        <%= link_to edit_request_item_path(@request, item), class: "green important", remote: true do %>
+        <span class="fa fa-pencil"></span> Change Item Details
+        <% end %>
+      </li>
+      <li class="divider"></li>
+      <li>
+        <%= link_to request_item_path(@request, item), method: :delete, data: { confirm: 'Are you sure?' }, remote: true,
+        class: "red important" do %>
+            <span class="fa fa-times-circle"></span> Remove item
+        <% end %>
+      </li>
+    </ul>
+  </div>
+<% end %>
+
+
+<hr/>
+<!-- status will go here -->
+
+<% if can?(:change_status, item) && is_request_active(@request) %>
+  <% status_class = (item.status == Item::STATUS_READY ? "item_ready" : "item_not_ready") %>
+  <%= link_to change_status_request_item_path(@request, item), class: "btn btn-lg change-item-status #{status_class}", remote: true, data: { status: item.status}, method: :get do %>
+    <span class="fa fa-check bigger" id="change_<%= item.id %>"></span>
+    <span class="hidden">Done</span>
+  <% end %>
+  <span class="label label-default <%= status_class %> item-status"><%= item.status.humanize.capitalize rescue nil %></span>
+<% elsif can?(:change_status, item) && @request.status == Request::REMOVED && item.status != Item::STATUS_DELETED %>
+  <%= link_to change_status_request_item_path(@request, item, status: Item::STATUS_DELETED), class: "btn btn-sm gray-bg change-item-status", remote: true, data: { confirm: "Are you sure? This ACTION IS PERMANENT." }, method: :get do %>
+    <span class="fa fa-retweet orange" id="change_<%= item.id %>"></span> Remove
+  <% end %>
+<% elsif  item.status == Item::STATUS_DELETED %>
+  <span class="btn btn-sm gray-bg">Removed</span>
+<% end %>
+
+<% if can?(:change_status, item) && item.status != Item::STATUS_DELETED%>
+<br/><br/>
+  <a data-toggle="modal" href="#history_popup" data-target="#history_popup" class="btn btn-xs btn-default">
+    Add a Note
+  </a>
+<% end %>

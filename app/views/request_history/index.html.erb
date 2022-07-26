@@ -1,0 +1,80 @@
+<% unless request.xhr? %>
+
+	<% title "Request # #{@request.id}" %>
+	<% page_header do %>
+		<div class="row">
+			<div class="col-md-6">
+				<h1>
+				Request #<%= @request.id%>
+					<small class="request">
+						<span class="label label-default status-<%= @request.status.parameterize %>"><%= @request.status.humanize %></span>
+						<span class="label label-default"><%= @request.reserve_location.name %></span>
+					</small>
+				</h1>
+			</div>
+		</div>
+	<% end %>
+
+
+	<%= link_to @request, class: "btn btn-link" do %>
+		<span class="fa fa-angle-double-left"></span> Back to request details
+	<% end %>
+
+	<hr/>
+
+	<div class="panel panel-success">
+	  <div class="panel-heading">
+	    <h3 class="panel-title">Request # <%= @request.id %></h3>
+	  </div>
+		<div class="panel-body">
+			<div class="table-responsive">
+		  	<table class="table table-bordered">
+		  		<tr>
+		  			<td><strong>Requestor</strong></td>
+		  			<td><%= @request.requester.name %></td>
+		  			<td><strong>course</strong></td>
+		  			<td><%= @request.course.name %></td>
+		  		</tr>
+		  		<tr>
+		  			<td><strong>location</strong></td>
+		  			<td><%= @request.reserve_location.name %></td>
+		  			<td><strong>assigned to</strong></td>
+		  			<td><%= @request.assigned_to ? @request.assigned_to.name : "Nobody" %></td>
+		  		</tr>
+
+
+		  	</table>
+			</div>
+		</div>
+	</div>
+
+<% end %>
+
+<% if request.xhr? %>
+	<% title "Request # #{@request.id}", false %>
+
+	<div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		<h4 class="modal-title" id="myModalLabel">Request History</h4>
+	</div>
+<% end %>
+
+<div class="modal-body">
+
+	<div class="panel panel-default">
+	  <div class="panel-heading">
+	    Add a note
+	  </div>
+		<div class="panel-body">
+			<%= render "form" %>
+		</div>
+	</div>
+
+	<%= render "history_log" %>
+</div>
+
+<% if request.xhr? %>
+	<div class="modal-footer">
+		<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+	</div>
+<% end %>

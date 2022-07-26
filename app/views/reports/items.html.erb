@@ -1,0 +1,93 @@
+<% title "Reports: Items" %>
+<%= link_to "Reports Home", reports_path %>
+<hr/>
+
+<%= form_for :r, url: items_reports_path, html: { class: "form-inline", method: "get"} do |f| %>
+  <div class="form-group">
+    <%= f.label "Item Types" %>
+    <%= f.select "item_types", Item::TYPES, {include_blank: 'All',  selected: @item_types} %>
+  </div>
+  <div class="form-group">
+    <%= f.label "Location" %>
+    <%= f.select "location", Location.active.collect {|p| [ p.name, p.id ] }, {include_blank: 'All',  selected: @location} %>
+  </div>
+  <div class="form-group">
+    <%= f.label "Faculty" %>
+    <%= f.select "faculty", Course::FACULTIES, {include_blank: 'All', selected: @faculty} %>
+  </div>
+  <div class="form-group">
+    <%= f.label "Department" %>
+    <%= f.select "department", Course::SUBJECTS, {include_blank: 'All', selected: @department} %>
+  </div>
+  <div class="form-group">
+    <%= f.label "Term" %>
+    <%= f.select "term", Course::TERMS, {include_blank: 'All', selected: @term} %>
+  </div>
+  <div class="form-group">
+    <%= f.label "Created After" %>
+    <%= f.text_field "created_after", class: "datepicker", value: @created_after %>
+  </div>
+  <div class="form-group">
+    <%= f.label "Created Before" %>
+    <%= f.text_field "created_before", class: "datepicker", value: @created_before %>
+    <%= f.submit "Generate", data: { disable_with: "Processing"} %>
+  </div
+
+<% end %>
+
+<hr/>
+<div class="collapse" id="to_sql">
+  <div class="well">
+    <p><%= @courses.to_sql if @courses%></p>
+    <p><%= @requests.to_sql if @requests %></p>
+    <p><%= @items.to_sql %></p>
+  </div>
+</div>
+
+<div class="items">
+  <h3>Total Found: <%= @items.size %>
+    <div class="pull-right">
+      <a href="<%= items_reports_path(params: request.query_parameters, format: "xlsx") %>" class="btn btn-xs btn-default">
+        <span class="fa fa-download"></span> Exel
+      </a>
+      <button class="btn btn-xs btn-default" type="button" data-toggle="collapse" data-target="#to_sql">
+        <span class="fa fa-database"></span> Sql</button>
+    </div>
+  </h3>
+  <ul class="list-group">
+    <% @items_grouped.each do |type, items| %>
+      <li class="list-group-item list-group-item-info">
+        <span class="badge"><%= items.size %> items</span>
+        <%= type %>
+      </li>
+
+      <% items.each do |i| %>
+        <li class="list-group-item request">
+          <div class="row">
+            <div class="col-md-1 col-sm-1">
+              <%= link_to i.request.id, i.request if i.request %>
+            </div>
+            <div class="col-md-3">
+              <%= i.title %>
+            </div>
+            <div class="col-md-2">
+              <%= i.request.course.year %> -
+              <%= i.request.course.faculty %> -
+              <%= i.request.course.subject %> -
+              <%= i.request.course.term %>
+            </div>
+            <div class="col-md-2">
+              From <%= i.metadata_source %>
+            </div>
+            <div class="col-md-2">
+              <span class="label label-<%=  i.status == Item::STATUS_READY ? "success" : "default" %> "><%= i.status.humanize.upcase %></span>
+            </div>
+          </div>
+        </li>
+      <% end %>
+
+    <% end %>
+  </ul>
+
+
+</div>

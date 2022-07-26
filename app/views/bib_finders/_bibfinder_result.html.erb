@@ -1,0 +1,119 @@
+<ul class="list-group">
+<% if @bib_results.kind_of?(Array) %>
+  <% @bib_results.each_with_index do |bib_result, index| %>
+  <li class="single-result list-group-item ">
+    <div class="row">
+      <div class="col-md-10"><h4 class="distinct strong title"><%= bib_result.title %></h4></div>
+      <div class="col-md-2">
+        <a href="javascript:void(0);" class="usethis btn btn-sm btn-success" data-json="<%= bib_result.to_json %>">Use This</a>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-5">
+        <p class="black">Author:<span class="distinct strong">
+          <% if bib_result.author.kind_of?(Array)%>
+            <% bib_result.author.each do |a| %>
+              <%= truncate(a, :length => 50 ) %>
+            <% end %>
+          <% else %>
+            <%= truncate(bib_result.author, :length => 50 ) %>
+            <span class="my_popover"  data-container=".distinct"  data-toggle="popover" data-placement="right" data-html="true" data-trigger="hover" data-content="<%= bib_result.author %>"><i class="fa fa-expand" style="z-index: 1050"></i></span>      
+          <% end %>
+       </span></p>
+       <% isbn = bib_result.isbn %>
+        <% if (isbn.blank?) %>
+          <p class="black">ISBN/ISSN: <span class="distinct strong">
+          <% issn = bib_result.issn %>
+
+          <% if !(issn.blank?) %>
+            <% issn.each do |j| %>
+              <%= j %>
+            <% end %>
+          <% end %>
+
+        <% else %>
+            <p class="black">ISBN/ISSN: <span class="distinct strong">
+          <% isbn.each do |i| %>
+            <%= i %>
+          <% end %>
+        <% end %>
+         </span></p>
+      </div>
+      <div class="col-md-5"><p class="black">Callnumber: <span class="distinct strong"><%= bib_result.callnumber %></span></p>
+
+      <p class="black">Publisher:<span class="distinct strong">
+      <% if bib_result.publisher.kind_of?(Array)%>
+
+        <% bib_result.publisher.each do |f| %>
+          <%= f %>
+        <% end %>
+
+      <% else %>
+        <%= bib_result.publisher %>
+      <% end %>
+      </span></p>
+      </div>
+      <div class="col-md-2"><%= image_tag "https://www.library.yorku.ca/find/bookcover.php?isn=#{isbn.first}&size=small&id=#{bib_result.id}", class: "bookcover" if (!(isbn.blank?)) %></div>
+
+      <!-- Hidden elements -->
+
+   </div>
+   <div class="row">
+     <div class="col-md-5"><p class="black">Format:<span class="distinct strong">
+       <% if bib_result.format.kind_of?(Array)%>
+
+         <% bib_result.format.each do |f| %>
+           <%= f %>
+         <% end %>
+
+       <% else %>
+         <%= bib_result.format %>
+       <% end %>
+     </span></p></div>
+     <div class="col-md-2"><p class="black">Edition:<span class="distinct strong">
+       <% if bib_result.edition.kind_of?(Array)%>
+
+         <% bib_result.edition.each do |f| %>
+           <%= f %>
+         <% end %>
+
+       <% else %>
+         <%= bib_result.edition %>
+       <% end %>
+     </span></p></div>
+
+   </div>
+   <div class="row">
+     <div class="col-md-5"><p class="black">Physical Description:<span class="distinct strong">
+       <% if bib_result.physical_description.kind_of?(Array)%>
+
+         <% bib_result.physical_description.each do |f| %>
+           <%= f %>
+         <% end %>
+
+       <% else %>
+         <%= bib_result.physical_description %>
+       <% end %>
+     </span></p>
+     </div>
+     <div class="col-md-2">
+       <% record_source = bib_result.source %>
+        <% if (!record_source.blank?) %>
+          <% if (record_source == "VUFIND")  %>
+            <p class="black">Source:<span class="distinct strong">YORKU</span></p>
+          <% else %>
+            <p class="black">Source:<span class="distinct strong"><%= record_source %></span></p>
+          <% end %>
+        <% end %>
+     </div>
+  </div>
+  </li>
+  <% end %>
+<% else %>
+  <li class="no-results list-group-item">
+    <h3>No Results found.</h3>
+    <p>Please refine your search or fill in the form manually.</p>
+    <p>It is possible that we do not have the item you are looking for and it may need to be ordered.</p>
+  </li>
+<% end %>
+  </ul>

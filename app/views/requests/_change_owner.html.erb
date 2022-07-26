@@ -1,0 +1,24 @@
+<% if can? :change_owner, @request %>
+  <div class="modal fade" id="change_owner_form">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+          <h4 class="modal-title">Change Request Owner?</h4>
+        </div>
+        <%= simple_form_for @request, url: change_owner_request_path do |f| %>
+        <div class="modal-body">
+            <label>Look up a new request owner by name</label>
+            <%= text_field :requester, :name, data: { autocomplete_source: users_path }, aria: { label: "Change owner"}, class: "input-lg form-control" %>
+            <%= hidden_field :nil, nil, name: "requester_id", id: "requester_id" %>
+            <p class="weak">This change will be recorded in the audit trail</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel Changes</button>
+           <%= f.button :submit,  "Change Owner", data: { confirm: "Are you sure? "}, class: "btn btn-success" %>
+        </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+<% end %>

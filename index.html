@@ -1,0 +1,226 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+   <head>
+      <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
+      <meta name="description" content="York University" />
+      <meta name="keywords" content="York University" />
+      <link rel="stylesheet" href="https://passportyork.yorku.ca/yorkweb/standards/apptemplate/apptemplate-wide.css" />
+      <link rel="stylesheet" href="https://passportyork.yorku.ca/yorkweb/standards/web/css/main.css" />
+      <link rel="stylesheet" type="text/css" media="print" href="https://passportyork.yorku.ca/yorkweb/standards/apptemplate/app_print.css"/>
+      <title>Passport York Login</title>
+      </head>
+   <body bgcolor="#FFFFFF">
+    <div class="hide"><a href="#content" title="Skip navigation." accesskey="2">Skip navigation</a>.</div>
+    <div id="globalnavigation">
+      <table width="100%" border="0" cellspacing="0" cellpadding="0">
+	<tr>
+	  <td width="167" valign="top"><a href="http://www.yorku.ca/"><img src="https://passportyork.yorku.ca/yorkweb/standards/images/yorklogo.gif" alt="York U: Redefine the Possible" width="167" height="91" border="0" /></a></td>
+	  <td valign="bottom"><a href="http://www.yorku.ca/yorkweb/" id="yib2home">HOME</a> | <a href="http://www.yorku.ca/yorkweb/cs.htm" id="yib2cs">Current Students</a> | <a href="http://www.yorku.ca/yorkweb/fs.htm" id="yib2fs">Faculty &amp; Staff</a> | <a href="http://www.research.yorku.ca/" id="yib2research">Research</a> | <a href="http://www.yorku.ca/yorkweb/international.htm" id="yib2international">International</a></td>
+	  <td width="210" valign="top"><img src="https://passportyork.yorku.ca/yorkweb/standards/images/tablebanner.gif" width="210" height="91" border="0" usemap="#ybimap" alt="link: Future Students, Alumni &amp; Visitors" /></td>
+	</tr>
+      </table>
+      <table width="100%" border="0" cellspacing="0" cellpadding="0">
+        <tr>
+          <td valign="top" id="yib2qlinks">&nbsp;&nbsp;<a href="http://www.yorku.ca/yorkweb/faculties.htm" id="yib2fac">Faculties</a> &bull; <a href="http://www.library.yorku.ca/" id="yib2lib">Libraries</a> &bull; <a href="http://www.yorku.ca/yorkweb/maps/index.htm" id="yib2maps">Campus Maps</a> &bull; <a href="http://www.yorku.ca/yorkweb/org.htm" id="yib2org">York U Organization</a> &bull; <a href="http://starcraft.ccs.yorku.ca/atlas/servlet/atlas" id="yib2dir">Directory</a> &bull; <a href="http://www.yorku.ca/yorkweb/siteindex.htm" id="yib2index">Site Index</a></td>
+          <td align="right" valign="top" id="yib2searchbox"><a href="http://www.yorku.ca/yorkweb/reference/yorksearch/index.htm" id="yib2search">Search &raquo;</a>&nbsp;&nbsp;</td>
+        </tr>
+        <tr>
+          <td colspan="2" bgcolor="#000000"><img src="https://passportyork.yorku.ca/yorkweb/standards/images/pixel.gif" height="1" width="615" alt="" /></td>
+        </tr>
+      </table>
+      <map name="ybimap"><area shape="rect" coords="47,38,201,84" href="http://www.yorku.ca/yorkweb" alt="" />
+      </map>
+    </div>
+    <br/>
+	<br/>
+        <div id="main" align="center">
+	 <script src="/ppylogin/css/ppylogin.js"></script>
+  <script language="javascript">
+function badSafarip()
+{
+  var divstyle = getStyleObject("toplayer");
+  var ua = navigator.userAgent;
+      
+  if (ua.match('.*Safari/4.*')) {
+      divstyle.display = 'block';
+ }
+}
+
+  function getStyleObject(objectId) {
+    // cross-browser function to get an object's style object given its
+    if(document.getElementById && document.getElementById(objectId)) {
+	// W3C DOM
+	return document.getElementById(objectId).style;
+    } else if (document.all && document.all(objectId)) {
+	// MSIE 4 DOM
+	return document.all(objectId).style;
+    } else if (document.layers && document.layers[objectId]) {
+	// NN 4 DOM.. note: this won't find nested layers
+	return document.layers[objectId];
+    } else {
+	return false;
+    }
+} 
+</script>
+	<style type="text/css">
+	
+<!--
+
+body {
+ background-color:#FFFFFF;
+ width:auto; /* these affect how #centerme works */
+ margin: 0px;
+ }
+
+/*  ----  DIV  ----  */
+div#main {
+  margin:auto;
+  padding:auto;
+  width:auto;
+  height:auto;
+  }
+		
+#closewindow {
+display: block;
+text-align: right;
+float: right;
+}
+
+
+#warningtitle {
+}
+
+#toplayer {
+border: solid 1px #000000;
+  display: none;
+  background-color:#FFFFCC;
+  padding:1%; /* we subtract this x 2 from the
+	               width and height values below */
+  width:55%; /* 60% - 2% = 58% */
+  position:absolute;
+	top:10%;
+	left:35%;  /* same as above */
+  }
+
+-->
+    </style>
+
+<!--   <BODY bgcolor="#ffffff" onLoad="badSafarip()"> -->
+
+
+<div id="toplayer">
+
+  <div id="closewindow"><a href="#" onClick="document.getElementById('toplayer').style.display='none';">[close window]</a></div>
+  <div id="warningtitle"><span class="heading"><img src="/albacommon/images/yield-yellowbg.gif" alt="Attention icon" align="absmiddle">Compatibility warning</span></div>
+</p>
+<p>It appears you are running <b>Safari</b> under <b>MacOS X 10.4</b>.  Unfortunately, due to a problem with the way this browser handles cookies, it <b>does not work</b> with most Passport York protected pages.</p>
+
+<p> If you are redirected back to the login page after you authenticate successfully then <b>please use an alternate browser.</b></p></div>
+
+<DIV id="main" align="center">
+  <table width="680" border="0" cellspacing="0" cellpadding="0">
+    <tr valign="top">
+      <td width="330" scope="row"> <TABLE width="330" border="0" cellspacing="0" cellpadding="0">
+	  <tr>
+	    <td><img src="/albacommon/images/topleftcorner2.gif" width="34" height="42" align="middle" alt="spacer"></td>
+	    <td width="256" background="/albacommon/images/stripebackground.gif"><span class="heading">Passport York Login</span></td>
+	    <td><img src="/albacommon/images/toprightcorner.gif" width="40" height="42" alt="spacer"></td>
+	  </tr>
+	  <tr>
+	    <td><img src="/albacommon/images/spacer.gif" width="34" height="19" alt="spacer"></td>
+	    <td bgcolor="#666666" width="256"><span class="smallbodytext">&nbsp;</span></td>
+	    <td><img src="/albacommon/images/toprightbar2.gif" alt="spacer" width="40"></td>
+	  </tr>
+	  <tr>
+	    <td width="34" background="/albacommon/images/leftbar.gif"><IMG src="/albacommon/images/leftbar.gif" width="34" height="4" alt="spacer"></td>
+	    <td>
+	      <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                <tr>
+                  <td width="256"><p><br>
+                      <span class="subheading">papyrus</span></P>
+                     <br>
+                    <form name="loginform" method="POST" action="/ppylogin/ppylogin"><table width="100%"  border="0" cellspacing="0" cellpadding="2">
+                        <tr valign="top">
+                          <td><strong>Username:</strong></td>
+                          <td><input type="text" maxlength="9" name="mli" /></td>
+                        </tr>
+                        <tr valign="top">
+                          <td><strong>Password:</strong></td>
+                          <td><input type="password" maxlength="8" name="password" /><br></td>
+                        </tr>
+                      </table>
+                      &nbsp;<br>
+                      <table width="100%"  border="0" cellpadding="1" cellspacing="1">
+                        <tr valign="middle">
+                          <td valign="top" bgcolor="lightgrey"><input type="checkbox" name="passchangewanted" value="yes" /></td>
+                          <td valign="top"><strong>Click this box before logging in to change your Passport York password.</strong></td>
+                        </tr>
+                      </table>
+                      <p> <input type="submit" name="dologin" value="Login" /></p>
+                    <div><input type="hidden" name="__albform__" value="eJx7pNB78tFWyx0aTdqVKx+wsjYw1RYyaoRyFCQWF5fnF6UUMnkzhDLn5mQWMgMZ7Cn5OfnpmXmF
+LECOAEhNckZiXnpqeWJeSWpKIas3Q6keAPkYHLM=
+" /></div>
+<div><input type="hidden" name="__albstate__" value="eJxrcur3uD5lsm67zd+m9iVBVxqYagsZNUI54uMLEtNT4+MLmUJZc/LTM/MKmUM5IYLFQFGW2ELW
+Uj0A/p8WmA==
+" /></div>
+<div><input type="hidden" name="__pybpp__" value="eKINO6vnGvmoarBRL6EEGTA="></div></form><br/>
+                  </td>
+                </tr>
+              </table>
+            </td>
+            <td width="40" background="/albacommon/images/rightbar.gif">
+              <img src="/albacommon/images/rightbar.gif" width="40" height="8" alt="spacer">
+            </td>
+          </tr>
+          <tr>
+            <td><img src="/albacommon/images/bottomleft.gif" width="34" height="23" alt="spacer"></td>
+            <td background="/albacommon/images/bottombar.gif"><img src="/albacommon/images/bottombar.gif" width="28" height="23"></td>
+            <td><img src="/albacommon/images/bottomright.gif" width="40" height="23" alt="spacer"></td>
+          </tr> 
+        </table>
+        <br/>
+
+        <td width="20">&nbsp;&nbsp;&nbsp;&nbsp;</td>
+      <td width="330"> 
+        <br>
+
+        <table width="330" border="0" cellspacing="0" cellpadding="0">
+          <tr valign="top">
+            <td scope="row"><img src="/albacommon/images/passportyork-med.gif" width="130" height="75" align="left" alt="Passport York logo"></td>
+	    <br/>
+            <td><strong>Passport York</strong> authenticates you as a member of the York community and gives
+you access to a wide range of computing resources and services.</td>
+          </tr>
+        </table>
+        <br>
+        <p class="subheading">NEW TO PASSPORT YORK? </p>
+        <p>
+          <strong>&bull; <a href="ppylogin?signup=1">New Student Sign Up</a><br></strong>
+          <strong>&bull; <a href="ppylogin?empsignup=1">Employee Sign Up</a><br></strong>
+          <strong>&bull; <a href="http://computing.yorku.ca/faculty-staff/passwords-passport-york-access/passport-york/">Faculty and Staff </a></strong><br>
+          <strong>&bull;&nbsp;<a href="http://computing.yorku.ca/students/home/passwords-passport-york-access/forgotppyd_alumni/">Alumni</a></strong>
+        </p>
+        <p class="subheading">FORGOT YOUR PASSWORD OR USERNAME?</P>
+        <p>
+          <strong>&bull;&nbsp;<a href="http://computing.yorku.ca/students/reset-passport-york-password/">Students</a></strong><br>
+          <strong>&bull;&nbsp;<a href="http://computing.yorku.ca/faculty-staff/passwords-passport-york-access/password-reset/reset-passport-york-password/">Faculty and Staff</a></strong><br>
+          <strong>&bull;&nbsp;<a href="http://computing.yorku.ca/students/reset-passport-york-password/">Alumni</a></strong>
+        </p>
+	<br/>
+        <hr/>
+        <p>
+          <strong>Wednesday Morning Outage</strong><br> 
+          There will be a scheduled maintenance outage every Wednesday morning between 5:00 a.m. and 7:00 a.m.<br/><br/>
+          <a href="http://computing.yorku.ca/faculty-staff/passwords-passport-york-access/passport-york-maintenance/">More details &gt;&gt;</a> 
+        </p>
+        <p>&nbsp;</p>
+      </td>
+    </tr>
+  </table>
+  <p>&nbsp;</p>
+  <P>&nbsp;</P>
+  <P>&nbsp;</P>
+</DIV>
+</div>
+    </body>
+</html>

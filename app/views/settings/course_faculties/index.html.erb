@@ -1,0 +1,24 @@
+<% title "Course Faculties" %>
+
+<div class="text-right">
+<%= link_to 'New Course Faculty', new_settings_faculty_path, class: "btn btn-primary btn-sm" %>
+</div>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th>Code</th>
+      <th>Name</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @faculties.each do |s| %>
+      <tr>
+        <td><%= s.code %></td>
+        <td><%= s.name %></td>
+        <td><%= link_to 'Make Changes', edit_settings_faculty_path(s) %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

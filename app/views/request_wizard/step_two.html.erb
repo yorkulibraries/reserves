@@ -1,0 +1,33 @@
+<% title "Submit New Request - Step Two" %>
+
+<h3>You're almost done!</h3>
+<div class="well">
+	<ul>
+		<li>Please add the items you would like to put on reserve. You can add as many as you need.</li>
+		<li>Start by clicking on the type of item you would like to add, then fill in the details and click the add button.</li>
+	</ul>
+</div>
+
+<%= render partial: "request_wizard/save_buttons"%>
+<hr/>
+
+<%= render partial: "items/add_item" %>
+
+
+<% if @items.size > 0 %>
+	<div class="items">
+		<% @items.each do |item| %>
+			<%= render item %>
+		<% end %>
+	</div>
+<% else %>
+	<!-- blank slate -->
+	<div class="items-empty-slate arrow">
+		<h1>No Items Requested Yet!</h1>
+		<p>You must <strong class="black">add</strong> at least one item in order for your request to be open</p>
+	</div>
+<% end %>
+
+
+
+<%= render partial: "request_wizard/save_buttons"%>

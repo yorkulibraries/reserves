@@ -1,0 +1,253 @@
+<% title "Request # #{@request.id}" %>
+<% page_header do %>
+<div class="row">
+	<div class="col-md-6">
+		<h1>
+		Request #<%= @request.id%>
+		<small class="request">
+			<% if @request.rolledover? %>
+				<a href="<%= request_path(@request.rollover_parent)%>" class="label label-primary">R</a>
+			<% end %>
+
+				<span class="label label-default status-<%= @request.status.parameterize %>"><%= @request.status == Request::REMOVED ? "Removed" : @request.status.humanize %></span>
+				<span class="label label-default"><%= @request.reserve_location.name %></span>
+			</small>
+		</h1>
+	</div>
+	<div class="col-md-6">
+		<div class="btn-group pull-right">
+			<% if can? :assign, @request %>
+				<div class="btn-group">
+				  <button type="button" class="btn btn-default btn-sm dropdown-toggle " data-toggle="dropdown">
+						<strong>Assigned to:</strong>
+				    <%= @request.assigned_to ? @request.assigned_to.name : "Nobody" %> <span class="caret"></span>
+				  </button>
+				  <ul class="dropdown-menu" role="menu">
+						<li>&nbsp; &nbsp;<strong>Assign to:</strong></li>
+						<li class="divider"></li>
+				   	<% @admin_users.each do |u| %>
+							<li><%= link_to u.name, assign_request_url(@request, who: u.id), method: :post %></li>
+						<% end %>
+						<% if @request.assigned_to != nil %>
+					    <li class="divider"></li>
+					    <li><%= link_to "Nobody", assign_request_url(@request, who: nil), method: :post %></li>
+						<% end %>
+				  </ul>
+				</div>
+			<% end %>
+			<% if can?(:update, @request) && is_request_active(@request) %>
+				<%= link_to 'Update Request', edit_request_path(@request), class: "btn btn-success btn-sm" %>
+			<% end %>
+
+
+		</div>
+	</div>
+</div>
+
+<% end %>
+
+<div class="request">
+
+	<div class="panel panel-success">
+	  <div class="panel-heading">
+	    <h3 class="panel-title">
+				Requestor Details
+				<% if can? :change_owner, @request %>
+
+					<button class="btn btn-primary btn-xs xsmall-i pull-right" title="Change Owner" data-toggle="modal" data-target="#change_owner_form">
+						Change Owner <span class="fa fa-exchange"></span>
+					</button>
+				<% end %>
+			</h3>
+	  </div>
+
+		<div class="panel-body">
+			<div class="table-responsive">
+		  	<table class="table table-bordered">
+		  		<tr>
+		  			<td><strong>name</strong></td>
+		  			<td>
+							<%= link_to_if can?(:login_as, :requestor), @request.requester.name, @request.requester %>
+							<% if can?(:login_as, :requestor) && @request.requester.admin? == false %>
+								&nbsp;&nbsp;&nbsp;
+								<%= link_to login_as_path(who: @request.requester.id), data: {confirm: "Are you sure? This action is logged."}, class: 'text-muted' do %>
+									<small>
+										<span class="fa fa-share" title="Login As This Requestor"></span>
+									 	Login As
+									</small>
+								<% end %>
+							<% end %>
+							<br/>
+
+						</td>
+		  			<td><strong>type</strong></td>
+		  			<td><%= @request.requester.user_type.upcase %></td>
+		  		</tr>
+		  		<tr>
+		  			<td><strong>email</strong></td>
+		  			<td><%= @request.requester.email %></td>
+		  			<td><strong>department</strong></td>
+		  			<td><%= @request.requester.department %></td>
+		  		</tr>
+
+		  		<tr>
+		  			<td><strong>phone</strong></td>
+		  			<td><%= @request.requester.phone %></td>
+		  			<td><strong>office</strong></td>
+		  			<td><%= @request.requester.office %></td>
+		  		</tr>
+					<tr>
+						<td><strong>library id</strong></td>
+						<td colspan="3"><%= @request.requester.library_uid %></td>
+					</tr>
+		  	</table>
+			</div>
+		</div>
+	</div>
+
+
+	<%= render partial: "change_owner" %>
+	<!-- COURSE INFO -->
+
+	<div class="panel panel-success">
+	  <div class="panel-heading">
+	    <h3 class="panel-title">Course Information</h3>
+	  </div>
+		<div class="panel-body"><%= render partial: @request.course %></div>
+	</div>
+
+
+
+	<!-- REQUEST INFO -->
+
+	<div class="panel panel-success">
+	  <div class="panel-heading">
+	    <h3 class="panel-title">Request Information</h3>
+	  </div>
+		<div class="panel-body">
+			<div class="row">
+				<div class="col-md-3">
+					<% if can?(:manage, @request) %>
+						<span class="field">Assigned to</span><br/>
+						<%= @request.assigned_to ? @request.assigned_to.name : "Nobody" %>
+						<br/><br/>
+						<span class="field">History Log</span><br/>
+						<a data-toggle="modal" href="#history_popup" data-target="#history_popup" class="btn btn-xs btn-default">
+							Add a Note / History Log
+						</a>
+					<% else %>
+						<span class="field">Status</span><br/>
+						<%= @request.status ? @request.status.upcase : "Unknown" %>
+					<% end %>
+				</div>
+				<div class="col-md-3">
+					<span class="field">Reserve Starts On</span><br/>
+					<%= @request.reserve_start_date.strftime("%b %d, %Y") rescue nil %>
+					<br/><br/>
+					<span class="field">Reserve Ends After</span><br/>
+					<%= @request.reserve_end_date.strftime("%b %d, %Y") rescue nil %>
+				</div>
+				<div class="col-md-3">
+					<span class="field">Created on</span><br/>
+					<%= @request.created_at.strftime("%b %d, %Y") rescue nil %>
+					<br/><br/>
+					<% if @request.status == Request::COMPLETED %>
+						<span class="field">Completed On</span><br/>
+						<%= @request.completed_date.strftime("%b %d, %Y") rescue nil %>
+					<% elsif @request.status == Request::CANCELLED %>
+						<span class="field">Cancelled On</span><br/>
+						<%= @request.cancelled_date.strftime("%b %d, %Y") rescue nil %>
+					<% elsif @request.status == Request::REMOVED %>
+						<span class="field">Archived</span><br/>
+						<%= @request.removed_at.strftime("%b %d, %Y") rescue nil %>
+					<% else %>
+						<span class="field">Opened on</span><br/>
+						<%= @request.requested_date.strftime("%b %d, %Y") rescue nil %>
+					<% end %>
+				</div>
+
+				<div class="col-md-3">
+					<span class="field">Pickup Location Details</span><br/>
+					<strong><%= @request.reserve_location.name %></strong>
+					<div class="small">
+						<span class="fa fa-home"></span> <%= @request.reserve_location.address %></br>
+						<span class="fa fa-phone"></span> <%= @request.reserve_location.contact_phone %></br>
+						<span class="fa fa-envelope"></span> <%= @request.reserve_location.contact_email %></br>
+					</div>
+				</div>
+			</div>
+			<% if @request.rolledover? %>
+				<p class="small">Rolled over from
+					<a href="<%= request_path(@request.rollover_parent)%>">
+						Request #<%= @request.rollover_parent.id %>
+					</a>
+				</p>
+			<% end %>
+		</div>
+	</div>
+
+	<hr/>
+	<%= render partial: "requests/action_buttons" %>
+	<hr/>
+
+	<!-- ITEMS -->
+
+	<div class="panel panel-info">
+	  <div class="panel-heading">
+	    <h3 class="panel-title">Requested Items</h3>
+	  </div>
+		<div class="panel-body">
+			<% if is_request_active(@request) %>
+				<%= render partial: "items/add_item" %>
+			<% end %>
+
+			<div class="items">
+
+				<%if @request.items.active.size > 0 %>
+					<% @request.items.active.recent_first.each do |item| %>
+						<%= render item %>
+					<% end %>
+				<% end %>
+
+				<% if is_request_active(@request) && @request.items.size == 0 %>
+					<!-- blank slate -->
+					<div class="items-empty-slate arrow">
+						<h1>No Items Requested Yet!</h1>
+						<p>In order for your request to be open, you must add at least one item.</p>
+					</div>
+				<% end %>
+
+
+				<% if @request.status == Request::REMOVED %>
+					<div id="removed_items" class="<%= 'hide' if @request.items.deleted.size == 0 %>">
+							<h4>Removed Items</h4>
+							<% @request.items.deleted.each do |item| %>
+								<%= link_to request_item_path(@request, item), class: "btn btn-link blend", remote: true do %>
+									<span class="fa fa-retweet"></span> <%= item.title %>
+							<% end %>
+					<% end %>
+					</div>
+				<% end %>
+
+			</div>
+		</div>
+	</div>
+
+
+
+	<%= render partial: "request_wizard/save_buttons"%>
+
+	<% if @request.status != Request::INCOMPLETE %>
+		<%= render partial: "change_status" %>
+	<% else %>
+		<hr/>
+		<%= link_to "REMOVE", change_status_request_path(@request, status: Request::REMOVED), class: "btn btn-danger", role: "button",
+		data: { confirm: "Are you sure? This request will be removed."} %>
+	<% end %>
+
+	<hr />
+
+	<%= render partial: "requests/action_buttons" %>
+	<%= render partial: "requests/history_log_modal" %>
+
+</div>

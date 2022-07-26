@@ -1,0 +1,14 @@
+<% if @item.errors.size == 0 %>
+	bootstrap_modal_close("item_form");
+	$("#item_<%= @item.id %>").replaceWith("<%= j render @item, locals: { item: @item } %>");
+	$("#item_<%= @item.id %>").effect("highlight",1000);
+	$("#item_<%= @item.id %> span.item-type").after("<span class='green pull-right fa fa-floppy-o'></span>");
+<% else %>
+  searchRecords();
+	<% if params[:show_barcode_form] %>
+		bootstrap_modal_replace_content("item_form", "<%= j render "form_barcode", formats: [:html] %>")
+	<% else %>
+		bootstrap_modal_replace_content("item_form", "<%= j render "form_modal", formats: [:html] %>")
+	<% end %>
+
+<% end %>

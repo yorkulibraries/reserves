@@ -1,0 +1,35 @@
+<% title "Update Request and Item Settings" %>
+
+<%= simple_form_for Setting, url: settings_path, method: :patch do |f| %>
+
+  <div class="panel panel-success">
+    <div class="panel-heading">
+      <h3 class="panel-title">Request Settings</h3>
+    </div>
+    <div class="panel-body">
+      <%= f.input :request_archive_all_allow, label: "Enable Auto Archive?", as: :radio_buttons %>
+
+      <% interval = [["30 days", 30.days], ["60 days", 60.days], ["90 days", 90.days], ["180 days", 180.days]] %>
+      <%= f.input :request_archive_all_after, label: "Archive Requests After", include_blank: false, collection: interval %>
+
+      <%= f.input :request_archive_all_user_id, label: "Archive as User", include_blank: false, collection: User.admin %>
+      <hr/>
+      <%= f.input :request_remove_incomplete_allow, label: "Enable PERMANENT Removal of Incomplete Requests?", as: :radio_buttons %>
+      <% interval2 = [["90 days", 90.days], ["180 days", 180.days], ["270 days", 270.days], ["1 Year", 1.year]] %>
+      <%= f.input :request_remove_incomplete_after, label: "PERMANENTLY Remove Incomplete Requests After", include_blank: false, collection: interval2 %>
+    </div>
+  </div>
+
+
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h3 class="panel-title">Item Settings</h3>
+    </div>
+    <div class="panel-body">
+      <%= f.input :item_copyright_options, as: :array, input_html: { long_form: true } %>
+    </div>
+  </div>
+
+  <input type="hidden" name="return_to" value="item_request"/>
+  <%= f.submit "Save Item Settings", class: "btn btn-success" %>
+<% end %>

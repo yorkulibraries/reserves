@@ -1,0 +1,13 @@
+<% url = @faculty.new_record? ? settings_faculties_path : settings_faculty_path(@faculty) %>
+<%= simple_form_for(@faculty, url: url) do |f| %>
+
+
+  <div class="form-inputs">
+    <%= f.input :code %>
+    <%= f.input :name, hint: "Optional" %>
+  </div>
+
+  <div class="form-actions">
+    <%= f.button :submit, class: "btn btn-success" %> or <%= link_to "Cancel", settings_faculties_path, class: "" %>
+  </div>
+<% end %>

@@ -1,0 +1,37 @@
+<% title "Library Locations" %>
+
+<table class="table table-bordered">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Contact Email</th>
+      <th>Contact Phone</th>
+      <th>Address</th>
+      <th>Notify About New Items?</th>
+			<th>Allowed <br/> Item Types</th>
+			<th>Disallowed <br/> Item Types</th>
+      <th></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @locations.each do |location| %>
+      <tr>
+        <td><%= location.name %><br/>
+          <span class="small trivial"><%= location.ils_location_name %></span>
+        </td>
+        <td><%= location.contact_email %></td>
+        <td><%= location.contact_phone %></td>
+        <td><%= location.address %></td>
+        <td><%= location.setting_bcc_location_on_new_item? ? "yes" : "No" %></td>
+				<td><%= raw Item::TYPES.reject { |t| location.disallowed_item_types.include?(t) }.join("<br/> ") %></td>
+				<td><%= raw location.disallowed_item_types.join( "<br/> ") %></td>
+        <td><%= link_to 'Make Changes', edit_location_path(location) %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to '<i class="fa fa-plus"></i> Add a new location'.html_safe, new_location_path, class: "btn btn-primary" %>

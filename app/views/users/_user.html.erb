@@ -1,0 +1,38 @@
+<tr class="user">
+  <td class="small">
+    <% if user.inactive? %> <i class="red fa fa-ban"></i> <% end %>
+    <a href="<%= user_path(user) %>">
+      <strong><%= user.name ? user.name : user.uid %></strong>
+    </a> <br/>
+    <span class="blend small"> User since <%= user.created_at.strftime("%b %e, %Y") %></span>
+  </td>
+  <td>
+    <span class="blend small"><%= user.user_type %></span>
+  </td>
+  <td class="blend small">
+    <%= user.department %><br/>
+  </td>
+  <td class="blend small">
+    <%= user.office %><br/>
+  </td>
+  <td class="blend small">
+    <%= user.phone %><br/>
+  </td>
+  <td class="blend small">
+    <%= user.email %>
+  </td>
+  <td class="actions">
+    <% if can? :manage, User %>
+      <a href="<%= edit_user_path(user) %>" class="black">
+        <span class="fa fa-pencil" title="Update details"></span>
+      </a>&nbsp;&nbsp;
+      <%= link_to user_url(user), method: :delete, data: { confirm: "Are you sure? "}  do %>
+      <span class="fa fa-ban" title="Block user access"></span>
+      <% end %>&nbsp;&nbsp;
+      <a href="<%= change_role_user_url(user, admin: true) %>" data-method="post" class="red" data-confirm="Are you sure?">
+        <span class="fa fa-arrow-up" title="Promote to admin user"></span>
+      </a>
+    <% end %>
+  </td>
+
+</tr>

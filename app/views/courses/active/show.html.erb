@@ -1,0 +1,99 @@
+<% title "Items for #{@course.name}" %>
+
+<div class="text-center">
+  <%= link_to courses_active_index_path do %>
+     <span class="fa fa-chevron-left"></span> Back to Active Courses Listing
+  <% end %>
+</div>
+<hr/>
+<div id="active_courses">
+
+    <div class="active-course">
+      <p class="name"><%= @course.name %></p>
+
+      <div class="row course-details">
+        <div class="col-sm-2">
+          <label> Course ID</labeL>
+          <span class="info"><%= @course.code %></span>
+        </div>
+        <div class="col-sm-4">
+          <ul class="horizontal">
+            <li>
+              <label>Locations</label>
+              <span class="info"><%= @course.reserve_locations.map { |l| l.name }.join(", ") %></span>
+            </li>
+            <li>
+              <label>Instructor</label>
+              <span class="info"><%= @course.instructor %></span>
+            </li>
+          </ul>
+        </div>
+        <div class="col-sm-4">
+          <ul class="horizontal">
+            <li>
+              <label>Start Date</label>
+              <span class="info"><%= @course.requests.first.reserve_start_date.strftime("%b %d, %Y") rescue "N/A"%></span>
+            </li>
+            <li>
+              <label>End Date</label>
+              <span class="info"><%= @course.requests.first.reserve_end_date.strftime("%b %d, %Y") rescue "N/A"%></span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+  <% if @items.size > 0 %>
+    <div class="text-center heading">
+      <h3>Course Items</h3>
+      <%= link_to courses_active_path(@course, format: "xlsx") do %>
+        <span class="fa fa-download"></span> Download For Excel
+      <% end %>
+    </div>
+
+
+
+    <table class="active-course table">
+      <% @items.each do |item| %>
+        <tr>
+          <td colspan="4" class="item-details"><span class="name"><%= item.title %></span>
+            <label>URL</label>
+            <%= format item.url %></span>
+          </td>
+          <td class="smaller"><%= item.item_type %>
+        </tr>
+        <tr class="item-details bg-grey ">
+          <td class="smaller">
+            <label>Author</label>
+            <%= format item.author %></td>
+          <td class="smaller">
+            <label>CALLNUMBER</label>
+            <%= format item.callnumber %>
+            <label>ISBN</label>
+            <%= format item.isbn %></td>
+
+
+          <td class="smaller">
+            <label>Publisher</label>
+            <%= format item.publisher %>
+            <label>Publication Date</label>
+          <%=format item.publication_date %>
+        </td>
+          <td class="smaller">
+              <label>Format</label>
+              <%=format item.format %>
+              <label>Edition</label>
+              <%= format item.edition %>
+          </td>
+          <td>
+            <label>Journal Title</label> <%= format item.journal_title %>
+    				<label>Page Number</label> <%= format item.page_number %>
+    				<label>Volume</label> <%= format item.volume %></td>
+          <!-- :title, :author, :isbn, :callnumber, :description, :publication_date, :publisher, :edition, :item_type, :copyright_options, :other_copyright_options, :format, :description, :url, :status, :provided_by_requestor, :map_index_num -->
+        </tr>
+      <% end %>
+    </table>
+  <% else %>
+    <p class="text-center alert alert-info strong">There are no items associated with this course</p>
+  <% end %>
+</div>

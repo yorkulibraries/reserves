@@ -1,0 +1,92 @@
+<% title "Profile" %>
+
+<table class="table table-bordered">
+
+
+		<tr class="<%= @user.admin? ? "danger" : "active" %>">
+			<td colspan="4"><h3 class="panel-title"><%= @user.name %></h3></td>
+		</tr>
+
+
+		<tr class="user">
+			<td>
+				<strong><%= @user.name %></strong><br/>
+				<span class="blend small"><%= @user.user_type.upcase %> ID: <%= @user.library_uid %></span>
+			</td>
+			<td>
+				<strong class="blend small">Department:</strong> <%= @user.department %><br/>
+				<strong class="blend small">Office:</strong> <%= @user.office %><br/>
+			</td>
+			<td>
+				<strong class="blend small">Phone:</strong> <%= @user.phone %><br/>
+				<strong class="blend small">Email:</strong> <%= @user.email %>
+			</td>
+			<td class="actions">
+				<% if can? :manage, @user %>
+					<a href="<%= edit_user_path(@user) %>">Update User Settings</a>
+				<% end %>
+			</td>
+
+		</tr>
+		<tr>
+			<td colspan="2">
+
+				<strong class="blend small">Active:</strong> <%= @user.active? ? "Yes" : "No "%><br/>
+				<strong class="blend small">Joined:</strong> <%= @user.created_at.strftime("%b %e, %Y") %><br/>
+			</td>
+			<td colspan="2">
+				<% if @user.admin? %>
+					<strong class="blend small">Staff: </strong> <%= @user.admin? ? "Yes" : "No " %><br/>
+					<strong class="blend small">LOCATION: </strong> <%= @user.location.name rescue nil %><br/>
+				<% end %>
+			</td>
+		</tr>
+</table>
+
+<div class="request_history">
+	<h4>History Log</h4>
+
+	<table class="table">
+
+		<% @audits_grouped.each do |date, events| %>
+			<tr class="date">
+				<td colspan="4">
+					<span class="trivial">
+						<strong><%= date.strftime('%b %e, %Y')%></strong></span>
+				</td>
+			</tr>
+			<% events.each do |event| %>
+				<% type = event.auditable_type %>
+				<% action = event.action %>
+				<tr>
+					<td class="trivial time"><%= event.created_at.strftime("%R")%></td>
+					<% if action == "note" %>
+						<td class="what">
+							<span class="label label-default type-note">Note</span>
+						</td>
+						<td class="note strong black"><%= simple_format event.comment %></td>
+					<% else %>
+						<td class="what">
+							<span class="label label-default type-<%= type.underscore.downcase %>">
+								<%= defined?(audit_what) ? audit_what : type.tableize.singularize.humanize %></span>
+						</td>
+						<td class="comment black"><%= event.comment ? event.comment : event.action %></td>
+					<% end %>
+					<td class="who"><span title="<%= event.action %> "><%= event.user.name if event.user %></span></td>
+				</tr>
+
+				<tr class="more-info hide bg-warning">
+					<td></td>
+					<td class="what text-warning small">changes</td>
+					<td class="changes" colspan="2">
+
+						<% if event.action != "note" %>
+							<%= render "request_history/detailed_changes", event: event %>
+						<% end %>
+					</td>
+				</tr>
+
+			<% end %>
+		<% end %>
+	</table>
+</div>

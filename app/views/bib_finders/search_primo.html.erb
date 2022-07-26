@@ -1,0 +1,36 @@
+<form class="" action="<%= search_primo_bib_finders_path %>" method="get">
+  <input type="text" name="q" value="<%= params[:q] %>">
+
+  <input type="submit" value="Search">
+</form>
+<hr/>
+<% if @results %>
+
+  <% @results.each do |r| %>
+
+    Title: <%= r[:pnx]["display"]["title"].first rescue nil %><br/>
+    Format: <%= r[:pnx]["display"]["format"].first rescue "nil" %><br/>
+    Type: <%= r[:pnx]["display"]["type"].first rescue "nil" %><br/>
+    Edition: <%= r[:pnx]["display"]["edition"].first rescue "nil" %><br/>
+    Publisher: <%= r[:pnx]["display"]["publisher"].first rescue "nil" %><br/>
+    Published Date: <%= r[:pnx]["addata"]["date"].first rescue "nil" %><br/>
+    Author: <%= r[:pnx]["sort"]["author"].first rescue "nil" %> <br/>
+    ILS ID: <%= r[:pnx]["display"]["mms"].first rescue "nil" %> <br/>
+    ISBN: <%= r[:pnx]["addata"]["isbn"].first rescue "nil" %> <br/>
+    ISSN: <%= r[:pnx]["addata"]["issn"].first rescue "nil" %> <br/>
+    Journal Title: <%= r[:pnx]["addata"]["jtitle"].first rescue "nil" %> <br/>
+    Volume: <%= r[:pnx]["addata"]["volume"].first rescue "nil" %> <br/>
+    Issue: <%= r[:pnx]["addata"]["issue"].first rescue "nil" %> <br/>
+    Start PAGE: <%= r[:pnx]["addata"]["spage"].first rescue "nil" %> <br/>
+    End PAGE: <%= r[:pnx]["addata"]["epage"].first rescue "nil" %> <br/>
+    URL: <%= r[:pnx]["addata"]["url"].first rescue "nil" %> <br/>
+
+    RTYPE: <%= r[:pnx]["search"]["rsrctype"].first rescue "nil" %> <br/>
+
+    CallNumber: <%= r[:delivery]["holding"].first["callNumber"] rescue "not provided" %><br/>
+    Main Location: <%= r[:delivery]["holding"].first["mainLocation"] rescue "not provided" %><br/>
+    <% pp r[:pnx] rescue nil%>
+    <hr/>
+  <% end %>
+
+<% end %>

@@ -1,0 +1,69 @@
+
+<%= simple_form_for @location, :defaults => { :input_html => { :class => "form-horizontal", role: "form" } }  do |f| %>
+
+
+
+<fieldset>
+  <legend>Location Details</legend>
+
+  <div class="form-group">
+    <div class="col-sm-12">
+        <%= f.input :name, as: :string %>
+    </div>
+  </div> <!-- form-group end -->
+  <div class="form-group">
+    <div class="col-sm-6">
+        <%= f.input :contact_email, as: :string, required: true %>
+    </div>
+    <div class="col-sm-6">
+        <%= f.input :contact_phone, as: :string %>
+    </div>
+  </div> <!-- form-group end -->
+  <div class="form-group">
+    <div class="col-sm-12">
+        <%= f.input :address, as: :string %>
+    </div>
+  </div> <!-- form-group end -->
+  <div class="form-group">
+    <div class="col-sm-12">
+        <%= f.input :ils_location_name, as: :string, label: "ILS Reserve Location Name", hint: "Name of reserve desk/locaiton in your ILS" %>
+    </div>
+  </div> <!-- form-group end -->
+  <div class="form-group">
+    <div class="col-sm-12">
+        <%= f.input :acquisitions_email, as: :string, hint: "Acqusitions from this location will be sent to this email" %>
+    </div>
+  </div>
+
+
+  <div class="form-group">
+    <div class="col-sm-6">
+        <%= f.input :disallowed_item_types, collection: Item::TYPES, as: :check_boxes, :include_hidden => false, item_wrapper_class: "inline_checkbox_label" %>
+    </div>
+    <div class="col-sm-6">
+      <%= f.input :setting_bcc_request_status_change, label: "Email Request Status Changes to Assigned Staff Member?", as: :radio_buttons %>
+      <%= f.input :setting_bcc_location_on_new_item, label: "Notify Location When New Item is Added?", as: :radio_buttons %>
+    </div>
+  </div> <!-- form-group end -->
+
+
+
+</fieldset>
+
+
+  <hr />
+  <div class="row">
+    <div class="col-sm-6">
+        <%= f.button :submit, class: "btn btn-success"%>
+				<%= link_to "Cancel Changes", locations_path, class: "btn btn-link" %>
+    </div>
+		<div class="col-sm-6">
+			<% unless @location.new_record? %>
+				<%= link_to @location, method: :delete, data: { confirm: 'Are you sure?' }, class: "red pull-right btn btn-link btn-xs" do %>
+					<span class="fa fa-trash-o"></span> Remove this location record?
+				<% end %>
+			<% end %>
+		</div>
+  </div> <!-- row end -->
+
+<% end %>

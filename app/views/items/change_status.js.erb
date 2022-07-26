@@ -1,0 +1,11 @@
+$("#item_<%= @item.id %>").replaceWith("<%= j render @item, locals: { item: @item } %>");
+
+<% if @item.status == Item::STATUS_READY && @item.ils_barcode.blank? %>
+  bootstrap_modal_show("item_form", "<%= j(render partial:"items/form_barcode") %>" );
+<% end %>
+
+<% if @request.items.ready == @request.items.active %>
+  $("a.completed").attr('disabled', false);
+<% else %>
+  $("a.completed").attr('disabled', true);
+<% end %>

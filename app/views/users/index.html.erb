@@ -1,0 +1,10 @@
+<% if @staff_list %>
+	<% title  "Staff List" %>
+	<%= render "staff_users" %>
+<% elsif params[:inactive] %>
+	<% title  "Inactive Instructor List" %>
+	<%= render "inactive_users" %>
+<% else %>
+	<% title  "Active Instructor List" %>
+	<%= render "active_users" %>
+<% end %>

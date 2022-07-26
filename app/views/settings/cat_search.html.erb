@@ -1,0 +1,29 @@
+<% title "Update Catalog Search Settings" %>
+
+<%= simple_form_for Setting, url: settings_path, method: :patch do |f| %>
+
+
+  <div class="panel panel-success">
+    <div class="panel-heading">
+      <h3 class="panel-title">VUFIND Settings</h3>
+    </div>
+    <div class="panel-body">
+      <%= f.input :vufind_url %>
+    </div>
+  </div>
+
+
+
+  <div class="panel panel-warning">
+    <div class="panel-heading">
+      <h3 class="panel-title">WORLDCAT Settings</h3>
+    </div>
+    <div class="panel-body">
+      <%= f.input :worldcat_key %>
+      <%= f.input :worldcat_enable, as: :radio_buttons, label: "Use WORDLCAT as backup search?" %>
+    </div>
+  </div>
+
+  <input type="hidden" name="return_to" value="cat_search"/>
+  <%= f.submit "Save Catalog Search Settings", class: "btn btn-success" %>
+<% end %>

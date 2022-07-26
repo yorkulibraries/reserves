@@ -1,0 +1,19 @@
+<% title "Update Help Settings" %>
+
+<%= simple_form_for Setting, url: settings_path, method: :patch do |f| %>
+
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h3 class="panel-title">Help Settings</h3>
+    </div>
+    <div class="panel-body">
+      <%= f.input :help_title, input_html: { long_form: true } %>
+      <%= f.input :help_link, label: "More Help Link" %>
+  		<%= f.input :help_body, as: :text, label: "Brief Help Text", input_html: { rows: 10 } %>
+      <%= f.input :help_contact, as: :text, label: "Help Contact Details", input_html: { rows: 5 } %>
+    </div>
+  </div>
+
+  <input type="hidden" name="return_to" value="help"/>
+  <%= f.submit "Save Help Settings", class: "btn btn-success" %>
+<% end %>

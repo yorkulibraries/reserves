@@ -1,0 +1,130 @@
+<br/>
+<div style="font-size: 15px; font-weight: bold">
+  <%= @template.render %>
+</div>
+
+<br/>
+<hr/>
+<br/>
+
+<style>
+
+.field { display: block; }
+td { valign: top; }
+
+</style>
+<h2>Acquisition Request #<%= @acquisition_request.id %></h2>
+<p><strong>Acquisition Reason:</strong> <%= format @acquisition_request.acquisition_reason %></p>
+<p><strong>Acquisition Notes:</strong> <%= format @acquisition_request.acquisition_notes %></p>
+<p>Request Sent By <strong><%= @user.name %> </strong> on <%= Date.today %> </p>
+<span class="field">Reserve Location Details</span><br/>
+<strong><%= @request.reserve_location.name %></strong>
+<div class="trivial">
+  <span class="fa fa-home">Address</span> <%= @request.reserve_location.address %></br>
+  <span class="fa fa-phone">Phone</span> <%= @request.reserve_location.contact_phone %></br>
+  <span class="fa fa-envelope">Contact Email</span> <%= @request.reserve_location.contact_email %></br>
+</div>
+<hr/>
+
+<% item = @item %>
+<h3>Item Information</h3>
+<span class="text-primary field">Title</span>
+<h4><%= item.item_type.upcase %> | <%= item.title %> - <span class="trivial small upcase">&nbsp; Item ID: <%= item.id %> &nbsp;| | &nbsp; Request ID: <%= @request.id %></span></h4>
+<table width="100%">
+  <tr>
+    <td colspan="2">
+      <span class="text-primary field">Acquisition Reason</span> <%= format @acquisition_request.acquisition_reason %>
+    </td>
+  </tr>
+  <tr>
+    <td width="30%">
+      <% show_field? item, "author" do%>
+				<span class="text-primary field">Author</span> <%= format item.author %>
+			<% end %>
+			<% show_field? item, "isbn" do%>
+				<span class="text-primary field">ISBN</span> <%= format item.isbn %>
+			<% end %>
+			<% show_field? item, "callnumber" do%>
+				<span class="text-primary field">Call Number</span> <%= format item.callnumber %>
+			<% end %>
+
+			<% show_field? item, "map_index_num" do%>
+				<span class="text-primary field">Map Index #</span> <%= format item.map_index_num %>
+			<% end %>
+
+			<% show_field? item, "format" do%>
+				<span class="text-primary field">Format</span> <%= format item.format %>
+			<% end %>
+			<% show_field? item, "journal_title" do %>
+				<span class="text-primary field">Journal Title</span> <%= format item.journal_title %>
+				<span class="text-primary field">Page Number</span> <%= format item.page_number %>
+				<span class="text-primary field">Volume</span> <%= format item.volume %>
+			<% end %>
+    </td>
+    <td width="30%">
+      <% show_field? item, "publisher" do%>
+        <span class="text-primary field">Publisher</span> <%= format item.publisher %>
+      <% end %>
+      <% show_field? item, "publication_date" do%>
+        <span class="text-primary field">Date Published</span> <%= format item.publication_date %>
+      <% end %>
+      <% show_field? item, "edition" do%>
+        <span class="text-primary field">Edition</span> <%= format item.edition %>
+      <% end %>
+      <% show_field? item, "issue" do %>
+        <span class="text-primary field">Issue</span> <%= format item.issue %>
+      <% end %>
+    </td>
+    <td width="30%">
+      <span class="text-primary field">Loan Period</span> <%= format item.loan_period %>
+			<span class="text-primary field">Provided By</span><%= item.provided_by_requestor? ? "Requestor" : "Reserves Staff" %>
+			<span class="text-primary field">Source &amp; ID</span> <%= format item.metadata_source %> / <%= format item.metadata_source_id %>
+    </td>
+  </tr>
+  <% if [Item::TYPE_EBOOK, Item::TYPE_MULTIMEDIA, Item::TYPE_PHOTOCOPY, Item::TYPE_COURSE_KIT].include? item.item_type %>
+    <tr>
+      <td colspan="2">
+        <% show_field? item, "url" do%>
+          <span class="text-primary field">URL</span>
+            <% if item.url.blank? %>
+              <%= format item.url %>
+            <% else %>
+              <%= link_to "#{item.url}", item.url %>
+            <% end %>
+        <% end %>
+        <% show_field? item, "description" do%>
+          <span class="text-primary field">Description</span> <%= format item.description %>
+        <% end %>
+      </td>
+      <td>
+        <% if item.item_type == Item::TYPE_PHOTOCOPY %>
+          <span class="text-primary field">Copyright</span>
+          <%= format item.copyright_options %>	<br/>
+          <span class="text-primary field">Copyright Explanation</span>
+          <%= format item.other_copyright_options%>
+        <% end %>
+      </td>
+    </tr>
+  <% end %>
+
+</table>
+
+<hr/>
+<h3>Course Information</h3>
+<table width="100%">
+  <tr>
+    <td class="text-primary field" width="30%">Name: </td>
+    <td><%= @course.name %> </td>
+  </tr>
+  <tr>
+    <td class="text-primary field">Code: </td>
+    <td><%= @course.code %> </td>
+  </tr>
+  <tr>
+    <td class="text-primary field">Instructor: </td>
+    <td>
+      <%= @course.instructor %> <br/>
+      <%= comm_email @request %>
+    </td>
+  </tr>
+</table>

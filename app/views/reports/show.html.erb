@@ -1,0 +1,103 @@
+<% title "Reports: Dashboard" %>
+
+<div class="row">
+  <div class="col-sm-4 col-md-4">
+    <h4> Request Reports </h4>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <% interval_name = distance_of_time_in_words(Setting.reports_default_interval.to_i) %>
+        <% interval = Time.now + Setting.reports_default_interval.to_i %>
+        <%= link_to "Expiring Requests in #{interval_name}", requests_reports_path(r: { expiring_before: interval.to_date } ) %>
+      </li>
+      <li class="list-group-item">
+        <p><strong>Requests Per Location, Last <%= interval_name %></strong></p>
+        <ol>
+          <% interval = Time.now - Setting.reports_default_interval.to_i %>
+          <% Location.active.each do |l| %>
+          <li><%= link_to l.name, requests_reports_path(r: { location: l.id, created_after: interval.to_date }) %></li>
+          <% end %>
+        </ol>
+      </li>
+      <li class="list-group-item">
+        <% interval = Time.now - Setting.reports_default_interval.to_i %>
+        <%= link_to "Custom Report", requests_reports_path(r: { created_after: interval.to_date} ) %>
+      </li>
+    </ul>
+  </div>
+  <div class="col-sm-4 col-md-4">
+    <h4> Item Reports </h4>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <% interval_name = distance_of_time_in_words(Setting.reports_default_interval.to_i) %>
+        <% interval = Time.now - Setting.reports_default_interval.to_i %>
+        <%= link_to "Items Created in the last #{interval_name}", items_reports_path(r: { created_after: interval.to_date} ) %>
+      </li>
+      <li class="list-group-item">
+        <p><strong>Items Per Location, Last <%= interval_name %> </strong></p>
+        <ol>
+          <% Location.active.each do |l| %>
+          <li><%= link_to l.name, items_reports_path(r: { location: l.id, created_after: interval.to_date }) %></li>
+          <% end %>
+        </ol>
+      </li>
+      <li class="list-group-item">
+        <p><strong>Items By Type, Last <%= interval_name %> </strong></p>
+        <ol>
+          <% Item::TYPES.each do |type| %>
+          <li><%= link_to type, items_reports_path(r: { item_types: type, created_after: interval.to_date }) %></li>
+          <% end %>
+        </ol>
+      </li>
+      <li class="list-group-item">
+        <%= link_to "Custom Report", items_reports_path(r: { created_after: interval.to_date} ) %>
+      </li>
+    </ul>
+  </div>
+  <div class="col-sm-4 col-md-4">
+    <h4>Statistics </h4>
+    <ul class="list-group">
+      <li class="list-group-item"><h4>Fiscal - (<%= Setting.fiscal_date.strftime("%b %e, %Y") %> to Today)</h4></li>
+      <li class="list-group-item">
+        <span class="badge"><%= @ytd_requests_count %></span>
+        Requests
+      </li>
+      <li class="list-group-item">
+        <span class="badge"><%= @ytd_items_count %></span>
+        Items
+      </li>
+      <li class="list-group-item">
+        <span class="badge"><%= @ytd_courses_count %></span>
+        Courses
+      </li>
+      <li class="list-group-item">
+        <span class="badge"><%= @ytd_requestors_count %></span>
+        Requestors
+      </li>
+      <li class="list-group-item">
+        <span class="badge"><%= @ytd_staff_count %></span>
+        Staff
+      </li>
+      <li class="list-group-item"><h4>Lifetime</h4></li>
+      <li class="list-group-item">
+        <span class="badge"><%= @lt_requests_count %></span>
+        Requests
+      </li>
+      <li class="list-group-item">
+        <span class="badge"><%= @lt_items_count %></span>
+        Items
+      </li>
+      <li class="list-group-item">
+        <span class="badge"><%= @lt_courses_count %></span>
+        Courses
+      </li>
+      <li class="list-group-item">
+        <span class="badge"><%= @lt_requestors_count %></span>
+        Requestors
+      </li>
+      <li class="list-group-item">
+        <span class="badge"><%= @lt_staff_count %></span>
+        Staff
+      </li>
+    </ul>
+  </div>
+</div>

@@ -1,0 +1,21 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Request:</strong>
+  <%= @item.request_id %>
+</p>
+
+<p>
+  <strong>Metadata source:</strong>
+  <%= @item.metadata_source %>
+</p>
+
+
+
+<p>
+  <strong>Donate to library:</strong>
+  <%= @item.provided_by_requestor %>
+</p>
+
+<%= link_to 'Edit', edit_request_item_path(@request, @item) %> |
+<%= link_to 'Back', request_items_path(@request) %>

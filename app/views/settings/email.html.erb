@@ -1,0 +1,19 @@
+<% title "Update Email Settings" %>
+
+<%= simple_form_for Setting, url: settings_path, method: :patch do |f| %>
+
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h3 class="panel-title">Email Settings</h3>
+    </div>
+    <div class="panel-body">
+
+      <%= render "email_fields", f: f %>
+
+    </div>
+  </div>
+
+  <input type="hidden" name="return_to" value="email"/>
+
+  <%= f.submit "Save Settings", class: "btn btn-success" %>
+<% end %>

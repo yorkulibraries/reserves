@@ -1,0 +1,24 @@
+<% title "Course Subjects" %>
+
+<div class="text-right">
+<%= link_to 'New Course Subject', new_settings_subject_path, class: "btn btn-primary btn-sm" %>
+</div>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th>Code</th>
+      <th>Name</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @subjects.each do |s| %>
+      <tr>
+        <td><%= s.code %></td>
+        <td><%= s.name %></td>
+        <td><%= link_to 'Make Changes', edit_settings_subject_path(s) %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

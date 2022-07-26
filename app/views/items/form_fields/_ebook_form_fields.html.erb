@@ -1,0 +1,32 @@
+<!-- EBOOK -->
+<div class="row required">
+	<div class="col-md-12">
+			<%= f.input :title, required: true %>
+	</div>
+	<div class="col-md-12"><%= f.input :author, required: true %></div>
+</div>
+
+
+<div class="row required">
+	<div class="col-md-6"><%= f.input :publisher, required: true %></div>
+</div>
+<hr/>
+
+<div class="row">
+	<div class="col-md-6"><%= f.input :publication_date, label: "Publication Date" %></div>
+	<div class="col-md-6"><%= f.input :callnumber, label: "Call Number" %></div>
+</div>
+
+<div class="row">
+	<div class="col-md-6"><%= f.input :edition %></div>
+	<div class="col-md-6"><%= f.input :isbn, label: "ISBN" %></div>
+	<div class="col-md-6"><%= f.input :format, input_html: { value: Item::FORMAT_EBOOK }, readonly: true %></div>
+</div>
+<hr/>
+
+<div class="row">
+	<div class="col-md-12"><%= f.input :url, label: "URL", as: :string, hint: "valid url examples: http://www.myvideos.com/rest/of/your/path OR https://myebookurl.com" %></div>
+</div>
+
+<%= f.hidden_field :provided_by_requestor, value: true %>
+<%= f.hidden_field :loan_period, value: "Unlimited" %>

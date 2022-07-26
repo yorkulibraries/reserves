@@ -1,0 +1,39 @@
+
+
+<div class="course_fields">
+	<div class="row">
+		<div class="col-md-8">
+			<%= f.input :name, label: "Course Title" %>
+			<div class="has-error"><span class="help-block has-error">
+				<%= f.object.errors[:code].join(",") %>
+			</span></div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-2 col-lg-2">
+			<%= f.input :year, collection: Course::ACADEMIC_YEARS_FULL, input_html: {  class: "input-sm", id: "request_course_attributes_year" } %>
+		</div>
+		<div class="col-md-2 col-lg-1">
+			<%= f.input :faculty, collection: Courses::Faculty.all_faculties, input_html: { class: "input-sm" } %>
+		</div>
+		<div class="col-md-2 col-lg-2">			
+			<%= f.input :subject, collection: Courses::Subject.all_subjects, input_html: { class: "input-sm" } %>
+		</div>
+		<div class="col-md-2 col-lg-2">
+			<%= f.input :course_id, label: "Course Number", input_html: { class: "input-sm" } %>
+		</div>
+		<div class="col-md-1 col-lg-1">
+			<%= f.input :term, collection: Course::TERMS, input_html: {  class: "input-sm", id: "request_course_attributes_term" } %>
+		</div>
+		<div class="col-md-1 col-lg-1">
+			<%= f.input :credits, collection: Course::TERM_CREDITS, input_html: { class: "input-sm" } %>
+		</div>
+		<div class="col-md-1 col-lg-1">
+			<%= f.input :section, collection: Course::SECTIONS, input_html: { class: "input-sm" } %>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-4"><%= f.input :instructor %></div>
+		<div class="col-md-3"><%= f.input :student_count, label: "Enrollment" %></div>
+	</div>
+</div>

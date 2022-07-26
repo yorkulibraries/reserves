@@ -1,0 +1,15 @@
+
+<div class="panel panel-primary">
+  <div class="panel-heading">
+    <h3 class="panel-title">Loan Period</h3>
+  </div>
+  <div class="panel-body">
+    <dl class="dl-horizontal">
+      <dt>Duration:</dt><dd><%= @loan_period.duration %></dd>
+    </dl>
+  </div>
+</div>
+
+
+<%= link_to '<i class="fa fa-backward"></i> Back To List'.html_safe, loan_periods_path, class: "btn btn-default" %>
+<%= link_to '<i class="fa fa-pencil"></i> Edit'.html_safe, edit_loan_period_path(@loan_period), class: "btn btn-default" %> 

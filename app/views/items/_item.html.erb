@@ -1,0 +1,99 @@
+<div class="item" id="item_<%= item.id %>" data-id="<%= item.id %>">
+	<div class="row">
+		<div class="col-md-10">
+			<h3><%= item.title %></h3>
+		</div>
+		<div class="col-md-2">
+			<span class="label label-default item-type <%= item.item_type %>_bg"><%= item.item_type.humanize.upcase %></span>
+			<br/><span class="small">Item <strong>#<%= item.id %></strong></span>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-md-4">
+			<% show_field? item, "author" do%>
+				<span class="text-primary field">Author</span> <%= format item.author %>
+			<% end %>
+			<% show_field? item, "isbn" do%>
+				<span class="text-primary field">ISBN</span> <%= format item.isbn %>
+			<% end %>
+			<% show_field? item, "callnumber" do%>
+				<span class="text-primary field">Call Number</span> <%= format item.callnumber %>
+			<% end %>
+
+			<% show_field? item, "physical_copy_required" do%>
+				<span class="text-primary field">Physical Copy Required?</span> <%= item.physical_copy_required? ? "Yes" : "No" %>
+			<% end %>
+
+
+			<% show_field? item, "map_index_num" do%>
+				<span class="text-primary field">Map Index #</span> <%= format item.map_index_num %>
+			<% end %>
+
+			<% show_field? item, "format" do%>
+				<span class="text-primary field">Format</span> <%= format item.format %>
+			<% end %>
+			<% show_field? item, "journal_title" do %>
+				<span class="text-primary field">Journal Title</span> <%= format item.journal_title %>
+				<span class="text-primary field">Page Number</span> <%= format item.page_number %>
+				<span class="text-primary field">Volume</span> <%= format item.volume %>
+			<% end %>
+
+
+		</div>
+		<div class="col-md-3">
+			<% show_field? item, "publisher" do%>
+				<span class="text-primary field">Publisher</span> <%= format item.publisher %>
+			<% end %>
+			<% show_field? item, "publication_date" do%>
+				<span class="text-primary field">Date Published</span> <%= format item.publication_date %>
+			<% end %>
+			<% show_field? item, "edition" do%>
+				<span class="text-primary field">Edition</span> <%= format item.edition %>
+			<% end %>
+			<% show_field? item, "issue" do %>
+				<span class="text-primary field">Issue</span> <%= format item.issue %>
+			<% end %>
+		</div>
+		<div class="col-md-3 left-border">
+			<span class="text-primary field">Loan Period</span> <%= format item.loan_period %>
+			<span class="text-primary field">Provided By</span><%= item.provided_by_requestor? ? "Requestor" : "Reserves Staff" %>
+			<span class="text-primary field">Source &amp; ID</span> <%= format item.metadata_source %> / <%= format item.metadata_source_id %>
+      <!-- Terry: We may need to add this to ebook view or electronic -->
+      <!-- <span class="text-primary field-label">Source</span> <%= item.url %>       -->
+			<span class="text-primary field">Barcode</span>
+				<%= link_to barcode_request_item_path(@request, item), remote: true do %>
+					<%= format item.ils_barcode %>
+				<% end %>
+		</div>
+		<div class="col-md-2 item_actions">
+			<%= render partial: "items/item_actions", locals: { item: item } unless local_assigns[:hide_item_actions] == true %>
+		</div>
+	</div>
+	<% if [Item::TYPE_EJOURNAL, Item::TYPE_EBOOK, Item::TYPE_MULTIMEDIA, Item::TYPE_PHOTOCOPY, Item::TYPE_COURSE_KIT].include? item.item_type %>
+		<hr/>
+		<div class="row">
+			<div class="col-md-4">
+				<% show_field? item, "url" do%>
+					<span class="text-primary field">URL</span>
+					  <% if item.url.blank? %>
+					    <%= format item.url %>
+					  <% else %>
+					    <%= link_to "#{item.url}", item.url %>
+					  <% end %>
+				<% end %>
+				<% show_field? item, "description" do%>
+					<span class="text-primary field">Description</span> <%= format item.description %>
+				<% end %>
+			</div>
+			<div class="col-md-4">
+				<% if item.item_type == Item::TYPE_PHOTOCOPY %>
+					<span class="text-primary field">Copyright</span>
+					<%= format item.copyright_options %>	<br/>
+					<span class="text-primary field">Copyright Explanation</span>
+					<%= format item.other_copyright_options%>
+				<% end %>
+			</div>
+		</div>
+	<% end %>
+</div>

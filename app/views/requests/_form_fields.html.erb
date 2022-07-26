@@ -1,0 +1,99 @@
+	<div class="well">
+		<h4>Please review the Fair Dealing Guidelines and York’s Copyright and You website when placing items on reserve </h4>
+		<ul>
+			<li>
+				<a href="http://copyright.info.yorku.ca/files/2013/10/4.-Application-of-the-Fair-Dealing-Policy-for-Universities-to-Library-Copying1.pdf ">
+					Fair Dealings Guidelines
+				</a>
+			</li>
+			<li><a href="http://copyright.info.yorku.ca/">York's Copyright Website</a></li>
+		</ul>
+	</div>
+
+	<!-- REQUEST DETAILS -->
+	<div class="panel panel-success">
+	  <div class="panel-heading">
+	    <h3 class="panel-title">Requestor Details</h3>
+	  </div>
+	  <div class="panel-body">
+	    <div class="row">
+	      <div class="col-sm-1"><strong>Name</strong></div>
+	      <div class="col-sm-3"><%= @request.requester.name%></div>
+	      <div class="col-sm-1"><strong>Email</strong></div>
+    		<div class="col-sm-3"><%= @request.requester.email %></div>
+	      <div class="col-sm-1"><strong>Type</strong></div>
+        <div class="col-sm-3"><%= @request.requester.user_type.upcase %></div>
+      </div>
+      <hr/>
+	    <div class="row">
+  		<%= f.fields_for @request.requester do |requester_fields |%>
+  			<div class="col-sm-4"><%= requester_fields.input :phone, required: true %></div>
+  			<div class="col-sm-4"><%= requester_fields.input :office, required: true  %></div>
+  			<div class="col-sm-4"><%= requester_fields.input :department, required: true, label: "Faculty/Department" %></div>
+  		<% end %>
+  		</div>
+
+  	</div>
+	</div>
+
+	<div class="hidden">
+		<%=  @request.errors.messages %>
+	</div>
+	<!-- COURSE INFO -->
+
+	<div class="panel panel-success">
+	  <div class="panel-heading">
+	    <h3 class="panel-title">Course Information</h3>
+	  </div>
+	  <div class="panel-body">
+			<%= f.fields_for :course do |builder| %>
+				<%= render  "courses/form_fields", f: builder %>
+			<% end %>
+			<div class="row">
+				<div class="col-md-6">
+					<%= f.input :requester_email, as: :string, label: "Instructor Email", required: false, input_html: { placeholder: @request.requester.email },
+							hint: "Who else should receive status change updates, etc.?"%>
+				</div>
+			</div>
+	  </div>
+	</div>
+
+
+	<!-- REQUEST INFO -->
+
+	<div class="panel panel-success">
+	  <div class="panel-heading">
+	    <h3 class="panel-title">Request Information</h3>
+	  </div>
+	  <div class="panel-body">
+		  <div class="row">
+
+		    <div class="col-sm-3">
+					<%= f.input :reserve_location_id, collection: Location.active, required: true, hint: "Where do you want students to pick up your items?" %>
+		    </div>
+		    <div class="col-sm-3">
+		    	<%= f.input :reserve_start_date, as: :string, readonly: ! current_user.admin?, required: false, hint: "Prefilled after term selection.",
+					input_html: { id: "request_reserve_start_date", class: current_user.admin? ? "datepicker" : "" } %>
+		    </div>
+		    <div class="col-sm-3">
+		        <%= f.input :reserve_end_date, as: :string, readonly: ! current_user.admin?, required: false,
+						input_html: { id: "request_reserve_end_date", class: current_user.admin? ? "datepicker" : "" }  %>
+		    </div>
+		  </div> <!-- row end -->
+	  </div>
+	</div>
+
+
+
+	<div class="row">
+	  <div class="col-md-8">
+
+			 <% if @request.new_record?  %>
+				 <%= f.button :submit, "Continue to Step Two",  class: "btn btn-primary" %>
+				 <%= link_to "Cancel Request", root_path, class: "btn btn-link" %>
+			 <% else %>
+				 <%= f.button :submit, "Update Request Details", class: "btn btn-success" %>
+			 	 <%= link_to "Cancel Changes", @request, class: "btn btn-link" %>
+			 <% end %>
+	  </div>
+	</div>

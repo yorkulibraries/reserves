@@ -1,0 +1,45 @@
+<% title "Active Courses" %>
+<div id="active_courses">
+  <div class="text-center heading">
+    <%= link_to courses_active_index_path( format: "xlsx") do %>
+      <span class="fa fa-download"></span> Download For Excel
+    <% end %>
+  </div>
+
+  <% @active_courses.each do |c| %>
+    <div class="active-course">
+      <p class="name"><%= link_to c.name, courses_active_path(c) %></p>
+
+      <div class="row course-details">
+        <div class="col-sm-2">
+          <label> Course ID</labeL>
+          <span class="smaller"><%= c.code %></span>
+        </div>
+        <div class="col-sm-4">
+          <ul class="horizontal">
+            <li>
+              <label>Locations</label>
+              <span class="smaller"><%= c.reserve_locations.map { |l| l.name }.join(", ") %></span>
+            </li>
+            <li>
+              <label>Instructor</label>
+              <span class="smaller"><%= c.instructor %></span>
+            </li>
+          </ul>
+        </div>
+        <div class="col-sm-4">
+          <ul class="horizontal">
+            <li>
+              <label>Start Date</label>
+              <span class="smaller"><%= c.requests.first.reserve_start_date.strftime("%b %d, %Y") rescue "N/A"%></span>
+            </li>
+            <li>
+              <label>End Date</label>
+              <span class="smaller"><%= c.requests.first.reserve_end_date.strftime("%b %d, %Y") rescue "N/A"%></span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>

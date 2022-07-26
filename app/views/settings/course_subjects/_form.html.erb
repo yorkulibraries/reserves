@@ -1,0 +1,13 @@
+<% url = @subject.new_record? ? settings_subjects_path : settings_subject_path(@subject) %>
+<%= simple_form_for(@subject, url: url) do |f| %>
+
+
+  <div class="form-inputs">
+    <%= f.input :code %>
+    <%= f.input :name, hint: "Optional" %>
+  </div>
+
+  <div class="form-actions">
+    <%= f.button :submit, class: "btn btn-success" %> or <%= link_to "Cancel", settings_subjects_path, class: "" %>
+  </div>
+<% end %>

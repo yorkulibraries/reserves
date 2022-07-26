@@ -1,0 +1,62 @@
+<div class="table-responsive">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>ID &amp; Date</th>
+        <th>Course</th>
+        <th># of Items</th>
+        <th>Location</th>
+        <th>Requestor</th>
+        <th>Assigned To</th>
+      </tr>
+    </thead>
+    <% @requests.each do |request| %>
+      <tr class="click_redirect "
+          data-id="<%= request.id %>" data-redirect-path="<%= request_path(request) %>">
+
+        <td class="requested_date <%= open_request_needs_attention_css?(request) %>">
+          <span class="strong">id: <%= request.id %></span><br/>
+            <span class="xsmall">
+              <% if request.status == Request::REMOVED %>
+                a: <%= request.removed_at.strftime("%b %d, %Y") rescue nil %>
+              <% elsif request.status == Request::COMPLETED %>
+                e: <%= request.reserve_end_date.strftime("%b %d, %Y") rescue nil %>
+              <% elsif request.status == Request::CANCELLED %>
+                x: <%= request.cancelled_date.strftime("%b %d, %Y") rescue nil %>
+              <% else %>
+                o: <%= request.created_at.strftime("%b %d, %Y") rescue nil %>
+              <% end %>
+            </span>
+          </td>
+        <td class="course">
+          <% if request.rolledover? %>
+            <span class="label label-primary rollover">R</span>
+          <% end %>
+          <a class="name" href="<%= request_path(request) %>">
+            <%= request.course.name %></a>
+            <span class="code"><%= request.course.code %></span>
+        </td>
+        <td class="items small">
+          <% if request.status == Request::REMOVED %>
+            <%= request.items.deleted.size %> <span class="orange fa fa-retweet"></span>
+            <span class="blend"> / <%= request.items.active.size %></span>
+          <% else %>
+            <%= request.items.ready.size %> <span class="green fa fa-check"></span>
+            <span class="trivial"> / <%= request.items.active.size %></span>
+          <% end %>
+        </td>
+        <td class="items">
+          <%= request.reserve_location.name %>
+        </td>
+        <td class="requestor">
+          <span class="name"><%= request.requester.name %></span>
+          <span class="department"><%= request.requester.department %></span>
+        </td>
+        <td class="details">
+          <span class="blend small"><%= request.assigned_to ? request.assigned_to.name : "Nobody" %></span>
+        </td>
+
+      </tr>
+    <% end %>
+  </table>
+</div>

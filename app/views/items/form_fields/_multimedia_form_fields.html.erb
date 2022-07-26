@@ -1,0 +1,37 @@
+<!-- MULTIMEDIA -->
+<div class="row required">
+	<div class="col-md-12">
+			<%= f.input :title, required: true %>
+	</div>
+
+</div>
+<div class="row required">
+	<div class="col-md-6"><%= f.input :author, required: true %></div>
+	<div class="col-md-6"><%= f.input :format, collection: Item::MULTIMEDIA_FORMATS, required: true %></div>
+</div>
+
+<div class="row required">
+	<hr/>
+	<div class="col-md-6"><%= f.input :loan_period, collection: LoanPeriod.all.collect { |p| p.duration }, required: true %></div>
+	<div class="col-md-6"><%= f.input :provided_by_requestor, as: :radio_buttons,  label: "Will you be providing this item?", required: true %></div>
+</div>
+
+<hr/>
+<div class="row">
+	<div class="col-md-6"><%= f.input :publisher %></div>
+	<div class="col-md-6"><%= f.input :isbn, label: "ISBN", hint: "ISBN should be a 13 digit number usually starting with a 9" %></div>
+</div>
+
+
+<div class="row">
+	<div class="col-md-6"><%= f.input :publication_date, label: "Publication Date" %></div>
+	<div class="col-md-6"><%= f.input :callnumber, label: "Call Number" %></div>
+</div>
+
+<div class="row">
+	<div class="col-md-6"><%= f.input :edition %></div>
+	<div class="col-md-6"></div>
+</div>
+<div class="row">
+	<div class="col-md-12"><%= f.input :url, label: "URL", as: :string, hint: "valid url examples: http://www.myvideos.com/rest/of/your/path OR https://myebookurl.com" %></div>
+</div>

@@ -1,0 +1,12 @@
+<!-- Add a note form -->
+<%= form_tag(save_note_request_path(format: "js"), method: "post", class: "form", role: "form",  remote: true ) do %>
+	<div class="row">
+		<div class="col-md-2 small black strong"><%= Date.today.strftime('%b %e, %Y')%></div>
+		<div class="col-md-6">
+		  <%= text_area_tag("audit_comment", nil, class:"form-control", id:"note-textarea", title: "Add a note") %><br/>
+	    <p class="trivial italic">Character count is <span class="remaining"></span> / 255 maximum allowed</p>
+			<p class="bg-danger hide" id="history_log_error"></p>
+		</div>
+		<div class="col-md-2"><%= submit_tag("Add Note", class: "btn btn-success btn-sm note-submit") %></div>
+	</div>
+<% end %>

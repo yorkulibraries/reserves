@@ -1,0 +1,35 @@
+<% if can?(:add_note, @request) %>
+
+  <div class="modal fade" id="history_popup" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+          <h4 class="modal-title" id="myModalLabel">Request History</h4>
+        </div>
+
+        <div class="modal-body">
+
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              Add a note
+            </div>
+            <div class="panel-body">
+              <%= render "request_history/form", locals: { remote: true} %>
+            </div>
+          </div>
+
+          <div id="request_history_log" data-url="<%= history_request_path(@request, format: "js") %>">
+
+          </div>
+
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>

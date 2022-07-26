@@ -1,0 +1,8 @@
+<%= simple_form_for(@course) do |f| %>
+
+ 	 <%= render  "form_fields",  f: f %>
+	 <hr/>
+   <%= f.button :submit, class: "btn btn-success" %>
+	 <%= link_to "Cancel Changes", courses_path, class: 'btn btn-link'%>
+
+<% end %>

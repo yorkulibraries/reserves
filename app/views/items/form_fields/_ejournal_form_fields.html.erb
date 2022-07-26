@@ -1,0 +1,31 @@
+<!-- EJOURNAL -->
+<div class="row required">
+	<div class="col-md-12">
+			<%= f.input :title, label: "Article Title", required: true %>
+	</div>
+</div>
+<div class="row required">
+	<div class="col-md-12"><%= f.input :author, label: "Author: First and Last Names", required: true %></div>
+</div>
+
+<div class="row required">
+	<div class="col-md-12">
+			<%= f.input :journal_title, required: true %>
+	</div>
+</div>
+<div class="row required">
+	<div class="col-md-6"><%= f.input :publication_date, label: "Date of Publication", required: true %></div>
+	<div class="col-md-6"><%= f.input :volume, required: true %></div>
+	<div class="col-md-6"><%= f.input :page_number, required: true %></div>
+	<div class="col-md-6"><%= f.input :issue, required: true %></div>	
+</div>
+
+<hr/>
+<div class="row">
+	<div class="col-md-12"><%= f.input :url, label: "URL", as: :string, hint: "valid url examples: http://www.myvideos.com/rest/of/your/path OR https://myebookurl.com" %></div>
+</div>
+
+
+<%= f.hidden_field :provided_by_requestor, value: false %>
+<%= f.hidden_field :format, value: Item::FORMAT_ARTICLE  %>
+<%= f.hidden_field :loan_period, value: "Unlimited" %>

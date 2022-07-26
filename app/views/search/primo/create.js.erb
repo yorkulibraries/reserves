@@ -1,0 +1,33 @@
+$("#search_primo_results").remove();
+$("#search_primo .searching").addClass("hidden");
+$("#search_primo").after("<%= j render "search/primo/results" %>");
+use_this_record();
+
+function clear_primo_search() {
+  $("#search_primo_results").remove();
+  return false;
+}
+
+function use_this_record() {
+
+  $(".usethis").on('click',"", function() {
+
+    var my_record = $(this).data("json").table;
+    var my_record = $(this).data("json");
+    console.log(my_record);
+
+    $("#item_title").val(my_record.title);
+    $("#item_author").val(my_record.author);
+    $("#item_publisher").val(my_record.publisher);
+    $("#item_isbn").val(my_record.isbn_issn);
+    $("#item_callnumber").val(my_record.callnumber);
+    $("#item_edition").val(my_record.edition);
+    $("#item_publication_date").val(my_record.publication_date);
+    $("#item_metadata_source").val(my_record.source);
+    $("#item_metadata_source_id").val(my_record.ils_id);
+    $("#item_url").val(my_record.url);   // URL will not be populated.
+
+    clear_primo_search();
+  });
+
+}

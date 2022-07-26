@@ -1,0 +1,22 @@
+<% if params[:status] == Item::STATUS_DELETED %>
+	<% title "Removed Items In This Request" %>
+<% else %>
+	<% title "Items In This Request" %>
+<% end %>
+
+<%= link_to "<< Back To Request", @request %>
+
+<div class="items">
+
+	<%if @items.size > 0 %>
+		<%  @items.recent_first.each do |item| %>
+			<%= render item %>
+		<% end %>
+	<% else %>
+		<!-- blank slate -->
+		<div class="items-empty-slate arrow">
+			<h1>No Items Requested Yet!</h1>
+			<p>In order for your request to be open, you must add at least one item.</p>
+		</div>
+	<% end %>
+</div>

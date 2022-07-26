@@ -1,0 +1,69 @@
+<% title "Keep Item(s) on Reserve - Request # #{@request.id}?" %>
+<% page_header do %>
+<div class="row">
+	<div class="col-md-6">
+		<h1>
+		Request #<%= @request.id%>
+			<small class="request">
+				<span class="label label-default status-<%= @request.status.parameterize %>"><%= @request.status.humanize %></span>
+				<span class="label label-default"><%= @request.reserve_location.name %></span>
+			</small>
+		</h1>
+	</div>
+</div>
+<% end %>
+
+<!-- blank slate -->
+<div class="items-empty-slate">
+  <h1>Keep Item(s) on Reserve</h1>
+	<h2> <%= @request.course.name %> </h2>
+	<h3><%= @request.course.subject %> <%= @request.course.course_id %></h3>
+  <p>This action will create a new request with the same details, course and items but set for another term.</p>
+  <%= simple_form_for :rollover, url: rollover_request_path, html: { class: "form-inline" } do |f| %>
+    <div class="form-group">
+      <%= f.label "Choose a New Year, Term, Section, Credits and Course Enrollment:" %>
+    </div>
+		<br/><br/>
+    <%= f.input :course_year, collection: Course::ACADEMIC_YEARS_FULL, label: false, include_blank: false %>
+		<%= f.input :course_term, collection: Course::TERMS, label: false, input_html: { class: "input-sm" } %>
+		<%= f.input :course_section, collection: Course::SECTIONS, label: false, input_html: { class: "input-sm" } %>
+		<%= f.input :course_credits, collection: Course::TERM_CREDITS, label: false, input_html: { class: "input-sm" } %>
+		<%= f.input :course_student_count, label: false, input_html: { class: "input-sm", placeholder: "Course Enrollment" } %>
+			<br/><br/>
+    <%= f.submit "Keep Item(s) On Reserve", class: "btn btn-success", data: { confirm: "Are you sure?"} %>
+		<hr/>
+    Go back to <%= link_to "Reviewing This Request", @request %>
+  <% end %>
+	<hr/>
+	<p>You can also
+		<%= link_to "Remove Item(s) From Reserve", archive_request_path(@request), class: 'btn btn-primary btn-xs', data: { confirm: "Are you sure?" } %>
+		for this request. </p>
+	<p class="small">This action will instruct reserve staff to remove these items from reserve.</p>
+</div>
+
+<div class="request">
+  <div class="panel panel-default">
+	  <div class="panel-heading">
+	    <h1 class="panel-title">Course Details</h1>
+      <br/>
+      <%= render partial: @request.course %>
+	  </div>
+    <div class="panel-body">
+      <h1 class="panel-title">Items List</h1>
+      <br/>
+      <ul class="list-group">
+        <% @request.items.each do |i| %>
+          <li class="list-group-item">
+            <span class="badge"><%= i.item_type %></span>
+            <%= i.title %>
+          </li>
+        <% end %>
+
+      </ul>
+
+    </div>
+
+  </div>
+
+
+</div>

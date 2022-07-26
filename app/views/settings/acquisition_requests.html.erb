@@ -1,0 +1,42 @@
+<% title "Update Item Settings" %>
+
+<%= simple_form_for Setting, url: settings_path, method: :patch do |f| %>
+
+  <div class="panel panel-warning">
+    <div class="panel-heading">
+      <h3 class="panel-title">Acquisition Requests Settings</h3>
+    </div>
+    <div class="panel-body">
+      <div class="row">
+        <div class="col-md-6">
+          <%= f.input :acquisition_sources, as: :array %>
+        </div>
+        <div class="col-md-6">
+          <%= f.input :acquisition_reasons, as: :array %>
+        </div>
+      </div>
+      <p class="small">Press Ctrl-Shift-Del after clicking on the text box to remove that option.</p>
+    </div>
+  </div>
+
+  <div class="panel panel-info">
+    <div class="panel-heading">
+      <h3 class="panel-title">Send To Acquisitions Settings</h3>
+    </div>
+    <div class="panel-body">
+      <div class="row">
+        <div class="col-md-12">
+          <%= f.input :email_acquisitions_to, label: "Acquisitions Email" %>
+          <%= f.input :email_acquisitions_to_bookstore, label: "Bookstore Email" %>
+          <%= f.input :email_acquisitions_subject, label: "Subject" %>
+          <%= f.input :email_acquisitions_body, as: :text, label: "Body", input_html: { rows: 5 } %>
+        </div>
+      </div>
+      <p class="small">The email will be sent to the above address and inlcude Acquistion Request, Item and Course details.</p>
+    </div>
+  </div>
+
+
+  <input type="hidden" name="return_to" value="acquisition_requests"/>
+  <%= f.submit "Save Acquisitions Settings", class: "btn btn-success" %>
+<% end %>
