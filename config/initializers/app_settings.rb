@@ -62,8 +62,8 @@ if ActiveRecord::Base.connection.data_source_exists? 'settings'
 
 
   ## SEARCH - Using ElasticSearch
-  Setting.save_default(:search_elastic_enabled, true)
-  Setting.save_default(:search_elastic_server, "10.0.0.206:9200")
+  Setting.save_default(:search_elastic_enabled, false)
+  Setting.save_default(:search_elastic_server, "127.0.0.1:9200")
   Setting.save_default(:search_elastic_index_prefix, "reserves")
 
 
