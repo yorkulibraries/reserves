@@ -1,4 +1,4 @@
-class ChangeCommentTypeInAudits < ActiveRecord::Migration
+class ChangeCommentTypeInAudits < ActiveRecord::Migration[5.1]
   def up
     change_column :audits, :comment, :text
   end
