@@ -47,7 +47,7 @@ class User < ApplicationRecord
   has_associated_audits
 
   def update_external(user_id)
-    if Setting.alma_apikey != nil
+    if Setting.alma_apikey.length > 10
       update_external_alma(user_id)
     end
   end
