@@ -28,6 +28,8 @@ module Reserves
     config.active_record.belongs_to_required_by_default = false
     config.active_record.legacy_connection_handling = false
     config.time_zone = 'Eastern Time (US & Canada)'
+    config.assets.js_compressor = :uglifier
+    config.assets.css_compressor = :scss
 
     # Configuration for the application, engines, and railties goes here.
     #
