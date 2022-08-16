@@ -8,8 +8,10 @@ gem 'puma', '~> 5.6', '>= 5.6.4'
 gem 'rails', '~> 7.0', '>= 7.0.3.1'
 
 ## RAILS related ##
+gem 'cssbundling-rails', '~> 1.1', '>= 1.1.1'
+gem 'jsbundling-rails', '~> 1.0', '>= 1.0.3'
 gem 'sass-rails', '~> 6.0'
-gem 'sprockets', '~> 4.1', '>= 4.1.1'
+gem 'sprockets-rails', '~> 3.4', '>= 3.4.2'
 gem 'uglifier', '~> 4.2'
 
 ## DEPLOYMENT ##
