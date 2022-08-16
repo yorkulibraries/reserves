@@ -8,11 +8,9 @@ gem 'puma', '~> 5.6', '>= 5.6.4'
 gem 'rails', '~> 7.0', '>= 7.0.3.1'
 
 ## RAILS related ##
-gem 'bcrypt-ruby', '~> 3.1.2'
-gem 'jbuilder', '~> 2.5'
 gem 'sass-rails', '~> 6.0'
-gem 'sprockets', '3.6.3'
-gem 'uglifier', '>= 1.3.0'
+gem 'sprockets', '~> 4.1', '>= 4.1.1'
+gem 'uglifier', '~> 4.2'
 
 ## DEPLOYMENT ##
 gem 'capistrano', '3.8.0'
@@ -57,11 +55,6 @@ gem 'primo', git: 'https://github.com/tulibraries/primo.git', branch: 'main'
 gem 'elasticsearch-model', '0.1.9'
 gem 'elasticsearch-rails', '0.1.9'
 
-## UPLOADING AND MANIPULATING FILES ##
-gem 'carrierwave', '0.9.0'
-gem 'mime-types', '1.25.1'
-gem 'mini_magick', '3.7.0'
-
 ## DUMP DATA INTO YML FILE ##
 # rake db:data:dump_dir dir=../tmp/db_june_2017
 gem 'yaml_db', '~> 0.7.0'
@@ -70,7 +63,6 @@ gem 'yaml_db', '~> 0.7.0'
 gem 'exception_notification', '~> 4.4', '>= 4.4.1'
 
 ## TESTING && DEVELOPMENT ##
-gem 'awesome_print', '1.8.0'
 gem 'rb-readline'
 
 gem 'populator', git: 'https://github.com/ryanb/populator.git'
