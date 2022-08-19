@@ -28,6 +28,8 @@ module Reserves
     config.active_record.belongs_to_required_by_default = false
     config.active_record.legacy_connection_handling = false
     config.time_zone = 'Eastern Time (US & Canada)'
+    config.active_record.yaml_column_permitted_classes = [Date, ActiveSupport::TimeWithZone, Time,
+                                                          ActiveSupport::TimeZone]
 
     config.assets.configure do |env|
       env.js_compressor  = :uglifier
