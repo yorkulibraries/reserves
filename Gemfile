@@ -4,14 +4,11 @@ source 'http://rubygems.org'
 ruby '3.1.2'
 
 ## RAILS and related ##
-gem 'puma', '~> 5.6', '>= 5.6.4'
+gem 'puma', '~> 5.6', '>= 5.6.5'
 gem 'rails', '~> 7.0', '>= 7.0.3.1'
 
 ## RAILS related ##
-gem 'cssbundling-rails', '~> 1.1', '>= 1.1.1'
-gem 'jsbundling-rails', '~> 1.0', '>= 1.0.3'
 gem 'sass-rails', '~> 6.0'
-gem 'sprockets-rails', '~> 3.4', '>= 3.4.2'
 gem 'uglifier', '~> 4.2'
 
 ## DEPLOYMENT ##
@@ -26,23 +23,23 @@ gem 'mysql2', '0.5.3', group: :production
 ## CSS AND JAVASCRIPT ##
 gem 'jquery-rails', '4.3.1'
 gem 'jquery-ui-rails', '6.0.1'
-gem 'mini_racer', '~> 0.6.2'
+gem 'mini_racer', '~> 0.6.3'
 
 ## BOOTSTRAP & SIMPLE_FORM & FONTAWESOME ##
 gem 'font-awesome-rails', '~> 4.7'
 gem 'simple_form', '~> 5.1'
 
 ## TOOLS AND UTILITIES ##
-gem 'audited', '~> 5.0'
+gem 'audited', '~> 5.0', '>= 5.0.2'
 gem 'bigdecimal', '1.3.5'
 gem 'cancancan', '~> 3.4'
 gem 'devise', '~> 4.8', '>= 4.8.1'
-gem 'email_validator', '1.4.0'
-gem 'kaminari', '0.17.0'
-gem 'liquid', '4.0.0'
+gem 'email_validator', '~> 2.2', '>= 2.2.3'
+gem 'kaminari', '~> 1.2', '>= 1.2.2'
+gem 'liquid', '~> 5.4'
 gem 'rails-settings-cached', '~> 2.8', '>= 2.8.2'
-gem 'rsolr', '1.0.10'
-gem 'rufus-scheduler', '3.0.9'
+gem 'rsolr', '~> 2.5'
+gem 'rufus-scheduler', '~> 3.8', '>= 3.8.2'
 gem 'worldcatapi', git: 'https://github.com/taras-yorku/worldcatapi.git',
                    ref: 'ed6d0cb849e86a032dc84741a5d169da19b8e385'
 
@@ -50,7 +47,7 @@ gem 'caxlsx', '3.2.0'
 gem 'caxlsx_rails', '0.6.3'
 
 ## EX LIBRIS INTEGRATION ALMA, PRIMO
-gem 'alma'
+gem 'alma', '~> 0.3.3'
 gem 'primo', git: 'https://github.com/tulibraries/primo.git', branch: 'main'
 
 ## SEARCH - USING ELASTIC SEARCH
@@ -62,7 +59,7 @@ gem 'elasticsearch-rails', '0.1.9'
 gem 'yaml_db', '~> 0.7.0'
 
 # NOTIFICATIONS
-gem 'exception_notification', '~> 4.4', '>= 4.4.1'
+gem 'exception_notification', '~> 4.5'
 
 ## TESTING && DEVELOPMENT ##
 gem 'rb-readline'
@@ -70,27 +67,18 @@ gem 'rb-readline'
 gem 'populator', git: 'https://github.com/ryanb/populator.git'
 
 group :test do
-  gem 'bullet' # Testing SQL queries
-  gem 'byebug'
-  gem 'capybara', '2.1.0'
-  gem 'database_cleaner', '1.2.0'
+  gem 'byebug', '~> 11.1', '>= 11.1.3'
+  gem 'database_cleaner', '~> 2.0', '>= 2.0.1'
   gem 'factory_girl_rails', '4.8.0'
   gem 'faker'
   gem 'guard-minitest', '2.4.6'
-  gem 'minitest', '~> 5.16', '>= 5.16.2'
-  gem 'mocha', '0.14', require: false
-  gem 'rack-livereload'
-  gem 'shoulda', '~> 4.0'
+  gem 'minitest', '~> 5.16', '>= 5.16.3'
   gem 'shoulda-context', '~> 2.0'
-  gem 'shoulda-matchers', '~> 4.0'
-  gem 'webrat', '0.7.3'
+  gem 'shoulda-matchers', '~> 5.1'
 end
 
 group :development do
-  gem 'better_errors'
-  gem 'binding_of_caller'
-  gem 'ruby-prof'
-  gem 'spring', '1.3.6'
+  gem 'spring', '~> 4.0'
   gem 'web-console', '~> 4.2'
 end
 
