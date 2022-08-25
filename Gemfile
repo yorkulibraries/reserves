@@ -21,7 +21,7 @@ gem 'capistrano-rbenv', '2.1.0'
 gem 'mysql2', '0.5.3', group: :production
 
 ## CSS AND JAVASCRIPT ##
-gem 'jquery-rails', '4.3.1'
+gem 'jquery-rails', '4.5.0'
 gem 'jquery-ui-rails', '6.0.1'
 gem 'mini_racer', '~> 0.6.3'
 
@@ -64,15 +64,13 @@ gem 'exception_notification', '~> 4.5'
 ## TESTING && DEVELOPMENT ##
 gem 'rb-readline'
 
-gem 'populator', git: 'https://github.com/ryanb/populator.git'
-
 group :test do
   gem 'byebug', '~> 11.1', '>= 11.1.3'
   gem 'database_cleaner', '~> 2.0', '>= 2.0.1'
   gem 'factory_girl_rails', '4.8.0'
-  gem 'faker'
   gem 'guard-minitest', '2.4.6'
   gem 'minitest', '~> 5.16', '>= 5.16.3'
+  gem 'minitest-around', '~> 0.5.0'
   gem 'shoulda-context', '~> 2.0'
   gem 'shoulda-matchers', '~> 5.1'
 end
@@ -83,7 +81,9 @@ group :development do
 end
 
 group :development, :test do
+  gem 'faker', '~> 2.22'
   gem 'guard-bundler', '~> 3.0'
-  gem 'guard-livereload', require: false
+  gem 'guard-livereload', '~> 2.5', '>= 2.5.2', require: false
+  gem 'populator', git: 'https://github.com/ryanb/populator.git'
   gem 'sqlite3', '~> 1.4', '>= 1.4.4'
 end
