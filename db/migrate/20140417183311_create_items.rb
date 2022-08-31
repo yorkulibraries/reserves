@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 class CreateItems < ActiveRecord::Migration[5.1]
   def change
     create_table :items do |t|
       t.integer :request_id
       t.string :metadata_source
-      t.string :metadata_source_id      
+      t.string :metadata_source_id
       t.string :title
       t.string :author
       t.string :isbn
@@ -11,7 +13,7 @@ class CreateItems < ActiveRecord::Migration[5.1]
       t.string :publication_date
       t.string :publisher
       t.string :description
-      t.string :edition         
+      t.string :edition
       t.string :loan_period
       t.boolean :provided_by_requestor, default: false
       t.string  :item_type
@@ -27,7 +29,6 @@ class CreateItems < ActiveRecord::Migration[5.1]
       t.string  :issue
 
       t.timestamps
-      
     end
   end
 end

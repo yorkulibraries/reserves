@@ -1,8 +1,9 @@
-class LoanPeriodsController < ApplicationController
+# frozen_string_literal: true
 
-  before_action :set_loan_period, only: [:show, :edit, :update, :destroy]
+class LoanPeriodsController < ApplicationController
+  before_action :set_loan_period, only: %i[show edit update destroy]
   authorize_resource
-  
+
   # GET /loan_periods
   # GET /loan_periods.json
   def index
@@ -11,8 +12,7 @@ class LoanPeriodsController < ApplicationController
 
   # GET /loan_periods/1
   # GET /loan_periods/1.json
-  def show
-  end
+  def show; end
 
   # GET /loan_periods/new
   def new
@@ -20,8 +20,7 @@ class LoanPeriodsController < ApplicationController
   end
 
   # GET /loan_periods/1/edit
-  def edit
-  end
+  def edit; end
 
   # POST /loan_periods
   # POST /loan_periods.json
@@ -64,13 +63,14 @@ class LoanPeriodsController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_loan_period
-      @loan_period = LoanPeriod.find(params[:id])
-    end
 
-    # Never trust parameters from the scary internet, only allow the white list through.
-    def loan_period_params
-      params.require(:loan_period).permit(:duration)
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_loan_period
+    @loan_period = LoanPeriod.find(params[:id])
+  end
+
+  # Never trust parameters from the scary internet, only allow the white list through.
+  def loan_period_params
+    params.require(:loan_period).permit(:duration)
+  end
 end
