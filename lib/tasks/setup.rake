@@ -2,16 +2,8 @@
 
 namespace :app do
   task set_alma_api_key: :environment do
-    setting = Setting.find_by! var: 'primo_apikey'
-    setting.value = ENV['PRIMO_API_KEY']
-    setting.save
-
-    setting = Setting.find_by! var: 'alma_apikey'
-    setting.value = ENV['ALMA_API_KEY']
-    setting.save
-
-    setting = Setting.find_by! var: 'worldcat_key'
-    setting.value = ENV['WORLDCAT_API_KEY']
-    setting.save
+    Setting.primo_apikey = ENV['PRIMO_API_KEY']
+    Setting.alma_apikey= ENV['ALMA_API_KEY']
+    Setting.worldcat_key= ENV['WORLDCAT_API_KEY']
   end
 end
