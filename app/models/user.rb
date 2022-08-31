@@ -50,6 +50,14 @@ class User < ApplicationRecord
   end
 
   def update_external_alma(user_id)
+    logger.debug "Setting.alma_apikey: #{Setting.alma_apikey}"
+    logger.debug "Setting.alma_region: #{Setting.alma_region}"
+    Alma.configure do |config|
+      config.apikey = Setting.alma_apikey
+      config.region = Setting.alma_region
+    end
+
+    logger.debug "Searching for user in ALMA with id: #{user_id}"
     user = Alma::User.find(user_id)
 
     begin
