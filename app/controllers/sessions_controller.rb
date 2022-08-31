@@ -1,83 +1,54 @@
+# frozen_string_literal: true
+
 class SessionsController < ApplicationController
-  skip_authorization_check except: [:login_as, :back_to_my_login]
+  before_action :authenticate_user!, except: :destroy
+  skip_authorization_check except: %i[login_as back_to_my_login]
 
   def new
-    uid = request.headers["HTTP_PYORK_USER"]
-
-    user = User.find_by_uid(uid)
-
-    if user
-
-      if user.active?
-        session[:user_id] = user.id
-        session[:username] = uid
-        pp request.headers["HTTP_PYORK_CYIN"]
-        update_successful = user.update_external(request.headers["HTTP_PYORK_CYIN"])
+    current_user = request.env['warden'].authenticate!
+    session[:user_id] = current_user.id if current_user.present?
+    if current_user
+      if current_user.active?
+        update_successful = current_user.update_external(request.headers['HTTP_PYORK_CYIN'])
         if update_successful
-          user.audit_comment = "Updated user information from ALMA"
-          user.save(validate: false)
+          current_user.audit_comment = 'Updated user information from ALMA'
+          current_user.save(validate: false)
         end
 
-        if session[:redirect_to] == nil
-          redirect_to root_url, notice: "Logged in!" if user.admin?
-          redirect_to requests_user_url(user), notice: "Welcome back!" unless user.admin?
+        if session[:redirect_to].nil?
+          redirect_to root_url, notice: 'Logged in!' if current_user.admin?
+          if current_user.name.nil? || current_user.phone.nil? || current_user.office.nil?
+            redirect_to edit_user_url(current_user), notice: 'Welcome! Please tell us about yourself.'
+          else
+            redirect_to requests_user_url(current_user), notice: 'Welcome back!' unless current_user.admin?
+          end
         else
           url = session[:redirect_to]
           session[:redirect_to] = nil
-          redirect_to url, notice: "Logged in!"
+          redirect_to url, notice: 'Logged in!'
         end
-
       else
-        redirect_to inactive_user_url, alert: "Your Account Has Been Disabled"
-      end
-
-    else
-      # user is new, lets make one
-      @user = User.new
-      # try prefilling
-      update_successful = @user.update_external(request.headers["HTTP_PYORK_CYIN"])
-
-      @user.admin = false
-      @user.active = true
-      @user.user_type = User::UNKNOWN if  @user.user_type.nil?
-      @user.role = User::INSTRUCTOR_ROLE
-      @user.uid = uid
-      @user.audit_comment = "Creating new auto-logged in user...from ALMA data"
-
-      @user.save(validate: false)
-
-      session[:user_id] = @user.id
-      session[:username] = @user.uid
-
-
-      if update_successful
-        UserMailer.welcome(@user).deliver_later if @user.email != nil
-        redirect_to requests_user_url(@user), notice: "Welcome!"
-      else
-        redirect_to edit_user_url(@user), notice: "Welcome! Please tell us about yourself."
+        redirect_to inactive_user_url, alert: 'Your Account Has Been Disabled'
       end
     end
-
-    # redirect_to invalid_login_url, alert:  "Invalid username or password #{uid}"
   end
 
   def destroy
-
     session[:user_id] = nil
-    session[:username] = nil
+    request.env['warden'] = nil if request.env['warden'].present?
 
-    cookies.delete("mayaauth", domain: 'yorku.ca')
-    cookies.delete("pybpp", domain: 'yorku.ca')
+    cookies.delete('mayaauth', domain: 'yorku.ca')
+    cookies.delete('pybpp', domain: 'yorku.ca')
 
-    redirect_to  "http://www.library.yorku.ca"
+    redirect_to 'http://www.library.yorku.ca', allow_other_host: true
   end
 
   def invalid_login
-    render layout: "simple"
+    render layout: 'simple'
   end
 
   def unauthorized
-    render layout: "simple"
+    render layout: 'simple'
   end
 
   def inactive_account_url
@@ -95,24 +66,22 @@ class SessionsController < ApplicationController
       name = current_user.name
 
       session[:user_id] = requestor.id
-      session[:username] = requestor.uid
       session[:back_to_url] = request.referer
 
       ## updated audit trail
       requestor.audit_comment = "#{name} logged into #{requestor.name}'' account"
       requestor.save(validate: false)
 
-
       redirect_to requests_user_url(requestor)
     else
-      redirect_to root_url, notice: "Requestor not found"
+      redirect_to root_url, notice: 'Requestor not found'
     end
   end
 
   def back_to_my_login
     authorize! :back_to_login, :requestor
 
-    if session[:back_to_id] != nil
+    unless session[:back_to_id].nil?
       requestor = current_user
 
       u = User.find_by_id(session[:back_to_id])
@@ -122,15 +91,13 @@ class SessionsController < ApplicationController
       requestor.save(validate: false)
 
       session[:user_id] = u.id
-      session[:username] = u.uid
       session[:back_to_id] = nil
 
-      if session[:back_to_url] == nil
+      if session[:back_to_url].nil?
         redirect_to root_url
       else
         redirect_to session[:back_to_url]
       end
     end
   end
-
 end
