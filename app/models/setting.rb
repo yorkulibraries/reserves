@@ -66,7 +66,7 @@ class Setting < RailsSettings::Base
   field :vufind_url, default: (ENV['vufind_url'] || 'https://www.library.yorku.ca/find/Search/Results')
 
   ## WORLDCAT
-  field :worldcat_key, default: (ENV['worldcat_key'] || 'enter-your-key-here')
+  field :worldcat_key, default: (ENV['WORLDCAT_API_KEY'] || 'enter-your-key-here')
   field :worldcat_enable, default: (ENV['worldcat_enable'] || false)
 
   ## Help Defaults
@@ -76,7 +76,7 @@ class Setting < RailsSettings::Base
   field :help_link, default: (ENV['help_link'] || 'http://library.yorku.ca')
 
   ## PRIMO and ALMA Settings
-  field :primo_apikey, default: (ENV['primo_apikey'] || '')
+  field :primo_apikey, default: (ENV['PRIMO_API_KEY'] || '')
   field :primo_inst, default: (ENV['primo_inst'] || '')
   field :primo_vid, default: (ENV['primo_vid'] || '')
   field :primo_region, default: (ENV['primo_region'] || '')
@@ -84,7 +84,7 @@ class Setting < RailsSettings::Base
   field :primo_scope, default: (ENV['primo_scope'] || '')
   field :primo_pcavailability, default: (ENV['primo_pcavailability'] || true)
 
-  field :alma_apikey, default: (ENV['alma_apikey'] || '')
+  field :alma_apikey, default: (ENV['ALMA_API_KEY'] || '')
   field :alma_region, default: (ENV['alma_region'] || '')
 
   def self.fiscal_date
