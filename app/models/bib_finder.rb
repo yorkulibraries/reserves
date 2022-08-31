@@ -8,7 +8,22 @@ class BibFinder
   VUFIND = 'VUFIND'
   WORLDCAT = 'WORLDCAT'
 
+  def configure_primo_api
+    Primo.configure do |config|
+      if defined?(Setting)
+        config.apikey = Setting.primo_apikey
+        config.inst = Setting.primo_inst
+        config.vid = Setting.primo_vid
+        config.region = Setting.primo_region
+        config.enable_loggable = Setting.primo_enable_loggable
+        config.scope = Setting.primo_scope
+        config.pcavailability = Setting.primo_pcavailability
+      end
+    end
+  end
+
   def search_primo(search_string, max_number_of_results = 20, type = 'book')
+    configure_primo_api
     @query = Primo::Search::Query.new(value: search_string)
     add_primo_facets(type)
 
