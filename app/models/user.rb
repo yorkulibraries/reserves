@@ -57,7 +57,7 @@ class User < ApplicationRecord
       config.region = Setting.alma_region
     end
 
-    logger.debug "Searching for user in ALMA with id: #{user_id}"
+    logger.info "Searching for user in ALMA with id: #{user_id}"
     user = Alma::User.find(user_id)
 
     begin
