@@ -9,7 +9,7 @@ class RequestMailer < ApplicationMailer
     @request = request
     @item = item
     @location_email = request.reserve_location.contact_email
-    if Setting.email_allow == true && request.location.setting_bcc_location_on_new_item
+    if Setting.email_allow.to_s == "true" && request.location.setting_bcc_location_on_new_item
       mail to: @location_email, subject: 'New Item Has Been Added To A Request'
     end
   end
@@ -41,7 +41,7 @@ class RequestMailer < ApplicationMailer
     bcc = []
     bcc << current_user.email if request.reserve_location.setting_bcc_request_status_change
 
-    if Setting.email_allow == true && !@request_comm_email.blank?
+    if Setting.email_allow.to_s == "true" && !@request_comm_email.blank?
       mail to: @request_comm_email, from: @location_email, bcc: bcc, subject: Setting.email_status_change_subject
     end
   end
@@ -73,7 +73,7 @@ class RequestMailer < ApplicationMailer
                             [request.requester_email, request.requester.email]
                           end
 
-    if Setting.email_allow == true && !@request_comm_email.blank?
+    if Setting.email_allow.to_s == "true" && !@request_comm_email.blank?
       mail to: @request_comm_email, from: @location_email, subject: Setting.email_request_expiry_notice_subject
     end
   end
