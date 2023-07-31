@@ -3,8 +3,11 @@
 require 'test_helper'
 
 class RequestMailerTest < ActionMailer::TestCase
-  test 'new_item_notification location email' do
+  def setup
     Setting.email_allow = true
+  end
+
+  test 'new_item_notification location email' do
     user = create(:user)
     request = create(:request)
     request.location.setting_bcc_location_on_new_item = true
@@ -18,7 +21,6 @@ class RequestMailerTest < ActionMailer::TestCase
   end
 
   test 'status_change that sends an email to current user' do
-    Setting.email_allow = true
     user = create(:user)
     request = create(:request)
 
@@ -31,7 +33,6 @@ class RequestMailerTest < ActionMailer::TestCase
   end
 
   test "status_change that sends an email to requester email if it's set" do
-    Setting.email_allow = true
     user = create(:user)
     request = create(:request, requester_email: 'requester@requester.com')
 
@@ -48,12 +49,10 @@ class RequestMailerTest < ActionMailer::TestCase
 
     RequestMailer.status_change(request, user).deliver_now
     assert ActionMailer::Base.deliveries.empty?, 'Should be empty'
-
     Setting.email_allow = true
   end
 
   should 'not send email if requester_email or request.requester.email are blank' do
-    Setting.email_allow = true
     user = create(:user)
     request = create(:request, requester: user)
     request.update(requester_email: nil)
@@ -68,8 +67,6 @@ class RequestMailerTest < ActionMailer::TestCase
   end
 
   should 'send expiry notices to both emails of request' do
-    # Setting.email_allow = true
-
     user = create(:user)
     request = create(:request, requester: user)
     request.update(requester_email: 'test@test.com')

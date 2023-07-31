@@ -71,6 +71,7 @@ class AcquisitionRequestTest < ActiveSupport::TestCase
   end
 
   should "send an email to a bookstore, acquisitoins department and location's acquisition email" do
+    Setting.email_allow = true
     user = create(:user)
     location = create(:location, acquisitions_email: 'something@test.com')
     arequest = create(:acquisition_request, location: location)
