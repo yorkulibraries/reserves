@@ -8,6 +8,7 @@ class RequestWizardControllerTest < ActionDispatch::IntegrationTest
     @course = create(:course)
 
     @user = create(:user, admin: true, role: User::MANAGER_ROLE)
+    @user2 = create(:user, admin: true, role: User::MANAGER_ROLE)
     log_user_in(@user)
   end
 
@@ -32,6 +33,37 @@ class RequestWizardControllerTest < ActionDispatch::IntegrationTest
       assert_equal @user.id, request.requester.id, 'Requester id was set'
     end
   end
+
+  should 'create a new course with the same user and reuse it by avoiding diplay an error message' do
+    request_attributes = attributes_for(:request, reserve_location_id: @location.id)
+    request_attributes[:course_attributes] = attributes_for(:course)
+    request_attributes[:user] = { office: '1234 building', department: 'Department of sorts', phone: '1232312312321' }
+
+    post new_request_step_one_save_path, params: { request: request_attributes }
+    request = get_instance_var(:request)
+    assert_equal 0, request.errors.size, "Should be no errors, #{request.errors.messages.inspect}"
+    post new_request_step_one_save_path, params: { request: request_attributes }
+    assert_redirected_to new_request_step_two_path(request), 'Should redirect to Step Two'
+  end
+
+  should 'not create a new course with a different user and diplay an error message' do
+    request_attributes = attributes_for(:request, reserve_location_id: @location.id)
+    request_attributes[:course_attributes] = attributes_for(:course)
+    request_attributes[:user] = { office: '1234 building', department: 'Department of sorts', phone: '1232312312321' }
+
+    post new_request_step_one_save_path, params: { request: request_attributes }
+    request = get_instance_var(:request)
+    assert_equal 0, request.errors.size, "Should be no errors, #{request.errors.messages.inspect}"
+
+    logout
+    log_user_in(@user2)
+    post new_request_step_one_save_path, params: { request: request_attributes }
+    request = get_instance_var(:request)
+
+    assert_response :success
+    assert_equal 1, request.errors.size, "Should be 1 error, #{request.errors.messages.inspect}"
+end
+
 
   should 'load the request and any items, if comping back to this' do
     request = create(:request, status: Request::INCOMPLETE)
