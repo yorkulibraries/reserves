@@ -21,9 +21,11 @@
 				<span class="text-primary field">Call Number</span> <%= format item.callnumber %>
 			<% end %>
 
+<!--
 			<% show_field? item, "physical_copy_required" do%>
 				<span class="text-primary field">Physical Copy Required?</span> <%= item.physical_copy_required? ? "Yes" : "No" %>
 			<% end %>
+-->
 
 
 			<% show_field? item, "map_index_num" do%>

@@ -90,17 +90,17 @@ class Request < ApplicationRecord
     nr.rolledover_at = DateTime.now
     nr.audit_comment = 'Rolledover request'
 
+    ## rollover course
+    course = self.course.rollover(course_year, course_term, course_section, course_credits)
+
+    nr.course_id = course.id
+
     nr.save(validate: false)
 
     ## rollover items
     items.active.each do |i|
       i.rollover(nr.id)
     end
-
-    ## rollover course
-    course = self.course.rollover(course_year, course_term, course_section, course_credits)
-
-    nr.update(course_id: course.id)
 
     # change it's status to UPCYCLED
     self.audit_comment = "Rolling over request and settings this request to #{UPCYCLED} status"
