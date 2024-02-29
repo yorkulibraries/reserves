@@ -14,19 +14,32 @@ class RequestWizardController < ApplicationController
     end
   end
 
+  def get_request_duplicated
+    Request.includes(:course).find_by(course: {code: @request.course.code})
+  end
+
   def save
     @request = Request.new(request_params)
     @request.status = Request::INCOMPLETE
     current_user.update(office: params[:request][:user][:office], department: params[:request][:user][:department],
                         phone: params[:request][:user][:phone])
 
+    @request.course.created_by_id = current_user.id
     @request.requester_id = current_user.id
-
-    @request.audit_comment = 'Request Step One Completed'
-    if @request.save
-      redirect_to new_request_step_two_path(@request), notice: 'Proceeding to Step 2.'
+    if @request.course.save
+      @request.audit_comment = 'Request Step One Completed'
+      if @request.save
+        redirect_to new_request_step_two_path(@request), notice: 'Proceeding to Step 2.'
+      else
+        render action: 'step_one'
+      end
     else
-      render action: 'step_one'
+      @old_request = get_request_duplicated
+      if @old_request.course.created_by_id == current_user.id
+        redirect_to new_request_step_two_path(@old_request), notice: 'Proceeding to Step 2.'
+      elsif !@request.save
+        render action: 'step_one'
+      end
     end
   end
 

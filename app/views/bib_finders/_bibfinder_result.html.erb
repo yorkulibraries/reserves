@@ -53,7 +53,7 @@
       <% end %>
       </span></p>
       </div>
-      <div class="col-md-2"><%= image_tag "https://www.library.yorku.ca/find/bookcover.php?isn=#{isbn.first}&size=small&id=#{bib_result.id}", class: "bookcover" if (!(isbn.blank?)) %></div>
+      <div class="col-md-2"><%= image_tag "https://proxy-ca.hosted.exlibrisgroup.com/exl_rewrite/syndetics.com/index.php?client=primo&isbn=#{isbn.first}/sc.jpg", class: "bookcover" if (!(isbn.blank?)) %></div>
 
       <!-- Hidden elements -->
 
