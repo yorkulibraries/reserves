@@ -120,7 +120,7 @@ class RequestTest < ActiveSupport::TestCase
   should "mass archive all completed requests whos reserve_end_date is #{Setting.request_archive_all_after} days old" do
     not_expired = create_list(:request, 2, status: Request::OPEN)
     completed_expired = create_list(:request, 3, status: Request::COMPLETED,
-                                                 reserve_end_date: Date.today - Setting.request_archive_all_after.to_i)
+                                                 reserve_end_date: Date.today - Setting.request_archive_all_after)
 
     removed = Request.mass_archive(1, true)
     assert_equal completed_expired.size, removed.size, 'should be teh same number'
