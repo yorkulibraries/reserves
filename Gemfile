@@ -9,29 +9,21 @@ gem 'rails', '~> 7.0', '>= 7.0.3.1'
 
 ## RAILS related ##
 gem 'sass-rails', '~> 6.0'
-gem 'uglifier', '~> 4.2'
-
-## DEPLOYMENT ##
-gem 'capistrano', '3.8.0'
-gem 'capistrano-bundler', '1.2.0'
-gem 'capistrano-rails', '1.2.3'
-gem 'capistrano-rbenv', '2.1.0'
+gem 'terser', '~> 1.1', '>= 1.1.20'
 
 ## DATABASES ##
-gem 'mysql2', '0.5.3', group: :production
+gem 'mysql2', '0.5.3'
 
 ## CSS AND JAVASCRIPT ##
 gem 'jquery-rails', '4.5.0'
 gem 'jquery-ui-rails', '6.0.1'
-gem 'mini_racer', '~> 0.6.3'
 
 ## BOOTSTRAP & SIMPLE_FORM & FONTAWESOME ##
 gem 'font-awesome-rails', '~> 4.7'
 gem 'simple_form', '~> 5.1'
 
 ## TOOLS AND UTILITIES ##
-gem 'audited', '~> 5.0', '>= 5.0.2'
-gem 'bigdecimal', '1.3.5'
+gem 'audited', '~> 5.4', '>= 5.4.3'
 gem 'cancancan', '~> 3.4'
 gem 'devise', '~> 4.8', '>= 4.8.1'
 gem 'email_validator', '~> 2.2', '>= 2.2.3'
@@ -85,5 +77,4 @@ group :development, :test do
   gem 'guard-bundler', '~> 3.0'
   gem 'guard-livereload', '~> 2.5', '>= 2.5.2', require: false
   gem 'populator', git: 'https://github.com/ryanb/populator.git'
-  gem 'sqlite3', '~> 1.4', '>= 1.4.4'
 end
