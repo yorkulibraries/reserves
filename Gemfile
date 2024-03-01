@@ -15,8 +15,10 @@ gem 'terser', '~> 1.1', '>= 1.1.20'
 gem 'mysql2', '0.5.3'
 
 ## CSS AND JAVASCRIPT ##
+gem 'bootstrap', '~> 5.3', '>= 5.3.2'
 gem 'jquery-rails', '4.5.0'
 gem 'jquery-ui-rails', '6.0.1'
+gem 'underscore-rails', '~> 1.8', '>= 1.8.3'
 
 ## BOOTSTRAP & SIMPLE_FORM & FONTAWESOME ##
 gem 'font-awesome-rails', '~> 4.7'

@@ -16,6 +16,9 @@
 //= require jquery-ui/widgets/datepicker
 //= require jquery-ui/widgets/autocomplete
 //= require jquery-ui/effects/effect-highlight
+//= require jquery3
+//= require popper
+//= require bootstrap-sprockets
 //= require_self
 //= require_tree .
 
