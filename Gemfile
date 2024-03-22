@@ -65,6 +65,7 @@ group :test do
   gem 'minitest-around', '~> 0.5.0'
   gem 'shoulda-context', '~> 2.0'
   gem 'shoulda-matchers', '~> 5.1'
+  gem 'sqlite3'
 end
 
 group :development do
