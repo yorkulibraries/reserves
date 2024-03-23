@@ -40,10 +40,15 @@ Start the containers if you haven't started them yet.
 docker compose up --build
 ```
 
-Run the tests
+Run all the tests
 
 ```
-docker exec -it  -e RAILS_ENV=test -e DATABASE_URL=sqlite3:db/test.sqlite3 reserves-web-1 rails test
+docker compose exec web rt 
+```
+
+Run a specific test
+```
+docker compose exec web rt test/controllers/acquisition_requests_controller_test.rb 
 ```
 
 # Access the containers
