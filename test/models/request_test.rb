@@ -90,7 +90,7 @@ class RequestTest < ActiveSupport::TestCase
     # ensure rollover parent and date are recorded
     assert_equal request.rollover_parent_id, r.id, 'Should be rollover parent'
     assert_not_nil request.rolledover_at, 'Should be set'
-    assert_equal DateTime.now.beginning_of_day.strftime('%m/%d/%Y'),
+    assert_equal Time.zone.now.beginning_of_day.strftime('%m/%d/%Y'),
                  request.rolledover_at.beginning_of_day.strftime('%m/%d/%Y'), 'Should match the day '
 
     ## assert original request is UPCYCLED

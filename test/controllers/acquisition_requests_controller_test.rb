@@ -105,7 +105,7 @@ class AcquisitionRequestsControllerTest < ActionDispatch::IntegrationTest
 
     assert_equal @user.id, acquisition_request.acquired_by.id, 'Records who acquired it'
     assert_not_nil acquisition_request.acquired_at, 'Date and time acquired should set'
-    assert_equal Date.today, acquisition_request.acquired_at.to_date, 'Should be today'
+    assert_equal Time.zone.today, acquisition_request.acquired_at.to_date, 'Should be today'
   end
 
   should "set status to #{AcquisitionRequest::STATUS_CANCELLED}" do
@@ -125,7 +125,7 @@ class AcquisitionRequestsControllerTest < ActionDispatch::IntegrationTest
 
     assert_equal @user.id, acquisition_request.cancelled_by.id, 'Records who cancelled it'
     assert_not_nil acquisition_request.cancelled_at, 'Date and time cancelled should set'
-    assert_equal Date.today, acquisition_request.cancelled_at.to_date, 'Should be today'
+    assert_equal Time.zone.today, acquisition_request.cancelled_at.to_date, 'Should be today'
   end
 
   ## SENDING ACQUISITION'S EMAIL ##
