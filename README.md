@@ -55,11 +55,11 @@ docker compose exec web rt test/controllers/acquisition_requests_controller_test
 
 DB container
 ```
-docker exec -it reserves-db-1 bash
+docker compose exec db bash
 ```
 
 Webapp container
 ```
-docker exec -it reserves-web-1 bash
+docker compose exec web bash
 ```
 
