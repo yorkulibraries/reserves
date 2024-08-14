@@ -12,17 +12,17 @@ There are 2 containers created: *reserves-web-1* and *reserves-dbl-1*
 
 # Access the front end web app in DEVELOPMENT 
 
-By default, the application will listen on port 4004 and runs with RAILS_ENV=development.
+By default, the application will listen on port 3006 and runs with RAILS_ENV=development.
 
 To access the application in Chrome browser, you will need to add the ModHeader extension to your Chrome browser.
 
-Once the extension has been activated, you can add the following header to the site http://localhost:4004/. This will enable you to login as **manager** user.
+Once the extension has been activated, you can add the following header to the site http://localhost:3006/. This will enable you to login as **manager** user.
 
 Header: PYORK_USER
 
 Value: manager
 
-The application is now accessible at http://localhost:4004/
+The application is now accessible at http://localhost:3006/
 
 # What if I want to use a different port?
 
