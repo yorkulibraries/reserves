@@ -65,10 +65,10 @@ class BibResult
     rescue StandardError
       'n/a'
     end
-    self.isbn_issn = get_value record[:pnx]['addata']['isbn']
+    self.isbn_issn = get_value(record[:pnx]['addata']['isbn']&.first || '').tr('^A-Za-z0-9', '')
 
     ## journals
-    self.isbn_issn = get_value record[:pnx]['addata']['issn'] if isbn_issn.blank?
+    self.isbn_issn = get_value(record[:pnx]['addata']['issn']&.first || '').tr('^A-Za-z0-9', '') if isbn_issn.blank?
     self.journal_title = get_value record[:pnx]['addata']['jtitle']
     self.volume = get_value record[:pnx]['addata']['volume']
     self.issue = get_value record[:pnx]['addata']['issue']
