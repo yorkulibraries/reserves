@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class BibResult
-  attr_accessor :title, :author, :isbn_issn, :callnumber, :publication_date, :publisher, :edition,
+  attr_accessor :title, :author, :isbn_issn, :other_isbn_issn, :callnumber, :publication_date, :publisher, :edition,
                 :item_type, :format, :map_index_num, :journal_title, :volume, :page_number,
                 :issue, :ils_barcode, :ils_id, :description, :main_location, :url, :rtype,
                 :catalogue_record, :source, :language, :subject
@@ -66,9 +66,12 @@ class BibResult
       'n/a'
     end
     self.isbn_issn = get_value(record[:pnx]['addata']['isbn']&.first || '').tr('^A-Za-z0-9', '')
+    self.other_isbn_issn = (record[:pnx]['addata']['isbn']&.drop(1) || []).map { |isbn| get_value(isbn).tr('^A-Za-z0-9', '') }.join(',')
 
     ## journals
     self.isbn_issn = get_value(record[:pnx]['addata']['issn']&.first || '').tr('^A-Za-z0-9', '') if isbn_issn.blank?
+    self.other_isbn_issn = (record[:pnx]['addata']['issn']&.drop(1) || []).map { |issn| get_value(issn).tr('^A-Za-z0-9', '') }.join(',') if isbn_issn.blank?
+
     self.journal_title = get_value record[:pnx]['addata']['jtitle']
     self.volume = get_value record[:pnx]['addata']['volume']
     self.issue = get_value record[:pnx]['addata']['issue']
@@ -111,6 +114,7 @@ class BibResult
       { title: title,
         author: author,
         isbn_issn: isbn_issn,
+        other_isbn_issn: other_isbn_issn,
         callnumber: callnumber,
         publication_date: publication_date,
         publisher: publisher,
