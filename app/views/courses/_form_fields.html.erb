@@ -20,7 +20,7 @@
 			<%= f.input :subject, collection: Courses::Subject.all_subjects, input_html: { class: "input-sm" } %>
 		</div>
 		<div class="col-md-2 col-lg-2">
-			<%= f.input :course_id, label: "Course Number", input_html: { class: "input-sm" } %>
+			<%= f.input :course_id, label: "Course Number", input_html: { class: "input-sm", maxlength: 4, oninput: "this.value = this.value.replace(/[^0-9]/g, '').slice(0, 4);" } %>
 		</div>
 		<div class="col-md-1 col-lg-1">
 			<%= f.input :term, collection: Course::TERMS, input_html: {  class: "input-sm", id: "request_course_attributes_term" } %>
