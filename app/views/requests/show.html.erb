@@ -193,45 +193,53 @@
 	<!-- ITEMS -->
 
 	<div class="panel panel-info">
-	  <div class="panel-heading">
-	    <h3 class="panel-title">Requested Items</h3>
-	  </div>
-		<div class="panel-body">
-			<% if is_request_active(@request) %>
-				<%= render partial: "items/add_item" %>
+	<div class="panel-heading">
+		<h3 class="panel-title">Requested Items</h3>
+	</div>
+	<div class="panel-body">
+		<% if is_request_active(@request) %>
+		<%= render partial: "items/add_item" %>
+		<% end %>
+
+		<div class="items">
+		<div class="d-flex justify-content-between mb-3">
+			<%= link_to request_copy_items_path(@request), remote: true, class: "btn btn-link blend" do %>
+			<span class="fa fa-copy"></span> Copy Items
 			<% end %>
+			<%= link_to request_items_path(@request, status: Item::STATUS_DELETED), class: "btn btn-link blend" do %>
+			<span class="fa fa-trash-o"></span> <%= @request.items.deleted.size %>
+			<% end %>
+		</div>
 
-			<div class="items">
+		<% if @request.items.active.size > 0 %>
+			<% @request.items.active.recent_first.each do |item| %>
+			<%= render item %>
+			<% end %>
+		<% end %>
 
-				<%if @request.items.active.size > 0 %>
-					<% @request.items.active.recent_first.each do |item| %>
-						<%= render item %>
-					<% end %>
-				<% end %>
-
-				<% if is_request_active(@request) && @request.items.size == 0 %>
-					<!-- blank slate -->
-					<div class="items-empty-slate arrow">
-						<h1>No Items Requested Yet!</h1>
-						<p>In order for your request to be open, you must add at least one item.</p>
-					</div>
-				<% end %>
-
-
-				<% if @request.status == Request::REMOVED %>
-					<div id="removed_items" class="<%= 'hide' if @request.items.deleted.size == 0 %>">
-							<h4>Removed Items</h4>
-							<% @request.items.deleted.each do |item| %>
-								<%= link_to request_item_path(@request, item), class: "btn btn-link blend", remote: true do %>
-									<span class="fa fa-retweet"></span> <%= item.title %>
-							<% end %>
-					<% end %>
-					</div>
-				<% end %>
-
+		<% if is_request_active(@request) && @request.items.size == 0 %>
+			<!-- blank slate -->
+			<div class="items-empty-slate arrow">
+			<h1>No Items Requested Yet!</h1>
+			<p>In order for your request to be open, you must add at least one item.</p>
 			</div>
+		<% end %>
+
+		<% if @request.status == Request::REMOVED %>
+			<div id="removed_items" class="<%= 'hide' if @request.items.deleted.size == 0 %>">
+			<h4>Removed Items</h4>
+			<% @request.items.deleted.each do |item| %>
+				<%= link_to request_item_path(@request, item), class: "btn btn-link blend", remote: true do %>
+				<span class="fa fa-retweet"></span> <%= item.title %>
+				<% end %>
+			<% end %>
+			</div>
+		<% end %>
+
 		</div>
 	</div>
+	</div>
+
 
 
 
