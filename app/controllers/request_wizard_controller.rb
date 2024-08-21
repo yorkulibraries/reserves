@@ -35,9 +35,10 @@ class RequestWizardController < ApplicationController
       end
     else
       @old_request = get_request_duplicated
-      if @old_request.course.created_by_id == current_user.id
+      if @old_request&.course&.created_by_id == current_user.id
         redirect_to new_request_step_two_path(@old_request), notice: 'Proceeding to Step 2.'
-      elsif !@request.save
+      else
+        flash[:alert] = "Course couldn't be saved. Please check the details."
         render action: 'step_one'
       end
     end

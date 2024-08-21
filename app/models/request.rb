@@ -39,6 +39,7 @@ class Request < ApplicationRecord
 
   ## VALIDATIONS
 
+  validates :course, presence: { message: 'Cannot be empty' }
   # :requester_id, :course_id, :item_id ,:assigned_to_id, :department_id,
   validates_presence_of :reserve_start_date, :reserve_location_id, :course, :reserve_end_date,
                         message: 'Cannot be empty'
