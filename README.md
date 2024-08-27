@@ -46,9 +46,13 @@ Run all the tests
 docker compose exec web rt 
 ```
 
-Run a specific test
+Run a specific test and test within the test file.
 ```
-docker compose exec web rt test/controllers/acquisition_requests_controller_test.rb 
+docker compose exec web rt TEST=test/controllers/users_controller_test.rb
+
+1. docker compose exec web bash
+2. $>  rts TEST=test/system/requests_test.rb
+
 ```
 
 # Access the containers
