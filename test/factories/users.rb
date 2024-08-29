@@ -4,8 +4,8 @@
 
 FactoryGirl.define do
   factory :user do
-    name 'Jeremy Clarkson'
-    sequence(:email, 1000) { |n| "jereymy#{n}@yorku.ca" }
+    name { FactoryGirl.generate(:random_name) }
+    email { FactoryGirl.generate(:random_email) }
     phone '124'
     user_type User::FACULTY
     role User::INSTRUCTOR_ROLE
