@@ -45,5 +45,15 @@ class CoursesTest < ApplicationSystemTestCase
     assert_selector 'a', text: 'Course Title Test'
   end
 
+  test 'Search a course' do
+    login_as(@user)
+    visit root_url
+
+    find('a[aria-label="Search"]').click
+    fill_in 'q', with: @request.course.name
+    find('input[name="q"]').send_keys(:enter)
+
+    assert_selector 'a', text: @request.course.name
+  end
 
 end
