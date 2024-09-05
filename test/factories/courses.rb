@@ -4,7 +4,7 @@
 
 FactoryGirl.define do
   factory :course do
-    name 'Science, Technology and Society'
+    name { FactoryGirl.generate(:random_string) }
     # code "2013_GL_ECON_S1_2500__3_A"
     sequence(:code) { |n| "2013_GL_ECON_S1_200#{n}__3_A" }
     student_count 20

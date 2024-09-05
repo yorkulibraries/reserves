@@ -26,7 +26,7 @@ class Settings::CourseFacultiesController < ApplicationController
 
     respond_to do |format|
       if @faculty.save
-        format.html { redirect_to settings_faculties_path, notice: "#{@faculty.code} suject was created!" }
+        format.html { redirect_to settings_faculties_path, notice: "#{@faculty.code} faculty was created!" }
       else
         format.html { render :new }
       end
@@ -38,7 +38,7 @@ class Settings::CourseFacultiesController < ApplicationController
   def update
     respond_to do |format|
       if @faculty.update(faculty_params)
-        format.html { redirect_to settings_faculties_path, notice: "#{@faculty.code} suject was updated!" }
+        format.html { redirect_to settings_faculties_path, notice: "#{@faculty.code} faculty was updated!" }
       else
         format.html { render :edit }
       end

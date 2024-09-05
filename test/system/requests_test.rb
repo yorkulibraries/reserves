@@ -33,7 +33,7 @@ class RequestsTest < ApplicationSystemTestCase
     click_link "New Request"
 
     fill_in 'request_course_attributes_name', with: 'Course Title'
-    select "2023/2024", from: 'request_course_attributes_year'
+    select Course::ACADEMIC_YEARS_FULL.first[0], from: 'request_course_attributes_year'
     select "AP", from: 'request_course_attributes_faculty'
     select "ACTG", from: 'request_course_attributes_subject'
     fill_in 'request_course_attributes_course_id', with: '1234'
@@ -56,7 +56,7 @@ class RequestsTest < ApplicationSystemTestCase
     click_link "New Request"
 
     fill_in 'request_course_attributes_name', with: 'Course Title'
-    select "2023/2024", from: 'request_course_attributes_year'
+    select Course::ACADEMIC_YEARS_FULL.first[0], from: 'request_course_attributes_year'
     select "AP", from: 'request_course_attributes_faculty'
     select "ACTG", from: 'request_course_attributes_subject'
     fill_in 'request_course_attributes_course_id', with: '1234'
@@ -78,7 +78,7 @@ class RequestsTest < ApplicationSystemTestCase
 
     visit root_url
     click_link "Incomplete"
-    click_button "Some Location Name"
+    find('button .fa-home').click
     click_link "All Locations"
     assert_selector 'a', text: "Course Title"
   end
@@ -92,7 +92,7 @@ class RequestsTest < ApplicationSystemTestCase
     click_link "New Request"
 
     fill_in 'request_course_attributes_name', with: 'Course Title'
-    select "2023/2024", from: 'request_course_attributes_year'
+    select Course::ACADEMIC_YEARS_FULL.first[0], from: 'request_course_attributes_year'
     select "AP", from: 'request_course_attributes_faculty'
     select "ACTG", from: 'request_course_attributes_subject'
     fill_in 'request_course_attributes_course_id', with: '1234'
@@ -122,7 +122,7 @@ class RequestsTest < ApplicationSystemTestCase
     assert_selector '.label.label-default', text: "Open"
 
     visit root_url
-    click_button "Some Location Name"
+    find('button .fa-home').click
     click_link "All Locations"
     assert_selector 'a', text: "Course Title"
   end
@@ -136,7 +136,7 @@ class RequestsTest < ApplicationSystemTestCase
     click_link "New Request"
 
     fill_in 'request_course_attributes_name', with: 'Course Title'
-    select "2023/2024", from: 'request_course_attributes_year'
+    select Course::ACADEMIC_YEARS_FULL.first[0], from: 'request_course_attributes_year'
     select "AP", from: 'request_course_attributes_faculty'
     select "ACTG", from: 'request_course_attributes_subject'
     fill_in 'request_course_attributes_course_id', with: '1234'
@@ -180,7 +180,7 @@ class RequestsTest < ApplicationSystemTestCase
     click_link "New Request"
 
     fill_in 'request_course_attributes_name', with: 'Course Title'
-    select "2023/2024", from: 'request_course_attributes_year'
+    select Course::ACADEMIC_YEARS_FULL.first[0], from: 'request_course_attributes_year'
     select "AP", from: 'request_course_attributes_faculty'
     select "ACTG", from: 'request_course_attributes_subject'
     fill_in 'request_course_attributes_course_id', with: '1234'
@@ -230,7 +230,7 @@ class RequestsTest < ApplicationSystemTestCase
 
     visit root_url
     click_link "Completed"
-    click_button "Some Location Name"
+    find('button .fa-home').click
     click_link "All Locations"
     assert_selector 'a', text: "Course Title"
   end
@@ -242,7 +242,7 @@ class RequestsTest < ApplicationSystemTestCase
     assert_selector '.alert-success', text: "Logged in!"
 
     click_link "Completed"
-    click_button "Some Location Name"
+    find('button .fa-home').click
     click_link "All Locations"
     click_link @request2.course.name
 
@@ -278,7 +278,7 @@ class RequestsTest < ApplicationSystemTestCase
 
     visit root_url
 
-    click_button "Some Location Name"
+    find('button .fa-home').click
     click_link "All Locations"
 
     click_link @request1.course.name
@@ -298,7 +298,7 @@ class RequestsTest < ApplicationSystemTestCase
     click_link "New Request"
 
     fill_in 'request_course_attributes_name', with: 'Course Title'
-    select "2023/2024", from: 'request_course_attributes_year'
+    select Course::ACADEMIC_YEARS_FULL.first[0], from: 'request_course_attributes_year'
     select "AP", from: 'request_course_attributes_faculty'
     select "ACTG", from: 'request_course_attributes_subject'
     fill_in 'request_course_attributes_course_id', with: '1234'
@@ -334,7 +334,7 @@ class RequestsTest < ApplicationSystemTestCase
 
     visit root_url
 
-    click_button "Some Location Name"
+    find('button .fa-home').click
     click_link "All Locations"
 
     click_link @request1.course.name
@@ -362,7 +362,7 @@ class RequestsTest < ApplicationSystemTestCase
     visit root_url
     assert_selector '.alert-success', text: "Logged in!"
 
-    click_button "Some Location Name"
+    find('button .fa-home').click
     click_link "All Locations"
 
     click_link @request1.course.name

@@ -26,7 +26,7 @@ class Settings::CourseSubjectsController < ApplicationController
 
     respond_to do |format|
       if @subject.save
-        format.html { redirect_to settings_subjects_path, notice: "#{@subject.code} suject was created!" }
+        format.html { redirect_to settings_subjects_path, notice: "#{@subject.code} subject was created!" }
       else
         format.html { render :new }
       end
@@ -38,7 +38,7 @@ class Settings::CourseSubjectsController < ApplicationController
   def update
     respond_to do |format|
       if @subject.update(subject_params)
-        format.html { redirect_to settings_subjects_path, notice: "#{@subject.code} suject was updated!" }
+        format.html { redirect_to settings_subjects_path, notice: "#{@subject.code} subject was updated!" }
       else
         format.html { render :edit }
       end
