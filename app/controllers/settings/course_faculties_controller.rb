@@ -50,7 +50,7 @@ class Settings::CourseFacultiesController < ApplicationController
   def destroy
     @faculty.destroy
     respond_to do |format|
-      format.html { redirect_to settings_faculties_path, notice: "#{@faculty.code} suject was removed!" }
+      format.html { redirect_to settings_faculties_path, notice: "#{@faculty.code} faculty was removed!" }
     end
   end
 

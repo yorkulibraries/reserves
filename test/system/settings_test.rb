@@ -9,6 +9,7 @@ class SettingsTest < ApplicationSystemTestCase
   setup do
     @user = FactoryGirl.create(:user, role: User::MANAGER_ROLE, admin: true)
     @course_subject = FactoryGirl.create(:courses_subject)
+    @course_faculty = FactoryGirl.create(:courses_faculty)
   end
 
   test 'Change app name' do
@@ -152,6 +153,21 @@ class SettingsTest < ApplicationSystemTestCase
     assert_selector 'select#request_course_attributes_subject option', text: '1234'
   end
 
+  test 'Delete a course subject' do
+    login_as(@user)
+    visit root_url
+
+    find('a[aria-label="Settings"]').click
+    click_link "Course Subjects"
+    assert_selector("tr", text: "COD") { click_link("Make Changes") }
+
+    click_link 'Remove Course Subject'
+
+    page.accept_alert
+
+    assert_selector '.alert-success', text: "COD subject was removed!"
+  end
+
   test 'Add new course faculty' do
     login_as(@user)
     visit root_url
@@ -179,20 +195,35 @@ class SettingsTest < ApplicationSystemTestCase
     visit root_url
 
     find('a[aria-label="Settings"]').click
-    click_link "Course Subjects"
+    click_link "Course Faculties"
     assert_selector("tr", text: "MyString") { click_link("Make Changes") }
 
-    fill_in 'courses_faculty_code', with: '1234'
+    fill_in 'courses_faculty_code', with: '3213'
     fill_in 'courses_faculty_name', with: 'Name Test'
     click_button 'Update Faculty'
 
-    assert_selector '.alert-success', text: "1234 faculty was updated!"
+    assert_selector '.alert-success', text: "3213 faculty was updated!"
 
-    assert_selector 'td', text: '1234'
+    assert_selector 'td', text: '3213'
     assert_selector 'td', text: 'Name Test'
 
     click_link "New Request"
-    assert_selector 'select#request_course_attributes_faculty option', text: '1234'
+    assert_selector 'select#request_course_attributes_faculty option', text: '3213'
+  end
+
+  test 'Delete a course faculties' do
+    login_as(@user)
+    visit root_url
+
+    find('a[aria-label="Settings"]').click
+    click_link "Course Faculties"
+    assert_selector("tr", text: "MyString") { click_link("Make Changes") }
+    
+    click_link 'Remove Course Faculty'
+
+    page.accept_alert
+
+    assert_selector '.alert-success', text: "MyString faculty was removed!"
   end
 
 end

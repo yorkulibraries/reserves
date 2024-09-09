@@ -50,7 +50,7 @@ class Settings::CourseSubjectsController < ApplicationController
   def destroy
     @subject.destroy
     respond_to do |format|
-      format.html { redirect_to settings_subjects_path, notice: "#{@subject.code} suject was removed!" }
+      format.html { redirect_to settings_subjects_path, notice: "#{@subject.code} subject was removed!" }
     end
   end
 
