@@ -27,12 +27,12 @@ class User < ApplicationRecord
   belongs_to :location
 
   ## VALIDATIONS
-  validates_presence_of :name, :email, :uid, :user_type, :role
+  validates :email, presence: true, uniqueness: true, format: { with: /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i }, if: :new_record?
+  validates :uid, uniqueness: true, if: :new_record?
+  validates_presence_of :name, :email, :uid, :user_type
+  validates_presence_of :role, if: :admin?
   validates_presence_of :department, :phone, :office, unless: proc { |u| u.admin? }
   validates_presence_of :location, if: proc { |u| u.admin? }
-  validates :email, presence: true, uniqueness: true, format: { with: /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i }
-
-  validates_uniqueness_of :uid
 
   ## SCOPES
   scope :admin, -> { where(admin: true) }
