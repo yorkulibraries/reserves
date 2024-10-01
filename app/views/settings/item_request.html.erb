@@ -9,7 +9,7 @@
     <div class="panel-body">
       <%= f.input :request_archive_all_allow, label: "Enable Auto Archive?", as: :radio_buttons %>
 
-      <% interval = [["30 days", 30.days], ["60 days", 60.days], ["90 days", 90.days], ["180 days", 180.days]] %>
+      <% interval = [["15 days", 15.days], ["30 days", 30.days], ["60 days", 60.days], ["90 days", 90.days], ["180 days", 180.days]] %>
       <%= f.input :request_archive_all_after, label: "Archive Requests After", include_blank: false, collection: interval %>
 
       <%= f.input :request_archive_all_user_id, label: "Archive as User", include_blank: false, collection: User.admin %>
