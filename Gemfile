@@ -77,5 +77,6 @@ group :development, :test do
   gem 'faker', '~> 2.22'
   gem 'guard-bundler', '~> 3.0'
   gem 'guard-livereload', '~> 2.5', '>= 2.5.2', require: false
-  gem 'populator', git: 'https://github.com/ryanb/populator.git'
+  # gem 'populator', git: 'https://github.com/ryanb/populator.git'
+  gem 'populator', git: 'https://github.com/fulvi0/populator'
 end

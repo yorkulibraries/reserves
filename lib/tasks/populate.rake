@@ -45,7 +45,8 @@ namespace :db do
       u.uid = role.downcase
       u.active = true
       u.created_by_id = 1
-      u.location_id = index + 1
+      # u.location_id = index + 1
+      u.location_id = Location.all.sample.id 
       u.save(validate: false)
     end
 
@@ -61,10 +62,13 @@ namespace :db do
                   'Calumet 202', 'Founders 304', 'Winters 210', 'Tel 108', 'Tel 109', 'Winters 300', 'BSB 405', 'Petrie 324', 'Petrie 376']
       u.role = User::INSTRUCTOR_ROLE
       u.library_uid = "290000#{Faker::PhoneNumber.extension}"
-      u.admin = false
+      
+      u.admin = User::TYPES[type_index] == 'STAFF'
+      
       u.active = true
       u.created_by_id = 1
       u.uid = "#{u.user_type}_dev"
+      u.location_id = Location.all.sample.id 
       type_index += 1
     end
 
