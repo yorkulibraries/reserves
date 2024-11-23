@@ -63,7 +63,7 @@
     <% @requests_grouped.each do |id, requests| %>
       <li class="list-group-item list-group-item-info">
         <span class="badge"><%= requests.size %> requests</span>
-        <%= requests.first.reserve_location.name %>
+        <%= requests.first.reserve_location.name unless requests.first.reserve_location.nil? %>
       </li>
 
       <% requests.each do |r| %>
