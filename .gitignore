@@ -20,4 +20,5 @@ yarn.lock
 .ruby-version
 *.env
 !.env
-.github
+*.sql
+log/*

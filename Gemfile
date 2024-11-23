@@ -4,15 +4,15 @@ source 'http://rubygems.org'
 ruby '3.1.4'
 
 ## RAILS and related ##
-gem 'puma', '~> 5.6', '>= 5.6.5'
-gem 'rails', '~> 7.0', '>= 7.0.3.1'
+gem 'rails', '~> 7.0.0'
+gem 'puma'
 
 ## RAILS related ##
 gem 'sass-rails', '~> 6.0'
 gem 'terser', '~> 1.1', '>= 1.1.20'
 
 ## DATABASES ##
-gem 'mysql2', '0.5.3'
+gem 'mysql2'
 
 ## CSS AND JAVASCRIPT ##
 gem 'jquery-rails', '4.5.0'
@@ -65,7 +65,7 @@ group :test do
   gem 'minitest-around', '~> 0.5.0'
   gem 'shoulda-context', '~> 2.0'
   gem 'shoulda-matchers', '~> 5.1'
-  gem 'sqlite3'
+  gem 'sqlite3', '~> 1.4'
 end
 
 group :development do
