@@ -18,6 +18,7 @@ class UserTest < ActiveSupport::TestCase
     assert !build(:user, name: nil).valid?, 'Should have a name'
     assert !build(:user, user_type: nil).valid?, 'Should have user type'
     assert !build(:user, role: nil).valid?, 'Staff must have a role set'
+    assert !build(:user, username: nil).valid?, 'Should have a username'
 
     # staff specific validations
     assert !build(:user, admin: true, location: nil).valid?, 'Staff must have a location set'

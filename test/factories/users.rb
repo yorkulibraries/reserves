@@ -12,6 +12,7 @@ FactoryGirl.define do
     department 'History'
     office 'Some where'
     sequence(:uid, '20900') { |n| "12#{n}" }
+    sequence(:username, '20900') { |n| "12#{n}" }
     active true
     admin false
 
