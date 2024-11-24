@@ -183,6 +183,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_11_24_133437) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string "encrypted_password", default: "", null: false
+    t.string "username", null: false
     t.integer "sign_in_count", default: 0, null: false
     t.datetime "current_sign_in_at"
     t.datetime "last_sign_in_at"
@@ -191,6 +192,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_11_24_133437) do
     t.integer "failed_attempts", default: 0, null: false
     t.string "unlock_token"
     t.datetime "locked_at"
+    t.index ["username"], name: "index_users_on_username", unique: true
   end
 
 end
