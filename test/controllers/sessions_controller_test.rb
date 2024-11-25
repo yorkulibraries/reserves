@@ -3,8 +3,6 @@
 require 'test_helper'
 
 class SessionsControllerTest < ActionDispatch::IntegrationTest
-  include Warden::Test::Helpers
-  include Devise::Test::IntegrationHelpers
   setup do
     @cas_header = 'HTTP_PYORK_USER'
     @cas_alt_header = 'HTTP_PYORK_CYIN'
@@ -42,10 +40,12 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to requests_user_url(user)
   end
 
-  should 'redirect to inactive if user is not active' do
+  should 'show error 401 if user is not active' do
     user = create(:user, uid: '123123123', admin: false, active: false)
     get login_url, headers: { @cas_header.to_s =>  user.uid }
-    assert_redirected_to inactive_user_url, 'Shold redirect to invalid login url'
+    assert_equal 401, response.status
+    assert_not_nil flash[:alert]
+    assert_equal 'User not active.', flash[:alert]
   end
 
   should "NEW USER, redirect to new user signup if user doesn't exist, no email should be sent yet" do

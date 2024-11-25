@@ -5,58 +5,39 @@ class SessionsController < ApplicationController
   skip_authorization_check except: %i[login_as back_to_my_login]
 
   def new
-    current_user = request.env['warden'].authenticate!
-    session[:user_id] = current_user.id if current_user.present?
-    if current_user
-      if current_user.active?
-        update_successful = current_user.update_external(request.headers['HTTP_PYORK_CYIN'])
-        if update_successful
-          current_user.audit_comment = 'Updated user information from ALMA'
-          current_user.save(validate: false)
-        end
+    user = current_user # use Devise "current_user" helper to get logged in user
 
-        if session[:redirect_to].nil?
-          redirect_to root_url, notice: 'Logged in!' if current_user.admin?
-          if current_user.name.nil? || current_user.phone.nil? || current_user.office.nil?
-            redirect_to edit_user_url(current_user), notice: 'Welcome! Please tell us about yourself.'
-          else
-            redirect_to requests_user_url(current_user), notice: 'Welcome back!' unless current_user.admin?
-          end
-        else
-          url = session[:redirect_to]
-          session[:redirect_to] = nil
-          redirect_to url, notice: 'Logged in!'
-        end
+    session[:user_id] = user.id
+    if user.active?
+      #update_successful = user.update_external(request.headers['HTTP_PYORK_CYIN'])
+      #if update_successful
+      #  user.audit_comment = 'Updated user information from ALMA'
+      #  user.save(validate: false)
+      #end
+
+      redirect_to root_url, notice: 'Logged in!' if user.admin?
+
+      if user.name.nil? || user.phone.nil? || user.office.nil?
+        redirect_to edit_user_url(user), notice: 'Welcome! Please tell us about yourself.'
       else
-        redirect_to inactive_user_url, alert: 'Your Account Has Been Disabled'
+        redirect_to requests_user_url(user), notice: 'Welcome back!' unless user.admin?
       end
+    else
+      destroy_session
+      flash.alert = 'User not active.'
+      render layout: 'simple', :status => :unauthorized
     end
   end
 
-  def destroy
-    Rails.logger.debug "#{session[:user_id]} , user_id #{:user_id}"
-    Rails.logger.debug "Logging out #{:user}"
-
-    sign_out :user
-    
+  def destroy_session
+    sign_out :user # use Devise "sign_out" helper to sign out
     session[:user_id] = nil
-
-    Rails.logger.debug "request.env['warden'] = #{request.env['warden']}"
     request.env['warden'] = nil if request.env['warden'].present?
+  end
 
+  def destroy
+    destroy_session
     redirect_to Warden::PpyAuthStrategy::LOGOUT_URL, allow_other_host: true
-  end
-
-  def invalid_login
-    render layout: 'simple'
-  end
-
-  def unauthorized
-    render layout: 'simple'
-  end
-
-  def inactive_account_url
-    render layout: simple
   end
 
   def login_as
@@ -73,7 +54,7 @@ class SessionsController < ApplicationController
       session[:back_to_url] = request.referer
 
       ## updated audit trail
-      requestor.audit_comment = "#{name} logged into #{requestor.name}'' account"
+      requestor.audit_comment = "#{name} logged into #{requestor.name}'s account"
       requestor.save(validate: false)
 
       redirect_to requests_user_url(requestor)

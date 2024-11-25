@@ -2,7 +2,6 @@
 
 module ApplicationHelper
   def app_version
-    Reserves::Version.new.version
   end
 
   def app_name
