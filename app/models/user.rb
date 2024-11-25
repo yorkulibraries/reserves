@@ -49,13 +49,9 @@ class User < ApplicationRecord
   audited associated_with: :location
   has_associated_audits
 
-  def update_external(user_id)
-    update_external_alma(user_id) if Setting.alma_apikey.length > 10
-  end
-
   def update_external_alma(user_id)
-    logger.debug "Setting.alma_apikey: #{Setting.alma_apikey}"
-    logger.debug "Setting.alma_region: #{Setting.alma_region}"
+    return false if user_id.nil? || Setting.alma_apikey.nil? || Setting.alma_region.nil?
+
     Alma.configure do |config|
       config.apikey = Setting.alma_apikey
       config.region = Setting.alma_region
@@ -107,47 +103,7 @@ class User < ApplicationRecord
 
       true
     rescue Exception => e
-      pp e
       logger.debug 'Failed to parse User Profile Response from source ALMA'
-      false
-    end
-  end
-
-  def update_external_sirsi(user_id)
-    require 'json'
-    require 'open-uri'
-    source = "https://www.library.yorku.ca/find/Feeds/MyProfile?alt_id=#{user_id}"
-
-    begin
-      data = JSON.parse(open(source).read)
-
-      self.name = "#{data['firstname'].strip} #{data['lastname'].strip}"
-      self.email = begin
-        data['email'].strip
-      rescue StandardError
-        nil
-      end
-      self.phone = begin
-        data['phone'].strip
-      rescue StandardError
-        nil
-      end
-      self.office = begin
-        data['address2'].strip
-      rescue StandardError
-        nil
-      end
-      self.library_uid = data['id']
-      self.user_type = begin
-        data['profile'].strip
-      rescue StandardError
-        nil
-      end
-
-      true
-    rescue StandardError
-      logger.debug "Failed to parse User Profile Response from source #{source}"
-
       false
     end
   end

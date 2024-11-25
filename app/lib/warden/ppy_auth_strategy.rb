@@ -15,9 +15,7 @@ class Warden::PpyAuthStrategy < Devise::Strategies::Authenticatable
   def authenticate!
     if valid?
       resource = User.find_by('uid = ?', request.headers[USER])
-      if resource.present?
-        success!(resource)
-      else
+      if !resource.present?
         @user = User.new
         @user.password = Digest::SHA256.hexdigest(rand().to_s)
         @user.admin = false
@@ -28,11 +26,24 @@ class Warden::PpyAuthStrategy < Devise::Strategies::Authenticatable
         @user.username = request.headers[USER]
         @user.name = "#{request.headers[FIRSTNAME]} #{request.headers[SURNAME]}"
         @user.email = request.headers[EMAIL]
-        @user.audit_comment = 'PpyAuthStrategy created new user from PYORK headers'
+        @user.univ_id = request.headers[CYIN]
+        @user.audit_comment = 'PpyAuthStrategy created new user from authenticated PYORK headers'
         @user.save(validate: false)
         UserMailer.welcome(@user).deliver_later if @user.email.present?
-        success!(@user)
+        resource = @user
       end
+
+      if resource.univ_id.nil?
+        resource.univ_id = request.headers[CYIN]
+      end
+
+      if resource.update_external_alma(request.headers[CYIN])
+        resource.audit_comment = 'Updated user information from ALMA'
+      end
+
+      resource.save(validate: false) if resource.changed?
+
+      success!(resource)
     else
       Rails.logger.debug "not valid"
       fail!('Not authenticated')

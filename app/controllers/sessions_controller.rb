@@ -9,12 +9,6 @@ class SessionsController < ApplicationController
 
     session[:user_id] = user.id
     if user.active?
-      #update_successful = user.update_external(request.headers['HTTP_PYORK_CYIN'])
-      #if update_successful
-      #  user.audit_comment = 'Updated user information from ALMA'
-      #  user.save(validate: false)
-      #end
-
       if user.admin?
         redirect_to root_url, notice: 'Logged in!'
         return
