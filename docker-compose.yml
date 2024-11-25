@@ -7,7 +7,7 @@ services:
     volumes:
       - ./:/app
     working_dir: /app
-    command: sh -c "if [ ! -f Gemfile ]; then gem install rails -v '~> ${RAILS_VERSION:-7.0.0}' ; rails new . -f -G -d mysql ; bundle add sqlite3 --group test ; bundle install ; rails db:create ; rails db:migrate ; fi ; bundle install ; rails db:setup ; rails assets:precompile ; rm -f tmp/pids/server.pid ; rails server -b '0.0.0.0' "
+    command: sh -c "if [ ! -f Gemfile ]; then gem install rails -v '~> ${RAILS_VERSION:-7.0.0}' ; rails new . -f -G -d mysql ; bundle add sqlite3 --group test ; bundle install ; rails db:create ; rails db:migrate ; fi ; bundle install ; rails db:migrate ; rails assets:precompile ; rm -f tmp/pids/server.pid ; rails server -b '0.0.0.0' "
     ports:
       - ${PORT:-4004}:${PORT:-4004}
     depends_on:
