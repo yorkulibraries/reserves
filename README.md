@@ -8,7 +8,7 @@ cd reserves
 docker compose up --build
 ```
 
-There are 2 containers created: *reserves-web-1* and *reserves-dbl-1*
+There are 3 containers created: **web**, **db** and **mailcatcher**
 
 # Access the front end web app in DEVELOPMENT 
 
@@ -23,6 +23,10 @@ Header: PYORK_USER
 Value: manager
 
 The application is now accessible at http://localhost:3006/
+
+# Access mailcatcher web app
+
+http://localhost:3086/
 
 # What if I want to use a different port?
 
@@ -43,27 +47,19 @@ docker compose up --build
 Run all the tests
 
 ```
-docker compose exec web rt 
+docker compose exec web rt
+docker compose exec web rts
 ```
 
-Run a specific test and test within the test file.
-```
-docker compose exec web rt TEST=test/controllers/users_controller_test.rb
-
-1. docker compose exec web bash
-2. $>  rts TEST=test/system/requests_test.rb
-
-```
-
-# Access the containers
-
-DB container
-```
-docker compose exec db bash
-```
-
-Webapp container
+Run all tests in a specific test file
 ```
 docker compose exec web bash
+rt test/models/user_test.rb
+```
+
+Run a specific test
+```
+docker compose exec web bash
+rt test/models/user_test.rb:14
 ```
 
