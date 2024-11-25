@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class ApplicationController < ActionController::Base
+  layout :layout_by_resource
+
   # Prevent CSRF attacks by raising an exception.
   # For APIs, you may want to use :null_session instead.
   protect_from_forgery with: :exception
@@ -44,5 +46,13 @@ class ApplicationController < ActionController::Base
   private
   def do_not_check_authorization?
     respond_to?(:devise_controller?)
+  end
+
+  def layout_by_resource
+    if devise_controller?
+      "simple"
+    else
+      "application"
+    end
   end
 end
