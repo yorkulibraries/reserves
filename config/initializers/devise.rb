@@ -309,7 +309,7 @@ Devise.setup do |config|
   # changed. Defaults to true, so a user is signed in automatically after changing a password.
   # config.sign_in_after_change_password = true
   config.warden do |manager|
-    manager.default_strategies(scope: :user).unshift :ppy_devise
+    manager.default_strategies(scope: :user).unshift :ppy_auth
     manager.failure_app = Custompath
   end
 end
