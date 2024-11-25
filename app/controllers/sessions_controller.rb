@@ -34,13 +34,17 @@ class SessionsController < ApplicationController
   end
 
   def destroy
+    Rails.logger.debug "#{session[:user_id]} , user_id #{:user_id}"
+    Rails.logger.debug "Logging out #{:user}"
+
+    sign_out :user
+    
     session[:user_id] = nil
+
+    Rails.logger.debug "request.env['warden'] = #{request.env['warden']}"
     request.env['warden'] = nil if request.env['warden'].present?
 
-    cookies.delete('mayaauth', domain: 'yorku.ca')
-    cookies.delete('pybpp', domain: 'yorku.ca')
-
-    redirect_to 'http://www.library.yorku.ca', allow_other_host: true
+    redirect_to Warden::PpyAuthStrategy::LOGOUT_URL, allow_other_host: true
   end
 
   def invalid_login

@@ -1,4 +1,5 @@
 require 'devise/strategies/authenticatable'
+require 'digest'
 
 class Warden::PpyAuthStrategy < Devise::Strategies::Authenticatable
   # it must have a `valid?` method to check if it is appropriate to use
@@ -10,6 +11,8 @@ class Warden::PpyAuthStrategy < Devise::Strategies::Authenticatable
   CAS_LAST_NAME = 'HTTP_PYORK_SURNAME'
   CAS_EMAIL = 'HTTP_PYORK_EMAIL'
   CAS_USER_TYPE = 'HTTP_PYORK_TYPE'
+
+  LOGOUT_URL = 'https://passportyork.yorku.ca/ppylogin/ppylogout'
 
   # it must have an authenticate! method to perform the validation
   # a successful request calls `success!` with a user object to stop
@@ -23,6 +26,7 @@ class Warden::PpyAuthStrategy < Devise::Strategies::Authenticatable
         success!(resource)
       else
         @user = User.new
+        @user.password = Digest::SHA256.hexdigest(rand().to_s)
         @user.admin = false
         @user.active = true
         @user.user_type = User::UNKNOWN if @user.user_type.nil?

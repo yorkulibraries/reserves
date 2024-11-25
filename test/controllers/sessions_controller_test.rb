@@ -62,7 +62,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
     get logout_url
 
     assert_nil session[:user_id]
-    assert_redirected_to 'http://www.library.yorku.ca'
+    assert_redirected_to Warden::PpyAuthStrategy::LOGOUT_URL
   end
 
   context 'logged in actions' do
