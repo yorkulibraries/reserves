@@ -29,6 +29,7 @@ Warden::Strategies.add(:ppy_devise) do
         @user.user_type = User::UNKNOWN if @user.user_type.nil?
         @user.role = User::INSTRUCTOR_ROLE
         @user.uid = request.headers[CAS_USERNAME]
+        @user.username = request.headers[CAS_USERNAME]
         @user.audit_comment = 'Creating new auto-logged in user...from ALMA data'
         @user.save(validate: false)
         UserMailer.welcome(@user).deliver_later if @user.email.present?
