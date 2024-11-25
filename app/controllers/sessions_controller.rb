@@ -15,7 +15,10 @@ class SessionsController < ApplicationController
       #  user.save(validate: false)
       #end
 
-      redirect_to root_url, notice: 'Logged in!' if user.admin?
+      if user.admin?
+        redirect_to root_url, notice: 'Logged in!'
+        return
+      end
 
       if user.name.nil? || user.phone.nil? || user.office.nil?
         redirect_to edit_user_url(user), notice: 'Welcome! Please tell us about yourself.'
