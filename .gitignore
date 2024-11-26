@@ -18,6 +18,5 @@ public/assets/
 yarn.lock
 *.log
 .bundle
-.ruby-version
 *.sql.gz
 *.sql
