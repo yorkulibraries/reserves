@@ -6,3 +6,5 @@ dump=$1
 cat import.sql | rails db -p
 
 rails db:migrate
+
+rake searchkick:reindex_all
