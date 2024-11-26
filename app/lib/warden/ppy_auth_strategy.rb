@@ -33,12 +33,12 @@ class Warden::PpyAuthStrategy < Devise::Strategies::Authenticatable
         resource = @user
       end
 
-      if resource.univ_id.nil?
-        resource.univ_id = request.headers[CYIN]
+      if resource.update_external_alma(request.headers[CYIN])
+        resource.audit_comment = 'Updated user information from ALMA' if resource.changed?
       end
 
-      if resource.update_external_alma(request.headers[CYIN])
-        resource.audit_comment = 'Updated user information from ALMA'
+      if resource.univ_id.nil?
+        resource.univ_id = request.headers[CYIN]
       end
 
       resource.save(validate: false) if resource.changed?

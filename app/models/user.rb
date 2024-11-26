@@ -50,7 +50,7 @@ class User < ApplicationRecord
   has_associated_audits
 
   def update_external_alma(user_id)
-    return false if user_id.nil? || Setting.alma_apikey.nil? || Setting.alma_region.nil?
+    return false if user_id.nil? || Setting.alma_apikey.nil? || Setting.alma_apikey.strip.length == 0
 
     Alma.configure do |config|
       config.apikey = Setting.alma_apikey
@@ -66,7 +66,7 @@ class User < ApplicationRecord
       self.phone = begin
         user['contact_info']['phone'].first['phone_number']
       rescue StandardError
-        nil
+        self.phone
       end
 
       office_address = nil
@@ -84,7 +84,7 @@ class User < ApplicationRecord
                       begin
                         user['contact_info']['address'].first['line1'].strip
                       rescue StandardError
-                        nil
+                        self.office
                       end
                     else
                       office_address
@@ -93,18 +93,19 @@ class User < ApplicationRecord
       self.library_uid = begin
         user['primary_id']
       rescue StandardError
-        nil
+        self.library_uid
       end
+
       self.user_type = begin
         user.user_group['value']
       rescue StandardError
-        nil
+        self.user_type
       end
 
-      true
+      return true
     rescue Exception => e
       logger.debug 'Failed to parse User Profile Response from source ALMA'
-      false
+      return false
     end
   end
 
