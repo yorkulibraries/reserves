@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
 class Request < ApplicationRecord
-  ## searchable Concern
-  include Searchable
+  searchkick
 
   ## CONSTANTS
   INCOMPLETE = 'incomplete'
@@ -135,19 +134,12 @@ class Request < ApplicationRecord
   end
 
   ### ELASRTIC SEARCH HELPERS ##
-  def short_course_code
-    !course.nil? ? "#{course.subject} #{course.course_id}" : ''
-  end
-
-  def instructor_name
-    !course.nil? ? course.instructor.to_s : ''
-  end
-
-  def as_indexed_json(_options = {})
-    as_json(
-      only: [:id],
-      include: %i[course reserve_location assigned_to items requester],
-      methods: %i[short_course_code instructor_name]
-    )
+  def search_data
+    {
+      course_name: course.name,
+      course_code: course.code,
+      course_instructor: course.instructor,
+      requester_name: requester.name
+    }
   end
 end

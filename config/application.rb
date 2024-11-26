@@ -40,5 +40,13 @@ module Reserves
     # in config/environments, which are processed later.
     #
     # config.eager_load_paths << Rails.root.join("extras")
+
+    config.after_initialize do
+      if ENV['ELASTIC_SEARCH_URL']
+        Searchkick.client = Elasticsearch::Client.new(url: ENV['ELASTIC_SEARCH_URL']) 
+      elsif defined?(Setting) && Setting.search_elastic_server && Setting.search_elastic_enabled.to_s == 'true'
+        Searchkick.client = Elasticsearch::Client.new(url: Setting.search_elastic_server)
+      end
+    end
   end
 end

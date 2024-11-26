@@ -136,11 +136,6 @@ GEM
       elasticsearch-api (= 8.16.0)
     elasticsearch-api (8.16.0)
       multi_json
-    elasticsearch-model (0.1.9)
-      activesupport (> 3)
-      elasticsearch (> 0.4)
-      hashie
-    elasticsearch-rails (0.1.9)
     em-websocket (0.5.3)
       eventmachine (>= 0.12.9)
       http_parser.rb (~> 0)
@@ -344,6 +339,9 @@ GEM
       sprockets-rails
       tilt
     scrub_rb (1.0.1)
+    searchkick (5.4.0)
+      activemodel (>= 6.1)
+      hashie
     shellany (0.0.1)
     shoulda-context (2.0.0)
     shoulda-matchers (5.3.0)
@@ -398,8 +396,7 @@ DEPENDENCIES
   caxlsx_rails (= 0.6.3)
   database_cleaner (~> 2.0, >= 2.0.1)
   devise
-  elasticsearch-model (= 0.1.9)
-  elasticsearch-rails (= 0.1.9)
+  elasticsearch
   email_validator (~> 2.2, >= 2.2.3)
   exception_notification (~> 4.5)
   factory_girl_rails (= 4.8.0)
@@ -424,6 +421,7 @@ DEPENDENCIES
   rsolr (~> 2.5)
   rufus-scheduler (~> 3.8, >= 3.8.2)
   sass-rails (~> 6.0)
+  searchkick
   shoulda-context (~> 2.0)
   shoulda-matchers (~> 5.1)
   simple_form (~> 5.1)
