@@ -25,7 +25,7 @@ gem 'simple_form', '~> 5.1'
 ## TOOLS AND UTILITIES ##
 gem 'audited', '~> 5.4', '>= 5.4.3'
 gem 'cancancan', '~> 3.4'
-gem 'devise', '~> 4.8', '>= 4.8.1'
+gem 'devise'
 gem 'email_validator', '~> 2.2', '>= 2.2.3'
 gem 'kaminari', '~> 1.2', '>= 1.2.2'
 gem 'liquid', '~> 5.4'

@@ -17,6 +17,7 @@ if Rails.env.development?
   u.email = 'manager@testing.com'
   u.library_uid = '29000234113232'
   u.uid = u.role.downcase
+  u.username = u.uid
   u.active = true
   u.created_by_id = 1
   u.location_id = loc.id

@@ -397,7 +397,7 @@ DEPENDENCIES
   caxlsx (= 3.2.0)
   caxlsx_rails (= 0.6.3)
   database_cleaner (~> 2.0, >= 2.0.1)
-  devise (~> 4.8, >= 4.8.1)
+  devise
   elasticsearch-model (= 0.1.9)
   elasticsearch-rails (= 0.1.9)
   email_validator (~> 2.2, >= 2.2.3)

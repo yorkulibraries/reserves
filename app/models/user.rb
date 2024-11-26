@@ -1,9 +1,12 @@
 # frozen_string_literal: true
 
 class User < ApplicationRecord
+  # Include default devise modules. Others available are:
+  # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
+  devise :database_authenticatable, :trackable, :lockable
+  
   ## searchable Concern
   include Searchable
-  devise :registerable
 
   ## CONSTANTS
   FACULTY = 'FACULTY'
@@ -27,12 +30,13 @@ class User < ApplicationRecord
   belongs_to :location
 
   ## VALIDATIONS
-  validates_presence_of :name, :email, :uid, :user_type, :role
+  validates_presence_of :name, :email, :uid, :user_type, :role, :username
   validates_presence_of :department, :phone, :office, unless: proc { |u| u.admin? }
   validates_presence_of :location, if: proc { |u| u.admin? }
   validates :email, presence: true, uniqueness: true, format: { with: /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i }
 
   validates_uniqueness_of :uid
+  validates_uniqueness_of :username
 
   ## SCOPES
   scope :admin, -> { where(admin: true) }
@@ -45,13 +49,9 @@ class User < ApplicationRecord
   audited associated_with: :location
   has_associated_audits
 
-  def update_external(user_id)
-    update_external_alma(user_id) if Setting.alma_apikey.length > 10
-  end
-
   def update_external_alma(user_id)
-    logger.debug "Setting.alma_apikey: #{Setting.alma_apikey}"
-    logger.debug "Setting.alma_region: #{Setting.alma_region}"
+    return false if user_id.nil? || Setting.alma_apikey.nil? || Setting.alma_apikey.strip.length == 0
+
     Alma.configure do |config|
       config.apikey = Setting.alma_apikey
       config.region = Setting.alma_region
@@ -66,7 +66,7 @@ class User < ApplicationRecord
       self.phone = begin
         user['contact_info']['phone'].first['phone_number']
       rescue StandardError
-        nil
+        self.phone
       end
 
       office_address = nil
@@ -84,7 +84,7 @@ class User < ApplicationRecord
                       begin
                         user['contact_info']['address'].first['line1'].strip
                       rescue StandardError
-                        nil
+                        self.office
                       end
                     else
                       office_address
@@ -93,58 +93,19 @@ class User < ApplicationRecord
       self.library_uid = begin
         user['primary_id']
       rescue StandardError
-        nil
+        self.library_uid
       end
+
       self.user_type = begin
         user.user_group['value']
       rescue StandardError
-        nil
+        self.user_type
       end
 
-      true
+      return true
     rescue Exception => e
-      pp e
       logger.debug 'Failed to parse User Profile Response from source ALMA'
-      false
-    end
-  end
-
-  def update_external_sirsi(user_id)
-    require 'json'
-    require 'open-uri'
-    source = "https://www.library.yorku.ca/find/Feeds/MyProfile?alt_id=#{user_id}"
-
-    begin
-      data = JSON.parse(open(source).read)
-
-      self.name = "#{data['firstname'].strip} #{data['lastname'].strip}"
-      self.email = begin
-        data['email'].strip
-      rescue StandardError
-        nil
-      end
-      self.phone = begin
-        data['phone'].strip
-      rescue StandardError
-        nil
-      end
-      self.office = begin
-        data['address2'].strip
-      rescue StandardError
-        nil
-      end
-      self.library_uid = data['id']
-      self.user_type = begin
-        data['profile'].strip
-      rescue StandardError
-        nil
-      end
-
-      true
-    rescue StandardError
-      logger.debug "Failed to parse User Profile Response from source #{source}"
-
-      false
+      return false
     end
   end
 

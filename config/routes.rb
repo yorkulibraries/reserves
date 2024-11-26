@@ -8,9 +8,9 @@ Rails.application.routes.draw do
   get 'login' => 'sessions#new', as:  'login'
   get 'login_as' => 'sessions#login_as', as: 'login_as'
   get 'back_to_my_login' => 'sessions#back_to_my_login', as: 'back_to_my_login'
-  get 'invalid_login' => 'sessions#invalid_login', as: 'invalid_login'
-  get 'unauthorized' => 'sessions#unauthorized', as: 'unauthorized'
-  get 'inactive' => 'sessions#inactive', as: 'inactive_user'
+
+  # put devise path at root since /users/ already used by the users_controller
+  devise_for :user, :path => ''
 
   namespace :courses do
     resources :active, controller: 'active', only: %i[index show]
@@ -56,7 +56,6 @@ Rails.application.routes.draw do
 
     get :staff, on: :new, action: :new_admin_user
   end
-  devise_for :users
 
   namespace :search do
     resource :primo, only: %i[new create show], controller: 'primo'
