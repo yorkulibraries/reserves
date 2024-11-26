@@ -1,9 +1,10 @@
 namespace :searchkick do
   desc "Reindex all models"
   task reindex_all: :environment do
-    [User, Request, Item, Course, Location].each do |model|
-      puts "Reindexing #{model.name}..."
-      model.reindex
-    end
+      User.reindex
+      Request.reindex
+      Item.reindex
+      Course.reindex
+      Location.reindex
   end
 end
