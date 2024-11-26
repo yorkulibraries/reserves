@@ -17,7 +17,7 @@ class Setting < RailsSettings::Base
 
   ## Request Related Defaults
   field :request_expiry_notice_interval, default: (ENV['request_expiry_notice_interval'] || 2.weeks)
-  field :request_archive_all_after, default: (ENV['request_archive_all_after'] || 60.days)
+  field :request_archive_all_after, default: (ENV['request_archive_all_after'] || 60)
   field :request_archive_all_user_id, default: (ENV['request_archive_all_user_id'] || 0)
   field :request_archive_all_allow, default: (ENV['request_archive_all_allow'] || false)
   field :request_remove_incomplete_allow, default: (ENV['request_remove_incomplete_allow'] || false)
