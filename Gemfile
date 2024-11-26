@@ -43,8 +43,8 @@ gem 'alma', '~> 0.3.3'
 gem 'primo', git: 'https://github.com/tulibraries/primo.git', branch: 'main'
 
 ## SEARCH - USING ELASTIC SEARCH
-gem 'elasticsearch-model', '0.1.9'
-gem 'elasticsearch-rails', '0.1.9'
+gem 'searchkick'
+gem 'elasticsearch'
 
 ## DUMP DATA INTO YML FILE ##
 # rake db:data:dump_dir dir=../tmp/db_june_2017

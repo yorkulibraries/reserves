@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Item < ApplicationRecord
+  searchkick
+  
   ########################################### CONSTANTS ############################################
   METADATA_MANUAL = 'MANUAL'
   METADATA_SOLR = 'SOLR'

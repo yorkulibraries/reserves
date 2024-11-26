@@ -22,6 +22,7 @@ services:
       - RAILS_SERVE_STATIC_FILES=true
       - NODE_OPTIONS=${NODE_OPTIONS}
       - SELENIUM_REMOTE_URL=http://chrome:4444
+      - ELASTIC_SEARCH_URL=http://elasticsearch:9200
     env_file:
       - path: ./override.env
         required: false
@@ -45,3 +46,8 @@ services:
     ports:
       - ${VNC_HTTP:-7904}:7900
 
+  elasticsearch:
+    image: elasticsearch:8.16.1
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false

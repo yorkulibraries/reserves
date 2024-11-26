@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Location < ApplicationRecord
+  searchkick
+  
   # SETTING: setting_bcc_request_status_change
 
   # SERIALIZATION
