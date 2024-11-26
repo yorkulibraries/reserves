@@ -18,7 +18,7 @@ gem 'capistrano-rails', '1.2.3'
 gem 'capistrano-rbenv', '2.1.0'
 
 ## DATABASES ##
-gem 'mysql2', '0.5.3', group: :production
+gem 'mysql2'
 
 ## CSS AND JAVASCRIPT ##
 gem 'jquery-rails', '4.5.0'
