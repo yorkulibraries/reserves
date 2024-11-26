@@ -1,73 +1,56 @@
 <% title "Search Results #{@query}" %>
 <% page_header do %>
-	<h1>Search Results <small>for <%= is_number?(@query) ? "id: #{@query}" : @query %></small></h1>
+  <h1>Search Results <small>for <%= is_number?(@query) ? "id: #{@query}" : @query %></small></h1>
 <% end %>
 
-
 <form action="<%= search_path %>">
-
-	<div class="input-group">
-		<span class="input-group-addon" id="basic-addon1"><i class="fa fa-search"></i></span>
-		<input type="text" class="form-control"  autocomplete="off"
-				placeholder="Search requestor, course, code, instructor, id" name="q" value="<%= @query if @query %>" title="search field">
-	</div>
-
-	<input type="hidden" name="type" value="requests"/>
-	<input type="submit" value="search" class="hidden">
+  <div class="input-group">
+    <span class="input-group-addon" id="basic-addon1"><i class="fa fa-search"></i></span>
+    <input type="text" class="form-control"  autocomplete="off"
+        placeholder="Search requestor, course, code, instructor, id" name="q" value="<%= @query if @query %>" title="search field">
+  </div>
+  <input type="hidden" name="type" value="requests"/>
+  <input type="submit" value="search" class="hidden">
 </form>
 
 <hr/>
 
-
-
 <div class="dashboard">
-	<% if @requests.size > 0 %>
-		<%= paginate @requests if @requests.size > 1 %>
-		<table class="table table-bordered ">
-			<thead>
-				<tr>
+  <% if @requests.size > 0 %>
+    <%= paginate @requests if @requests.size > 1 %>
+    <table class="table table-bordered ">
+      <thead>
+        <tr>
+          <th>ID, Status, When</th>
+          <th colspan="2">Course</th>
+          <th>Requestor</th>
+        </tr>
+      </thead>
+      <% @requests.each do |request| %>
+        <tr class="click_redirect request" data-id="<%= request.id %>" data-redirect-path="<%= request_path(request) %>">
+          <td class="requested_date">
+            <span class="strong">#<%= request.id %></span>
+            <span class="label status-<%= request.status.parameterize %> pull-right"><%= request.status %></span><br/>
+            <%= request.created_at.strftime("%b %d, %Y") rescue nil %>
+          </td>
+          <td class="course">
+            <a class="name" href="<%= request_path(request) %>"><%= request.course.name %></a>
+            <span class="code"><%= request.course.code %></span>
+          </td>
+          <td class="course">
+            <span class="weak">instructor</span><br/>
+            <span class="strong"><%= request.course.instructor%> </span>
+          </td>
+          <td class="requestor">
+            <span class="name"><%= request.requester.name %></span>
+            <span class="department"><%= request.requester.department %></span>
+          </td>
+        </tr>
+      <% end %>
+    </table>
+    <%= paginate @requests if @requests.size > 1 %>
+  <% end %>
 
-					<th>ID, Status, When</th>
-					<th colspan="2">Course</th>
-					<th>Requestor</th>
-				</tr>
-			</thead>
-			<% @requests.each do |request| %>
-				<tr class="click_redirect request" data-id="<%= request.id %>" data-redirect-path="<%= request_path(request) %>">
-
-					<td class="requested_date">
-						<span class="strong">#<%= request.id %></span>
-						<span class="label status-<%= request.status.parameterize %> pull-right"><%= request.status %></span><br/>
-						<%= request.created_at.strftime("%b %d, %Y") rescue nil %>
-
-					</td>
-					<td class="course">
-						<a class="name" href="<%= request_path(request) %>"><%= request.course.name %></a>
-						<span class="code"><%= request.course.code %></span>
-					</td>
-					<td class="course">
-						<span class="weak">instructor</span><br/>
-						<span class="strong"><%= request.course.instructor%> </span>
-
-					</td>
-					<td class="requestor">
-						<span class="name"><%= request.requester.name %></span>
-						<span class="department"><%= request.requester.department %></span>
-					</td>
-				</tr>
-			<% end %>
-		</table>
-
-		<%= paginate @requests if @requests.size > 1 %>
-
-	<% end %>
-
-	<%= blank_slate(@requests, title: "No matching requests found", description:
-			"So sorry, there are no requests found for <strong>#{@query}</strong> search", icon:"search" )	%>
-
-
+  <%= blank_slate(@requests, title: "No matching requests found", description:
+      "So sorry, there are no requests found for <strong>#{@query}</strong> search", icon:"search" )  %>
 </div>
-
-<% if Setting.search_elastic_enabled.to_s == "true" %>
-	<p class="trivial">Using Elastic Search - <%= Request.__elasticsearch__.client.info["name"] rescue "ERROR"%></p>
-<% end %>
