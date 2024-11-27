@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2021_08_20_131142) do
+ActiveRecord::Schema[7.0].define(version: 2024_08_20_132657) do
   create_table "acquisition_requests", id: :integer, charset: "utf8mb3", collation: "utf8mb3_unicode_ci", force: :cascade do |t|
     t.integer "item_id"
     t.integer "requested_by_id"
@@ -111,6 +111,7 @@ ActiveRecord::Schema[7.0].define(version: 2021_08_20_131142) do
     t.string "issue"
     t.string "ils_barcode"
     t.boolean "physical_copy_required", default: false
+    t.string "other_isbn_issn"
   end
 
   create_table "loan_periods", id: :integer, charset: "utf8mb3", force: :cascade do |t|

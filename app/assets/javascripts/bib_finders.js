@@ -35,7 +35,7 @@ function searchRecords() {
 
    $("#item_publisher").val(my_record.publisher);
    $("#item_isbn").val(my_record.isbn);
-
+   $("#item_other_isbn_issn").val(my_record.other_isbn_issn);
    $("#item_callnumber").val(my_record.callnumber);
    $("#item_edition").val(my_record.edition);
    $("#item_publication_date").val(my_record.publish_date);

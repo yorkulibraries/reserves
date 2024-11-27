@@ -24,7 +24,7 @@ module ItemsHelper
 
   def show_field?(item, field, &block)
     field_map = {
-      Item::TYPE_BOOK => %w[title author callnumber isbn publisher publication_date edition
+      Item::TYPE_BOOK => %w[title author callnumber isbn other_isbn_issn publisher publication_date edition
                             provided_by loan_period physical_copy_required],
       Item::TYPE_EBOOK => %w[title author callnumber isbn publisher publication_date edition
                              provided_by url],
