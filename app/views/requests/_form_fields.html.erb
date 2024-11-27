@@ -50,10 +50,24 @@
 				<%= render  "courses/form_fields", f: builder %>
 			<% end %>
 			<div class="row">
-				<div class="col-md-6">
-					<%= f.input :requester_email, as: :string, label: "Instructor Email", required: false, input_html: { placeholder: @request.requester.email },
-							hint: "Who else should receive status change updates, etc.?"%>
+				<div class="col-md-6 <%= 'has-error' if f.object.errors[:requester_email].present? %>">
+				  <%= f.label :requester_email, "Instructor Email", class: ("text-danger" if f.object.errors[:requester_email].present?) %>
+  
+				<%= f.text_field :requester_email, 
+					class: "form-control", 
+					placeholder: @request.requester.email %>
+
+				<% if f.object.errors[:requester_email].present? %>
+					<div class="text-danger">
+					<%= f.object.errors[:requester_email].join(", ") %>
+					</div>
+				<% end %>
+
+				<small class="form-text text-muted">
+					Who else should receive status change updates, etc.?
+				</small>
 				</div>
+
 			</div>
 	  </div>
 	</div>
