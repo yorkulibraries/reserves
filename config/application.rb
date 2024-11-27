@@ -31,11 +31,7 @@ module Reserves
     config.active_record.yaml_column_permitted_classes = [Date, ActiveSupport::TimeWithZone, Time,
                                                           ActiveSupport::TimeZone]
 
-    config.assets.configure do |env|
-      env.js_compressor  = :uglifier
-      env.css_compressor = :scss
-      env.logger = Rails.logger
-    end
+    config.assets.js_compressor = :terser
     config.assets.compress = true
 
     # Configuration for the application, engines, and railties goes here.

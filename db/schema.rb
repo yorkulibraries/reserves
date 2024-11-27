@@ -184,4 +184,5 @@ ActiveRecord::Schema[7.0].define(version: 2021_08_20_131142) do
     t.datetime "updated_at"
   end
 
+
 end
