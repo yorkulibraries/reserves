@@ -13,9 +13,11 @@ There are 3 containers created: **web**, **db** and **mailcatcher**
 # Access the front end web app in DEVELOPMENT 
 
 By default, the application will listen on port 3006 and runs with RAILS_ENV=development.
+By default, the application will listen on port 3006 and runs with RAILS_ENV=development.
 
 To access the application in Chrome browser, you will need to add the ModHeader extension to your Chrome browser.
 
+Once the extension has been activated, you can add the following header to the site http://localhost:3006/. This will enable you to login as **manager** user.
 Once the extension has been activated, you can add the following header to the site http://localhost:3006/. This will enable you to login as **manager** user.
 
 Header: PYORK_USER
