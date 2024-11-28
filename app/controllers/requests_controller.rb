@@ -101,7 +101,7 @@ class RequestsController < ApplicationController
   end
 
   def change_owner
-    new_owner = User.find(params[:request][:requester_id])
+    new_owner = User.find(params[:requester_id])
     @request.audit_comment = "Requester changed from #{@request.requester.name} to #{new_owner.name}"
     @request.requester = new_owner
     @request.save(validate: false)
