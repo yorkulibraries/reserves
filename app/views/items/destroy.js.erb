@@ -2,3 +2,4 @@ $("#item_<%=@item.id %> .item_actions").remove();
 $( "#item_<%= @item.id %>" ).fadeOut( 3000, function() {
    $("#item_<%= @item.id %>").remove();
 });
+$("#save_buttons_frame").html("<%= j render 'request_wizard/save_buttons', request: @request %>");

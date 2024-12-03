@@ -47,7 +47,7 @@ class ItemsController < ApplicationController
 
     respond_to do |format|
       if @item.save
-        @request.update(status: Request::OPEN)
+        @request.reload
         RequestMailer.new_item_notification(@request, @item).deliver_later
 
         format.html { redirect_to [@request, @item], notice: 'Item was successfully created.' }
@@ -78,6 +78,7 @@ class ItemsController < ApplicationController
   def destroy
     @item.audit_comment = "Item #{@item.title} removed from request"
     @item.destroy
+    @request.reload
     respond_to do |format|
       format.html { redirect_to @request }
       format.js

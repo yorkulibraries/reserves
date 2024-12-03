@@ -242,8 +242,9 @@
 
 
 
-
-	<%= render partial: "request_wizard/save_buttons"%>
+	<div id="save_buttons_frame">
+  		<%= render partial: "request_wizard/save_buttons"%>
+	</div>
 
 	<% if @request.status != Request::INCOMPLETE %>
 		<%= render partial: "change_status" %>
