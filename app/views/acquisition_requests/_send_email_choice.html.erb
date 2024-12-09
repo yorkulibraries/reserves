@@ -3,7 +3,7 @@
   <p>Send Acquisition Email To:</p>
   <%= form_tag send_to_acquisitions_acquisition_request_path(@acquisition_request), method: :post do |f| %>
     <select name="which" class="form-control">
-      <option value="<%= AcquisitionRequest::EMAIL_TO_BOOKSTORE %>">Bookstore</option>
+      <%# <option value="<%= AcquisitionRequest::EMAIL_TO_BOOKSTORE %>">Bookstore</option> %>
       <option value="<%= AcquisitionRequest::EMAIL_TO_ACQUISITIONS %>">Acquisitions Department</option>
       <% if @acquisition_request.location.acquisitions_email.blank? %>
         <option disabled>-- No Acquistion Email Set For This Location --</option>
@@ -11,6 +11,14 @@
         <option value="<%= AcquisitionRequest::EMAIL_TO_LOCATION %>"><%= @acquisition_request.location.name %> Acquisition's Email</option>
       <% end %>
     </select>
+
+    <br>
+
+    <div class="form-group">
+      <label for="acquisition_notes">Notes</label>
+      <textarea name="acquisition_notes" id="acquisition_notes" class="form-control"><%= @acquisition_request.acquisition_notes %></textarea>
+      <small class="form-text text-muted">This note will be sent along with the acquisition email.</small>
+    </div>
 
     <%= submit_tag 'Send Request Details', data: { confirm: "Are you sure? "}, class: "btn btn-sm btn-primary", style: "margin-top: 10px;" %>
   <% end %>
