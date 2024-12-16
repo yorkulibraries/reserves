@@ -32,7 +32,7 @@
 <% if can?(:update, item) && is_request_active(@request) && item.status != Item::STATUS_DELETED %>
 
   <% if item.acquisition_requests.acquired.size > 0 %>
-    <div class="acquisition_request"><span class="label label-default status-acquired">Item Aqcuired</span></div>
+    <div class="acquisition_request"><span class="label label-default status-acquired">Item Acquired</span></div>
   <% end %>
 
   <div class="btn-group">
@@ -63,7 +63,7 @@
 <% if can?(:change_status, item) && is_request_active(@request) %>
   <% status_class = (item.status == Item::STATUS_READY ? "item_ready" : "item_not_ready") %>
   <%= link_to change_status_request_item_path(@request, item), class: "btn btn-lg change-item-status #{status_class}", remote: true, data: { status: item.status}, method: :get do %>
-    <span class="fa fa-check bigger" id="change_<%= item.id %>"></span>
+    <span class="fa fa-check bigger" id="change_<%= item.id %>" style="color: #32cd32;"></span>
     <span class="hidden">Done</span>
   <% end %>
   <span class="label label-default <%= status_class %> item-status"><%= item.status.humanize.capitalize rescue nil %></span>

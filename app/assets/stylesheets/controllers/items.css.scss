@@ -35,8 +35,8 @@ form {
 
 	a.change-item-status {
 		&.item_ready {
-			color: #006600;
-			border: 1px solid #006600;
+			color: #32cd32;
+			border: 1px solid #32cd32;
 		}
 
 		&.item_not_ready {
@@ -45,7 +45,7 @@ form {
 
 		&.item_ready:hover,
 		&.item_ready:focus {
-			color: green;
+			color: #32cd32;
 		}
 
 
@@ -54,7 +54,7 @@ form {
 	span.item-status {
 		&.item_ready {
 			color: white;
-			background: green;
+			background: #32cd32;
 		}
 	}
 
