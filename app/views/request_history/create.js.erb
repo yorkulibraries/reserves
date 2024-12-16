@@ -1,14 +1,16 @@
 
 <% if @aud.comment.blank? %>
-    $("#history_log_error").text("Note is blank. Please fill it in.").removeClass("hide");
+    $("#item_history_popup_<%= @aud.associated_id %> #history_log_error").text("Note is blank. Please fill it in.").removeClass("hide");
+
 
 <% elsif @aud.comment.length > 255 %>
-  $("#history_log_error").text("Note is more than 255 characters!").removeClass("hide");
+  $("#item_history_popup_<%= @aud.associated_id %> #history_log_error").text("Note is blank. Please fill it in.").removeClass("hide");
 <% else %>
-  $("#history_log_error").addClass("hide");
-  $('#history_popup form').trigger("reset");
+    $("#item_history_popup_<%= @aud.associated_id %> #note-textarea").val("");
+    $("#item_history_popup_<%= @aud.associated_id %> #history_log_error").addClass("hide");
+    $('#history_popup_<%= @aud.associated_id %> form').trigger("reset");  <!-- Reset the form for the specific item -->
   
-  var url = $("#request_history_log").data("url");
-  $( "#request_history_log" ).load( url);
+    var url = $("#request_history_log_<%= @aud.associated_id %>").data("url");  <!-- Get the URL for the specific item -->
+    $("#request_history_log_<%= @aud.associated_id %>").load(url);  <!-- Load the data for the specific item -->
 
 <% end %>

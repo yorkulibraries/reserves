@@ -6,8 +6,8 @@ $(document).ready(function() {
 
 
 
-  $("#note-textarea").bind('keyup', function(){
-    checkCount();
+  $(document).on('keyup', '[id^="note-textarea_"]', function () {
+    checkCount($(this));
   });
 
 
@@ -18,16 +18,29 @@ $(document).ready(function() {
 		$( "#request_history_log" ).load( data_url);
 	}	);
 
+  $(document).on('shown.bs.modal', '[id^="item_history_popup_"]', function () {
+    var $modal = $(this);
+    var itemId = $modal.attr('id').split('_').pop();
+    var dataUrl = $modal.find("#request_history_log_" + itemId).data("url");
+    
+    if (dataUrl) {
+      $modal.find("#request_history_log_" + itemId).load(dataUrl);
+    }
+  });
+  
 });
 
 /* Checks the count of the note text area and changes color to red if limit hit */
-function checkCount(){
-  var textAreaValue = $("#note-textarea").val();
-  $('.remaining').html(textAreaValue.length);
+function checkCount(textArea) {
+  var textAreaValue = textArea.val();
+  var itemId = textArea.attr('id').split('_').pop();
+  var remainingCounter = $(`#item_history_popup_${itemId} .remaining`);
+  
+  remainingCounter.text(textAreaValue.length);
+
   if (textAreaValue.length > 255) {
-    $('.remaining').addClass("red");
-  }
-  else {
-    $('.remaining').removeClass("red");
+    remainingCounter.addClass("red");
+  } else {
+    remainingCounter.removeClass("red");
   }
 }

@@ -76,8 +76,8 @@
 <% end %>
 
 <% if can?(:change_status, item) && item.status != Item::STATUS_DELETED%>
-<br/><br/>
-  <a data-toggle="modal" href="#history_popup" data-target="#history_popup" class="btn btn-xs btn-default">
-    Add a Note
-  </a>
+ <br/><br/>
+  <%= render partial: 'requests/item_history_log_modal_', locals: { item: item } %>
+  <!-- Adding a link with text -->
+  <%= link_to 'Add a Note / History Log', '#', data: { toggle: 'modal', target: "#item_history_popup_#{item.id}" }, class: 'btn btn-xs btn-default' %>
 <% end %>
