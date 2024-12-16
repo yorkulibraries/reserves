@@ -30,7 +30,7 @@ class AcquisitionRequest < ApplicationRecord
 
   ## VALIDATIONS
   validates_presence_of :item, :requested_by, :location ## default basic validation
-  validates_presence_of :acquired_by, :acquired_at, :acquisition_source_type, :acquisition_source_name, if: lambda {
+  validates_presence_of :acquired_by, :acquired_at, if: lambda {
                                                                                                               status == STATUS_ACQUIRED
                                                                                                             }
   validates_presence_of :cancelled_by, :cancelled_at, :cancellation_reason, if: lambda {

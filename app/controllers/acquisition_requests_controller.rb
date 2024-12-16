@@ -106,6 +106,7 @@ class AcquisitionRequestsController < ApplicationController
 
   def send_to_acquisitions
     @acquisition_request.audit_comment = "Sent email to #{params[:which].humanize}. CC: #{current_user.email}"
+    @acquisition_request.acquisition_notes = params[:acquisition_notes]
     @acquisition_request.save(validate: false)
 
     @acquisition_request.email_to(params[:which], current_user)
