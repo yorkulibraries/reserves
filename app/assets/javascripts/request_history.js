@@ -1,16 +1,12 @@
 $(document).ready(function() {
-	$(".request_history table .comment").click(function() {
-		//alert($(this).parent().next().prop("class"));
-		$(this).parent().next().toggleClass('hide');
-	});
 
-
+  $(document).on("click", ".request_history table .comment", function() {
+    $(this).parent().next().toggleClass('hide');
+  });
 
   $(document).on('keyup', '[id^="note-textarea_"]', function () {
     checkCount($(this));
   });
-
-
 
 	$('#history_popup').on('shown.bs.modal', function (e) {
 
