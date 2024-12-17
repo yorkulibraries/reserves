@@ -2,7 +2,6 @@ var COURSE;
 
 $(document).ready(function() {
 
-
 	$(".click_redirect").click(function() {
 		var path = $(this).data("redirect-path");
 		location.href=path;
@@ -55,6 +54,43 @@ $(document).ready(function() {
 
 		$("#request_reserve_start_date").val(start_year + "-" + start_month_day);
 		$("#request_reserve_end_date").val(end_year + "-" + end_month_day);
+
+
+	}).trigger("input_load");;
+
+	$("#rollover_course_term, #rollover_course_year").on("input_load change", function(e) {
+		console.log("testie")
+		var term = $("#rollover_course_term").val();
+		var year = parseInt($("#rollover_course_year").val());
+		//console.log("Here I am" + year);
+
+		var start_month_day = "09-01"; // F, Y, FW
+		var end_month_day = "04-30"; // Y, FW, W
+		var start_year = year;  // F, Y, FW
+		var end_year = year + 1; // Y, FW, W
+		//console.log(term)
+
+		
+		switch(term) {
+			case "F":
+				end_month_day = "12-31";
+				end_year = year;
+				break;
+			case "W":
+				start_month_day = "01-01";
+				start_year = year + 1;
+				break;
+			case "S":
+			case "SU":
+			case "S1":
+			case "S2":
+				start_month_day = "05-01";
+				start_year = year + 1;
+				end_month_day = "08-30";
+		}
+
+		$("#rollover_start_date").val(start_year + "-" + start_month_day);
+		$("#rollover_end_date").val(end_year + "-" + end_month_day);
 
 
 	}).trigger("input_load");;
