@@ -6,7 +6,7 @@
 <% elsif @aud.comment.length > 255 %>
   $("#item_history_popup_<%= @aud.associated_id %> #history_log_error").text("Note is blank. Please fill it in.").removeClass("hide");
 <% else %>
-    $("#item_history_popup_<%= @aud.associated_id %> #note-textarea").val("");
+    $("#note-textarea_<%= @aud.associated_id %>").val("");
     $("#item_history_popup_<%= @aud.associated_id %> #history_log_error").addClass("hide");
     $('#history_popup_<%= @aud.associated_id %> form').trigger("reset");  <!-- Reset the form for the specific item -->
   
