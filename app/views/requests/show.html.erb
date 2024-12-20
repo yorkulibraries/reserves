@@ -130,14 +130,15 @@
 					<% if can?(:manage, @request) %>
 						<span class="field">Assigned to</span><br/>
 						<%= @request.assigned_to ? @request.assigned_to.name : "Nobody" %>
-						<br/><br/>
-						<span class="field">History Log</span><br/>
-						<a data-toggle="modal" href="#history_popup" data-target="#history_popup" class="btn btn-xs btn-default">
-							Add a Note / History Log
-						</a>
+						
 					<% else %>
 						<span class="field">Status</span><br/>
 						<%= @request.status ? @request.status.upcase : "Unknown" %>
+						<br/><br/>
+						<span class="field">Request History Log</span><br/>
+						<a data-toggle="modal" href="#history_popup" data-target="#history_popup" class="btn btn-xs btn-default">
+							View Log
+						</a>
 					<% end %>
 				</div>
 				<div class="col-md-3">

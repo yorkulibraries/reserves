@@ -185,5 +185,4 @@ ActiveRecord::Schema[7.0].define(version: 2024_08_20_132657) do
     t.datetime "updated_at"
   end
 
-
 end
