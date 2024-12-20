@@ -5,11 +5,9 @@ $(document).ready(function() {
 	});
 
 
-
   $(document).on('keyup', '[id^="note-textarea_"]', function () {
-    checkCount($(this));
+    updateCharacterCount($(this));
   });
-
 
 
 	$('#history_popup').on('shown.bs.modal', function (e) {
@@ -30,12 +28,11 @@ $(document).ready(function() {
   
 });
 
-/* Checks the count of the note text area and changes color to red if limit hit */
-function checkCount(textArea) {
-  var textAreaValue = textArea.val();
-  var itemId = textArea.attr('id').split('_').pop();
-  var remainingCounter = $(`#item_history_popup_${itemId} .remaining`);
-  
+function updateCharacterCount($textArea) {
+  var textAreaValue = $textArea.val();
+  var itemId = $textArea.attr('id').split('_').pop();
+  var remainingCounter = $textArea.closest('.modal').find('.remaining');
+
   remainingCounter.text(textAreaValue.length);
 
   if (textAreaValue.length > 255) {

@@ -6,9 +6,13 @@ class RequestHistoryController < ApplicationController
   # skip_authorization_check
 
   def index 
-    @audits = @audits = @request.associated_audits.where.not(associated_type: 'item') # | @request.course.audits
+    associated_audits = @request.associated_audits.where.not(associated_type: 'item')
 
-    @audits_grouped = @audits.reverse.group_by { |a| a.created_at.at_beginning_of_day }
+    request_audits = @request.audits.where(auditable_type: 'Request', associated_id: nil, associated_type: nil)
+
+    @audits = (associated_audits + request_audits).sort_by(&:created_at)
+
+    @audits_grouped = @audits.reverse.group_by { |audit| audit.created_at.at_beginning_of_day }
 
     @users = User.all
     @locations = Location.active
