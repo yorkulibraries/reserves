@@ -1,5 +1,4 @@
 <% if can? :send_to_acquisitions, @acquisition_request %>
-  <hr/>
   <p>Send Acquisition Email To:</p>
   <%= form_tag send_to_acquisitions_acquisition_request_path(@acquisition_request), method: :post do |f| %>
     <select name="which" class="form-control">

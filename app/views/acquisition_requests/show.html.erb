@@ -49,9 +49,10 @@
           <%= @acquisition_request.location == nil ? "Unassigned Location" : @acquisition_request.location.name %>
 
           <br/><br/>
-          <%= render partial: "send_email_choice" %>
+
         </div>
         <div class="col-md-6 left-border">
+          <%= render partial: "send_email_choice" %>
           <% if @acquisition_request.status == AcquisitionRequest::STATUS_ACQUIRED %>
             <span class="text-primary field">Acquired By</span>
             <%= format @acquisition_request.acquired_by.name %>
@@ -68,9 +69,9 @@
             <span class="text-primary field">Cancellation Reason</span>
             <%= format @acquisition_request.cancellation_reason %>
           <% elsif can? :change_status, @acquisition_request %>
-            <div id="acquire_form">
+            <!-- <div id="acquire_form">
               <p class="small">All fields are required.</p>
-            </div>
+            </div> -->
 
             <div class="collapse" id="cancel_form">
               <p class="small">Please provide the reason for cancellation</p>
