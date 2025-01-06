@@ -86,12 +86,12 @@
 					<%= f.input :reserve_location_id, collection: Location.active, required: true, hint: "Where do you want students to pick up your items?" %>
 		    </div>
 		    <div class="col-sm-3">
-		    	<%= f.input :reserve_start_date, as: :string, readonly: ! current_user.admin?, required: false, hint: "Prefilled after term selection.",
-					input_html: { id: "request_reserve_start_date", class: current_user.admin? ? "datepicker" : "" } %>
+		    	<%= f.input :reserve_start_date, as: :string, readonly: true, required: false, hint: "Prefilled after term selection.",
+					input_html: { id: "request_reserve_start_date", class: "" } %>
 		    </div>
 		    <div class="col-sm-3">
-		        <%= f.input :reserve_end_date, as: :string, readonly: ! current_user.admin?, required: false,
-						input_html: { id: "request_reserve_end_date", class: current_user.admin? ? "datepicker" : "" }  %>
+		        <%= f.input :reserve_end_date, as: :string, readonly: true, required: false,
+						input_html: { id: "request_reserve_end_date", class: "" }  %>
 		    </div>
 		  </div> <!-- row end -->
 	  </div>
