@@ -34,6 +34,18 @@ class ItemsControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
+  should 'create a new item with other_isbn_issn' do
+    assert_difference('Item.count') do
+      post request_items_path(@_request), params: { 
+        item: attributes_for(:item, other_isbn_issn: '1234-5678').except(:request) 
+      }
+      item = get_instance_var(:item)
+      assert_equal 0, item.errors.size, "Should be no errors, #{item.errors.messages}"
+      assert_redirected_to request_item_path(@_request, item)
+      assert_equal '1234-5678', item.other_isbn_issn, 'other_isbn_issn should match'
+    end
+  end
+
   should 'send en email to location email, after item created, if enabled' do
     @_request.location.setting_bcc_location_on_new_item = true
     @_request.location.save

@@ -80,6 +80,15 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
       requests = get_instance_var(:requests)
       assert_equal 3, requests.size, 'Should only be 1 cancelled'
     end
+
+    should 'default location name is "All locations"' do
+      get root_path, params: { which: Request::OPEN, page: 1, location: 'all' }
+  
+      assert_select 'button.dropdown-toggle', text: 'All Locations'
+
+      assert_select 'ul.dropdown-menu li:first-child a', text: 'All Locations'
+    end
+
   end
 
   context 'User' do
