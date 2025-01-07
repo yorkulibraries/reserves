@@ -1,14 +1,22 @@
+<% if @aud.present? %>
+  <% is_associated = @aud.associated_id.present? %>
+  <% prefix = is_associated ? "#item_history_popup_#{@aud.associated_id}" : "" %>
+  <% log_error_selector = "#{prefix} #history_log_error" %>
+  <% form_reset_selector = is_associated ? "#history_popup_#{@aud.associated_id} form" : "#history_popup form" %>
+  <% textarea_selector = is_associated ? "#note-textarea_#{@aud.associated_id}" : nil %>
+  <% log_url_selector = is_associated ? "#request_history_log_#{@aud.associated_id}" : "#request_history_log" %>
 
-<% if @aud.comment.blank? %>
-    $("#history_log_error").text("Note is blank. Please fill it in.").removeClass("hide");
-
-<% elsif @aud.comment.length > 255 %>
-  $("#history_log_error").text("Note is more than 255 characters!").removeClass("hide");
-<% else %>
-  $("#history_log_error").addClass("hide");
-  $('#history_popup form').trigger("reset");
-  
-  var url = $("#request_history_log").data("url");
-  $( "#request_history_log" ).load( url);
-
+  <% if @aud.comment.blank? %>
+    $( "<%= log_error_selector %>" ).text("Note is blank. Please fill it in.").removeClass("hide");
+  <% elsif @aud.comment.length > 255 %>
+    $( "<%= log_error_selector %>" ).text("Note is more than 255 characters!").removeClass("hide");
+  <% else %>
+    $( "<%= log_error_selector %>" ).addClass("hide");
+    $( "<%= form_reset_selector %>" ).trigger("reset");
+    <% if textarea_selector %>
+      $( "<%= textarea_selector %>" ).val("");
+    <% end %>
+    var url = $( "<%= log_url_selector %>" ).data("url");
+    $( "<%= log_url_selector %>" ).load(url);
+  <% end %>
 <% end %>

@@ -78,6 +78,7 @@ Rails.application.routes.draw do
       post 'save_note' => 'request_history#create'
       post :rollover
       get :rollover_confirm
+      get 'item_history/:item_id', to: 'request_history#item_history', as: 'item_history'
     end
 
     resource :copy_items, only: %i[show new create], module: 'requests'

@@ -49,9 +49,10 @@
           <%= @acquisition_request.location == nil ? "Unassigned Location" : @acquisition_request.location.name %>
 
           <br/><br/>
-          <%= render partial: "send_email_choice" %>
+
         </div>
         <div class="col-md-6 left-border">
+          <%= render partial: "send_email_choice" %>
           <% if @acquisition_request.status == AcquisitionRequest::STATUS_ACQUIRED %>
             <span class="text-primary field">Acquired By</span>
             <%= format @acquisition_request.acquired_by.name %>
@@ -68,20 +69,9 @@
             <span class="text-primary field">Cancellation Reason</span>
             <%= format @acquisition_request.cancellation_reason %>
           <% elsif can? :change_status, @acquisition_request %>
-            <div id="acquire_form">
+            <!-- <div id="acquire_form">
               <p class="small">All fields are required.</p>
-              <%= simple_form_for @acquisition_request, url: change_status_acquisition_request_path(@acquisition_request) do |f| %>
-                <input type="hidden" name="status" value="<%= AcquisitionRequest::STATUS_ACQUIRED %>"/>
-                <%= f.input :acquisition_source_type, label: "Source", collection: Setting.acquisition_sources %>
-                <%= f.input :acquisition_source_name, label: "Source Name", as: :string %>
-                <%= f.input :acquisition_notes, label: "Notes",  hint: "This note will be sent along with the acquisition email."  %>
-                <%= f.button :submit, "Acquire Item", class: "btn btn-success btn-sm", data: { confirm: "Are you sure?" } %>
-                &nbsp;&nbsp; or
-                <a class="btn btn-link red btn-sm" data-toggle="collapse" data-slide-up="#acquire_form" href="#cancel_form">
-                 Cancel Request
-                </a>
-              <% end %>
-            </div>
+            </div> -->
 
             <div class="collapse" id="cancel_form">
               <p class="small">Please provide the reason for cancellation</p>
@@ -110,5 +100,17 @@
       <%= render partial: "history_log" %>
     </div>
   </div>
+
+  <%= simple_form_for @acquisition_request, url: change_status_acquisition_request_path(@acquisition_request) do |f| %>
+    <input type="hidden" name="status" value="<%= AcquisitionRequest::STATUS_ACQUIRED %>"/>
+    <%= f.input :acquisition_source_type, label: "Source", collection: Setting.acquisition_sources %>
+    <%= f.input :acquisition_source_name, label: "Source Name", as: :string %>
+    <%= f.input :acquisition_notes, label: "Notes",  hint: "This note will be sent along with the acquisition email."  %>
+    <%= f.button :submit, "Item Acquired", class: "btn btn-success btn-sm", data: { confirm: "Are you sure?" } %>
+    &nbsp;&nbsp; or
+    <a class="btn btn-link red btn-sm" data-toggle="collapse" data-slide-up="#acquire_form" href="#cancel_form">
+      Cancel Request
+    </a>
+  <% end %>
 
 </div>

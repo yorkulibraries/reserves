@@ -12,6 +12,8 @@
 	$("#item_<%= @item.id %>").effect("highlight",2000);
 	$("#item_<%= @item.id %> span.item-type").after("<span class='green pull-right fa fa-floppy-o'></span>");
 
+	$("#save_buttons_frame").html("<%= j render 'request_wizard/save_buttons', request: @request %>");
+
 <% else %>
   searchRecords();
 	bootstrap_modal_replace_content("item_form", "<%= j render "form_modal", formats: [:html] %>")

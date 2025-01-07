@@ -47,7 +47,7 @@ class ItemsController < ApplicationController
 
     respond_to do |format|
       if @item.save
-        @request.update(status: Request::OPEN)
+        @request.reload
         RequestMailer.new_item_notification(@request, @item).deliver_later
 
         format.html { redirect_to [@request, @item], notice: 'Item was successfully created.' }
@@ -78,6 +78,7 @@ class ItemsController < ApplicationController
   def destroy
     @item.audit_comment = "Item #{@item.title} removed from request"
     @item.destroy
+    @request.reload
     respond_to do |format|
       format.html { redirect_to @request }
       format.js
@@ -123,7 +124,7 @@ class ItemsController < ApplicationController
 
   # Never trust parameters from the scary internet, only allow the white list through.
   def item_params
-    item_attributes = %i[id title author description callnumber isbn publication_date edition publisher loan_period provided_by_requestor
+    item_attributes = %i[id title author description callnumber isbn other_isbn_issn publication_date edition publisher loan_period provided_by_requestor
                          metadata_source metadata_source_id _destroy request_id item_type copyright_options other_copyright_options url format map_index_num
                          page_number physical_copy_required journal_title issue volume ils_barcode]
 

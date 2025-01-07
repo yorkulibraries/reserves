@@ -4,11 +4,15 @@
 <div class="well">
 	<ul>
 		<li>Please add the items you would like to put on reserve. You can add as many as you need.</li>
+		<li>You must add one item to create this request. You can still save this request for later without any items.</li>
 		<li>Start by clicking on the type of item you would like to add, then fill in the details and click the add button.</li>
 	</ul>
 </div>
 
-<%= render partial: "request_wizard/save_buttons"%>
+<div id="save_buttons_frame">
+  <%= render partial: "request_wizard/save_buttons"%>
+</div>
+
 <hr/>
 
 <%= render partial: "items/add_item" %>
@@ -27,7 +31,3 @@
 		<p>You must <strong class="black">add</strong> at least one item in order for your request to be open</p>
 	</div>
 <% end %>
-
-
-
-<%= render partial: "request_wizard/save_buttons"%>

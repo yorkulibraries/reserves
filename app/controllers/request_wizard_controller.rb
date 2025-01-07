@@ -6,7 +6,7 @@ class RequestWizardController < ApplicationController
 
   def step_one
     if current_user.valid?
-      @request = Request.new
+      @request = Request.new(status: Request::INCOMPLETE)
       @request.course = Course.new
       @request.requester = current_user
     else
@@ -35,7 +35,7 @@ class RequestWizardController < ApplicationController
       end
     else
       @old_request = get_request_duplicated
-      if @old_request.course.created_by_id == current_user.id
+      if !@old_request.nil? &&  @old_request.course.created_by_id == current_user.id
         redirect_to new_request_step_two_path(@old_request), notice: 'Proceeding to Step 2.'
       elsif !@request.save
         render action: 'step_one'
@@ -48,7 +48,7 @@ class RequestWizardController < ApplicationController
   end
 
   def finish
-    if @request.items.size.positive?
+    if @request.items.where.not(status: 'deleted').exists?
       @request.audit_comment = 'Request Step Two Completed'
       @request.status = Request::OPEN
       @request.requested_date = Date.today.to_date
@@ -62,7 +62,7 @@ class RequestWizardController < ApplicationController
 
     else
       redirect_to new_request_step_two_path(@request),
-                  alert: 'You must add at least one item for this request to be submitted!'
+                  alert: 'You must add at least one active item for this request to be submitted!'      
     end
   end
 

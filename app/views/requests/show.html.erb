@@ -130,14 +130,15 @@
 					<% if can?(:manage, @request) %>
 						<span class="field">Assigned to</span><br/>
 						<%= @request.assigned_to ? @request.assigned_to.name : "Nobody" %>
-						<br/><br/>
-						<span class="field">History Log</span><br/>
-						<a data-toggle="modal" href="#history_popup" data-target="#history_popup" class="btn btn-xs btn-default">
-							Add a Note / History Log
-						</a>
+						
 					<% else %>
 						<span class="field">Status</span><br/>
 						<%= @request.status ? @request.status.upcase : "Unknown" %>
+						<br/><br/>
+						<span class="field">Request History Log</span><br/>
+						<a data-toggle="modal" href="#history_popup" data-target="#history_popup" class="btn btn-xs btn-default">
+							View Log
+						</a>
 					<% end %>
 				</div>
 				<div class="col-md-3">
@@ -191,19 +192,27 @@
 	<hr/>
 
 	<!-- ITEMS -->
-
 	<div class="panel panel-info">
-	  <div class="panel-heading">
-	    <h3 class="panel-title">Requested Items</h3>
-	  </div>
+		<div class="panel-heading">
+			<h3 class="panel-title">Requested Items</h3>
+		</div>
 		<div class="panel-body">
 			<% if is_request_active(@request) %>
 				<%= render partial: "items/add_item" %>
 			<% end %>
 
-			<div class="items">
+			<!-- Move buttons outside of the items div -->
+			<div class="d-flex justify-content-between mb-3">
+				<%= link_to request_copy_items_path(@request), remote: true, class: "btn btn-link blend" do %>
+					<span class="fa fa-copy"></span> Copy Items
+				<% end %>
+				<%= link_to request_items_path(@request, status: Item::STATUS_DELETED), class: "btn btn-link blend" do %>
+					<span class="fa fa-trash-o"></span> <%= @request.items.deleted.size %>
+				<% end %>
+			</div>
 
-				<%if @request.items.active.size > 0 %>
+			<div class="items">
+				<% if @request.items.active.size > 0 %>
 					<% @request.items.active.recent_first.each do |item| %>
 						<%= render item %>
 					<% end %>
@@ -217,25 +226,26 @@
 					</div>
 				<% end %>
 
-
 				<% if @request.status == Request::REMOVED %>
 					<div id="removed_items" class="<%= 'hide' if @request.items.deleted.size == 0 %>">
-							<h4>Removed Items</h4>
-							<% @request.items.deleted.each do |item| %>
-								<%= link_to request_item_path(@request, item), class: "btn btn-link blend", remote: true do %>
-									<span class="fa fa-retweet"></span> <%= item.title %>
+						<h4>Removed Items</h4>
+						<% @request.items.deleted.each do |item| %>
+							<%= link_to request_item_path(@request, item), class: "btn btn-link blend", remote: true do %>
+								<span class="fa fa-retweet"></span> <%= item.title %>
 							<% end %>
-					<% end %>
+						<% end %>
 					</div>
 				<% end %>
-
 			</div>
 		</div>
 	</div>
 
 
 
-	<%= render partial: "request_wizard/save_buttons"%>
+
+	<div id="save_buttons_frame">
+  		<%= render partial: "request_wizard/save_buttons"%>
+	</div>
 
 	<% if @request.status != Request::INCOMPLETE %>
 		<%= render partial: "change_status" %>

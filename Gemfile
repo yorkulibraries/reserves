@@ -2,6 +2,7 @@
 
 source 'http://rubygems.org'
 ruby '3.1.4'
+ruby '3.1.4'
 
 ## RAILS and related ##
 gem 'rails', '~> 7.0.0'

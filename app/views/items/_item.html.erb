@@ -17,6 +17,9 @@
 			<% show_field? item, "isbn" do%>
 				<span class="text-primary field">ISBN</span> <%= format item.isbn %>
 			<% end %>
+			<% show_field? item, "other_isbn_issn" do%>
+				<span class="text-primary field">Other ISBN</span> <%= format item.other_isbn_issn %>
+			<% end %>
 			<% show_field? item, "callnumber" do%>
 				<span class="text-primary field">Call Number</span> <%= format item.callnumber %>
 			<% end %>

@@ -17,8 +17,13 @@ public/assets/
 yarn.lock
 *.log
 .bundle
+<<<<<<< HEAD
 *.env
 !.env
 *.sql
 *.sql.gz
 log/*
+=======
+*.sql.gz
+*.sql
+>>>>>>> origin/20241126-maintenance-release

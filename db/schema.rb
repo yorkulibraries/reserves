@@ -111,6 +111,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_11_25_230111) do
     t.string "issue"
     t.string "ils_barcode"
     t.boolean "physical_copy_required", default: false
+    t.string "other_isbn_issn"
   end
 
   create_table "loan_periods", id: :integer, charset: "utf8mb3", force: :cascade do |t|

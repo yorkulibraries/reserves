@@ -28,7 +28,7 @@ class HomeController < ApplicationController
                 end
 
     ## location, nil is all locations
-    location_id = params[:location] || nil
+    location_id = params[:location] || 'all'
 
     if location_id.nil?
       ## home location
