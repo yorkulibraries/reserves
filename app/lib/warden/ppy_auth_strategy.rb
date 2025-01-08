@@ -21,6 +21,7 @@ class Warden::PpyAuthStrategy < Devise::Strategies::Authenticatable
         @user.admin = false
         @user.active = true
         @user.role = User::INSTRUCTOR_ROLE
+        @user.user_type = User::UNKNOWN
         @user.uid = request.headers[USER]
         @user.username = request.headers[USER]
         @user.name = "#{request.headers[FIRSTNAME]} #{request.headers[SURNAME]}"
