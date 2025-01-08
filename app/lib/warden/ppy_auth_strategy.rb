@@ -10,17 +10,17 @@ class Warden::PpyAuthStrategy < Devise::Strategies::Authenticatable
   TYPE = 'HTTP_PYORK_TYPE'
 
   LOGIN = ['/login']
-  LOGOUT_URL = 'https://passportyork.yorku.ca/ppylogin/ppylogout'
+  PPY_LOGOUT_URL = 'https://passportyork.yorku.ca/ppylogin/ppylogout'
 
   def authenticate!
     if valid?
-      resource = User.find_by('uid = ?', request.headers[USER])
+      resource = User.find_by('username = ?', request.headers[USER])
       if !resource.present?
         @user = User.new
         @user.password = Digest::SHA256.hexdigest(rand().to_s)
         @user.admin = false
         @user.active = true
-        @user.user_type = User::UNKNOWN if @user.user_type.nil?
+        @user.user_type = request.headers[TYPE]
         @user.role = User::INSTRUCTOR_ROLE
         @user.uid = request.headers[USER]
         @user.username = request.headers[USER]
@@ -28,25 +28,40 @@ class Warden::PpyAuthStrategy < Devise::Strategies::Authenticatable
         @user.email = request.headers[EMAIL]
         @user.univ_id = request.headers[CYIN]
         @user.audit_comment = 'PpyAuthStrategy created new user from authenticated PYORK headers'
-        @user.save(validate: false)
+        
+        if !@user.valid?
+          fail!('Not authenticated. User validation failed.')
+          return false
+        end
+
+        @user.save
         UserMailer.welcome(@user).deliver_later if @user.email.present?
         resource = @user
       end
 
-      if resource.update_external_alma(request.headers[CYIN])
-        resource.audit_comment = 'Updated user information from ALMA' if resource.changed?
+      resource.user_type = request.headers[TYPE]
+      resource.uid = request.headers[USER]
+      resource.username = request.headers[USER]
+      resource.email = request.headers[EMAIL]
+      resource.univ_id = request.headers[CYIN]
+
+      if resource.changed?
+        resource.audit_comment = 'Updated user information from PYORK headers'
+        resource.save
       end
 
-      if resource.univ_id.nil?
-        resource.univ_id = request.headers[CYIN]
+      if resource.role == User::INSTRUCTOR_ROLE
+        if resource.update_external_alma(request.headers[CYIN])
+          if resource.changed?
+            resource.audit_comment = 'Updated user information from ALMA'
+            resource.save
+          end
+        end
       end
-
-      resource.save(validate: false) if resource.changed?
 
       success!(resource)
     else
-      Rails.logger.debug "not valid"
-      fail!('Not authenticated')
+      fail!('Not authenticated. Warden::PpyAuthStrategy not valid.')
     end
   end
 

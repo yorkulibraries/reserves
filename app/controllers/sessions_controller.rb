@@ -34,7 +34,7 @@ class SessionsController < ApplicationController
 
   def destroy
     destroy_session
-    redirect_to Warden::PpyAuthStrategy::LOGOUT_URL, allow_other_host: true
+    redirect_to Warden::PpyAuthStrategy::PPY_LOGOUT_URL, allow_other_host: true
   end
 
   def login_as

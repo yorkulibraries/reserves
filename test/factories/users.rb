@@ -5,14 +5,14 @@
 FactoryGirl.define do
   factory :user do
     name 'Jeremy Clarkson'
-    sequence(:email, 1000) { |n| "jereymy#{n}@yorku.ca" }
+    sequence(:email, 1000) { |n| "e#{n}@yorku.ca" }
     phone '124'
     user_type User::FACULTY
     role User::INSTRUCTOR_ROLE
     department 'History'
     office 'Some where'
-    sequence(:uid, '20900') { |n| "12#{n}" }
-    sequence(:username, '20900') { |n| "12#{n}" }
+    sequence(:uid, 1000) { |n| "uid#{n}" }
+    sequence(:username, 1000) { |n| "username#{n}" }
     active true
     admin false
 

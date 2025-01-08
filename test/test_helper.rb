@@ -61,7 +61,10 @@ class ActionDispatch::IntegrationTest
   Warden.test_mode!
 
   def log_user_in(user)
-    get login_url, headers: { 'HTTP_PYORK_USER' => user.uid }
+    get login_url, headers: { 
+      'HTTP_PYORK_USER' => user.username, 'HTTP_PYORK_EMAIL' => user.email, 
+      'HTTP_PYORK_CYIN' => user.univ_id, 'HTTP_PYORK_TYPE' => user.user_type
+    }
   end
 
   def get_instance_var(what)

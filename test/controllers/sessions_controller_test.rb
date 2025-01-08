@@ -3,10 +3,6 @@
 require 'test_helper'
 
 class SessionsControllerTest < ActionDispatch::IntegrationTest
-  setup do
-    @cas_header = 'HTTP_PYORK_USER'
-    @cas_alt_header = 'HTTP_PYORK_CYIN'
-  end
 
   should 'not throw authorization not performed error when using the controller' do
     assert_nothing_raised do
@@ -17,7 +13,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
   should 'create a new session information if user logs in' do
     user = create(:user, uid: 'test', admin: true, role: User::MANAGER_ROLE)
 
-    get login_url, headers: { @cas_header.to_s => user.uid }
+    log_user_in(user)
 
     assert_equal user.id, session[:user_id]
     assert_redirected_to root_url
@@ -26,7 +22,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
 
   should 'test redirection to a dashboard if the staff is logged in' do
     staff = create(:user, uid: '123123123', admin: true, role: User::STAFF_ROLE)
-    get login_url, headers: { @cas_header.to_s => staff.uid }
+    log_user_in(staff)
 
     assert_equal staff.id, session[:user_id]
     assert_redirected_to root_url
@@ -34,7 +30,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
 
   should 'test redirection to a requests_user_url if the regulard user is logged in' do
     user = create(:user, uid: '123123123', admin: false)
-    get login_url, headers: { @cas_header.to_s => user.uid }
+    log_user_in(user)
 
     assert_equal user.id, session[:user_id]
     assert_redirected_to requests_user_url(user)
@@ -42,7 +38,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
 
   should 'show error 401 if user is not active' do
     user = create(:user, uid: '123123123', admin: false, active: false)
-    get login_url, headers: { @cas_header.to_s =>  user.uid }
+    log_user_in(user)
     assert_equal 401, response.status
     assert_not_nil flash[:alert]
     assert_equal 'User not active.', flash[:alert]
@@ -51,7 +47,11 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
   should "NEW USER, redirect to new user signup if user doesn't exist, no email should be sent yet" do
     ActionMailer::Base.deliveries.clear
     get logout_url
-    get login_url, headers: { @cas_header.to_s => 'something_or_other', 'HTTP_PYORK_TYPE' => User::FACULTY }
+    get login_url, headers: { 
+      'HTTP_PYORK_USER' => 'something_or_other', 'HTTP_PYORK_EMAIL' => 'something@email.com', 
+      'HTTP_PYORK_CYIN' => '999999999', 'HTTP_PYORK_TYPE' => User::FACULTY,
+      'HTTP_PYORK_SURNAME' => 'doe', 'HTTP_PYORK_FIRSTNAME' => 'john'
+    }
     assert ActionMailer::Base.deliveries.empty?, "Should be empty, since we didn't get any details about user"
     assert_not_nil session[:user_id], 'Make sure user is logged in'
 
@@ -62,7 +62,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
     get logout_url
 
     assert_nil session[:user_id]
-    assert_redirected_to Warden::PpyAuthStrategy::LOGOUT_URL
+    assert_redirected_to Warden::PpyAuthStrategy::PPY_LOGOUT_URL
   end
 
   context 'logged in actions' do
