@@ -47,6 +47,13 @@ class User < ApplicationRecord
   audited associated_with: :location
   has_associated_audits
 
+  def set_user_type(type)
+    self.user_type = FACULTY if type.downcase.include?('faculty')
+    self.user_type = GRADUATE if type.downcase.include?('graduate')
+    self.user_type = UNDERGRAD if type.downcase.include?('undergrad')
+    self.user_type = STAFF if type.downcase.include?('staff')
+  end
+
   def update_external_alma(user_id)
     return false if user_id.nil? || Setting.alma_apikey.nil? || Setting.alma_apikey.strip.length == 0
 

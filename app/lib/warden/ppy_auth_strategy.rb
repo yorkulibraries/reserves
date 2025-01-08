@@ -20,7 +20,6 @@ class Warden::PpyAuthStrategy < Devise::Strategies::Authenticatable
         @user.password = Digest::SHA256.hexdigest(rand().to_s)
         @user.admin = false
         @user.active = true
-        @user.user_type = request.headers[TYPE]
         @user.role = User::INSTRUCTOR_ROLE
         @user.uid = request.headers[USER]
         @user.username = request.headers[USER]
@@ -28,6 +27,8 @@ class Warden::PpyAuthStrategy < Devise::Strategies::Authenticatable
         @user.email = request.headers[EMAIL]
         @user.univ_id = request.headers[CYIN]
         @user.audit_comment = 'PpyAuthStrategy created new user from authenticated PYORK headers'
+        
+        @user.set_user_type(request.headers[TYPE])
         
         if !@user.valid?
           fail!('Not authenticated. User validation failed.')
@@ -39,7 +40,7 @@ class Warden::PpyAuthStrategy < Devise::Strategies::Authenticatable
         resource = @user
       end
 
-      resource.user_type = request.headers[TYPE]
+      resource.set_user_type(request.headers[TYPE])
       resource.uid = request.headers[USER]
       resource.username = request.headers[USER]
       resource.email = request.headers[EMAIL]
