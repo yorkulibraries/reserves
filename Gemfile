@@ -41,7 +41,7 @@ gem 'caxlsx_rails', '0.6.3'
 
 ## EX LIBRIS INTEGRATION ALMA, PRIMO
 gem 'alma', '~> 0.3.3'
-gem 'primo', git: 'https://github.com/tulibraries/primo.git', branch: 'main'
+gem 'primo'
 
 ## SEARCH - USING ELASTIC SEARCH
 gem 'searchkick'
