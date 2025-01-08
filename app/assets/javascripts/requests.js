@@ -3,24 +3,59 @@ var COURSE;
 $(document).ready(function() {
 
 
-	$(".click_redirect").click(function() {
-		var path = $(this).data("redirect-path");
-		location.href=path;
-	});
+	let isSelectionMade = false;
 
 	$('#requester_name').autocomplete({
-    source: $('#requester_name').data('autocomplete-source'),
-		appendTo: "#change_owner_form .modal-body",
-		focus: function(event, ui) {
-			event.preventDefault();
-			$(this).val(ui.item.label);
-		},
-		select: function(event, ui) {
-			event.preventDefault();
-			$(this).val(ui.item.label);
-			$("#requester_id").val(ui.item.value);
-		}
+	  source: $('#requester_name').data('autocomplete-source'),
+	  appendTo: "#change_owner_form .modal-body",
+	  focus: function(event, ui) {
+		event.preventDefault();
+		$(this).val(ui.item.label);
+	  },
+	  select: function(event, ui) {
+		event.preventDefault();
+		$(this).val(ui.item.label);
+		$("#requester_id").val(ui.item.value);
+		isSelectionMade = true;
+		enableSubmitButton();
+		disableTyping();
+	  }
 	});
+	
+	$('#requester_name').on('input change', function() {
+	  if (isSelectionMade) {
+		enableSubmitButton();
+	  }
+	});
+	
+	function disableTyping() {
+	  $('#requester_name').attr('readonly', true);
+	}
+	
+	function enableTyping() {
+	  $('#requester_name').attr('readonly', false);
+	}
+	
+	function enableSubmitButton() {
+	  const requesterIdValue = $('#requester_id').val().trim();
+	  if (requesterIdValue !== "") {
+		$('#change_owner_submit').prop('disabled', false);
+	  } else {
+		$('#change_owner_submit').prop('disabled', true);
+	  }
+	}
+	
+	$('#requester_name').on('keyup', function() {
+	  if (isSelectionMade) {
+		$(this).val('');
+		$("#requester_id").val('');
+		isSelectionMade = false;
+		enableSubmitButton();
+		enableTyping();
+	  }
+	});
+	
+  
 
 	$("#request_course_attributes_term, #request_course_attributes_year").on("input_load change", function(e) {
 
