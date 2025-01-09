@@ -9,12 +9,14 @@
         <%= simple_form_for @request, url: change_owner_request_path do |f| %>
         <div class="modal-body">
             <label>Look up a new request owner by name</label>
-            <%= f.collection_select :requester_id, User.all, :id, :name, { prompt: "Choose a new owner" }, { class: "input-lg form-control" } %>
+            <%= text_field :requester, :name, data: { autocomplete_source: users_path }, aria: { label: "Change owner"}, class: "input-lg form-control" %>
+            <%= hidden_field :nil, nil, name: "requester_id", id: "requester_id" %>
             <p class="weak">This change will be recorded in the audit trail</p>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">Cancel Changes</button>
-           <%= f.button :submit,  "Change Owner", data: { confirm: "Are you sure? "}, class: "btn btn-success" %>
+           <%= f.button :submit, "Change Owner", data: { confirm: "Are you sure?" }, class: "btn btn-success", id: "change_owner_submit", disabled: "disabled" %>
+
         </div>
         <% end %>
       </div>
