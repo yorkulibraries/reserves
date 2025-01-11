@@ -50,7 +50,7 @@
 
    <footer class="footer">
       <div class="container">
-         <p>&copy; <%= Date.today.year %>. <%= Setting.app_owner %>. All rights reserved.</p>
+         <p>&copy; <%= Date.today.year %>. <%= Setting.app_owner %>. All rights reserved. <%= Rails.application.config.git_commit_hash %></p>
       </div>
    </footer>
 
