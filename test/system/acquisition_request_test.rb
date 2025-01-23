@@ -21,10 +21,7 @@ class AcquisitionRequestTest < ApplicationSystemTestCase
 
     click_link @request_open.course.name
 
-    # Click on the "Acquisition Requests" dropdown button for the "Beans" item
     find("#item_#{@item_open.id} .acquisition_request .dropdown-toggle").click
-
-    # Now click on the "New Request" link inside the dropdown
     find("#item_#{@item_open.id} .acquisition_request .dropdown-menu li a", text: "New Request").click
 
     assert_selector('.modal', visible: true, wait: 5)
@@ -33,7 +30,6 @@ class AcquisitionRequestTest < ApplicationSystemTestCase
     fill_in "acquisition_request_acquisition_notes", with: 'Test Acquisition Note'
     click_button 'Create Acquisition Request'
 
-    # Click on the "Acquisition Requests" dropdown button for the "Beans" item
     find("#item_#{@item_open.id} .acquisition_request .dropdown-toggle").click
 
     assert_text "By #{@admin_user.name.split(" ").first}"
@@ -45,10 +41,8 @@ class AcquisitionRequestTest < ApplicationSystemTestCase
 
     click_link @request_open.course.name
 
-    # Click on the "Acquisition Requests" dropdown button for the "Beans" item
     find("#item_#{@item_open.id} .acquisition_request .dropdown-toggle").click
 
-    # Now click on the "New Request" link inside the dropdown
     find("#item_#{@item_open.id} .acquisition_request .dropdown-menu li a", text: "New Request").click
 
     assert_selector('.modal', visible: true, wait: 5)
@@ -57,7 +51,6 @@ class AcquisitionRequestTest < ApplicationSystemTestCase
     fill_in "acquisition_request_acquisition_notes", with: 'Test Acquisition Note'
     click_button 'Create Acquisition Request'
 
-    # Click on the "Acquisition Requests" dropdown button for the "Beans" item
     find("#item_#{@item_open.id} .acquisition_request .dropdown-toggle").click
 
     assert_text "By #{@admin_user.name.split(" ").first}"
@@ -77,10 +70,8 @@ class AcquisitionRequestTest < ApplicationSystemTestCase
 
     click_link @request_open.course.name
 
-    # Click on the "Acquisition Requests" dropdown button for the "Beans" item
     find("#item_#{@item_open.id} .acquisition_request .dropdown-toggle").click
 
-    # Now click on the "New Request" link inside the dropdown
     find("#item_#{@item_open.id} .acquisition_request .dropdown-menu li a", text: "New Request").click
 
     assert_selector('.modal', visible: true, wait: 5)
@@ -89,7 +80,6 @@ class AcquisitionRequestTest < ApplicationSystemTestCase
     fill_in "acquisition_request_acquisition_notes", with: 'Test Acquisition Note'
     click_button 'Create Acquisition Request'
 
-    # Click on the "Acquisition Requests" dropdown button for the "Beans" item
     find("#item_#{@item_open.id} .acquisition_request .dropdown-toggle").click
 
     assert_text "By #{@admin_user.name.split(" ").first}"
