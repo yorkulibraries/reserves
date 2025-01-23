@@ -16,6 +16,12 @@ FactoryGirl.define do
     active true
     admin false
 
+    trait :admin do
+      after(:create) do |user|
+        user.add_role(:admin)
+      end
+    end
+
     last_login 1.day.ago
     created_by nil
 
