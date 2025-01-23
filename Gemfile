@@ -82,3 +82,5 @@ group :development, :test do
   gem 'guard-livereload', '~> 2.5', '>= 2.5.2', require: false
   gem 'populator', git: 'https://github.com/ryanb/populator.git'
 end
+
+gem 'concurrent-ruby', '1.3.4'
