@@ -5,7 +5,7 @@ require 'date'
 
 FactoryGirl.define do
   factory :request do
-    requested_date '2013-04-17'
+    requested_date Date.today
     completed_date ''
     cancelled_date ''
     reserve_start_date 1.month.ago.to_date.strftime('%Y-%m-%d')
@@ -19,5 +19,6 @@ FactoryGirl.define do
     association :reserve_location, factory: :location
     association :course, factory: :course
     association :assigned_to, factory: :user
+    #association :item, factory: :item
   end
 end
