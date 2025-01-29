@@ -29,6 +29,11 @@
 		<%= f.input :course_section, collection: Course::SECTIONS, label: false, input_html: { class: "input-sm" } %>
 		<%= f.input :course_credits, collection: Course::TERM_CREDITS, label: false, input_html: { class: "input-sm" } %>
 		<%= f.input :course_student_count, label: false, input_html: { class: "input-sm", placeholder: "Course Enrollment" } %>
+    <br>
+    <%= f.input :reserve_start_date, as: :string, readonly: true, required: false,
+        input_html: { id: "rollover_start_date", class: "" } %>
+    <%= f.input :reserve_end_date, as: :string, readonly: true, required: false,
+						input_html: { id: "rollover_end_date", class: "" }  %>    
 			<br/><br/>
     <%= f.submit "Keep Item(s) On Reserve", class: "btn btn-success", data: { confirm: "Are you sure?"} %>
 		<hr/>
