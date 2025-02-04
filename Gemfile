@@ -67,6 +67,9 @@ group :test do
   gem 'shoulda-context', '~> 2.0'
   gem 'shoulda-matchers', '~> 5.1'
   gem 'sqlite3'
+  gem 'selenium-webdriver', '~> 4.15'
+  gem 'capybara', '~> 3.39', '>= 3.39.2'
+  gem 'mocha', '~> 2.1'
 end
 
 group :development do

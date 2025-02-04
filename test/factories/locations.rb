@@ -4,10 +4,10 @@
 
 FactoryGirl.define do
   factory :location do
-    name 'Some Location Name'
-    contact_email 'somecontact@email.com'
-    contact_phone '416-222-3333'
-    address '123 Fake Street'
+    sequence(:name) { |n| "Location #{n}" }
+    contact_email { Faker::Internet.email }
+    contact_phone { Faker::PhoneNumber.phone_number }
+    address { "123 #{Faker::Address.street_name}" }
     disallowed_item_types nil
     acquisitions_email nil
     # association :department, factory: :department

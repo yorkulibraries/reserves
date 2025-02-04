@@ -62,8 +62,23 @@ class RequestWizardControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_equal 1, request.errors.size, "Should be 1 error, #{request.errors.messages.inspect}"
-end
+  end
 
+  should 'handle empty new request' do
+    assert_no_difference('Request.count') do
+      request_attributes = attributes_for(:request, reserve_location_id: @location.id)
+      request_attributes[:course_attributes] = attributes_for(:course, name: '', code: '')
+      request_attributes[:user] = { office: '', department: '', phone: '' }
+
+      post new_request_step_one_save_path, params: { request: request_attributes }
+      request = get_instance_var(:request)
+      assert_not_empty request.errors, 'There should be validation errors'
+
+      assert_response :success
+      assert_match /can&#39;t be blank/, @response.body
+    end
+
+  end
 
   should 'load the request and any items, if comping back to this' do
     request = create(:request, status: Request::INCOMPLETE)
@@ -96,4 +111,19 @@ end
     assert_response :redirect
     assert_redirected_to request_path(request), 'Show request details'
   end
+
+  test 'should not allow finishing the request without items' do
+    request = create(:request, status: Request::INCOMPLETE)
+
+    get new_request_step_two_path(request)
+    assert_response :success
+    assert_match /Save this request for later/, @response.body
+    assert_no_match /I am done, submit this request/, @response.body
+
+    post new_request_finish_path(request)
+    assert_redirected_to new_request_step_two_path(request)
+    follow_redirect!
+    assert_match /You must add at least one active item for this request to be submitted!/, @response.body
+  end
+
 end

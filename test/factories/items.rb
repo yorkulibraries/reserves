@@ -10,15 +10,15 @@ FactoryGirl.define do
     status Item::STATUS_NOT_READY
     loan_period '2 Hours'
 
-    title 'WOOT'
-    author 'John McCain'
-    isbn '97811222'
-    callnumber 'AB 1010 AB78'
-    description 'Woot Book'
-    publication_date '2014'
-    publisher 'Random House'
+    title { generate(:random_string) }
+    author { generate(:random_name) }
+    isbn { Faker::Number.number(digits: 13) }
+    callnumber { Faker::Alphanumeric.alphanumeric(number: 10).upcase }
+    description { Faker::Lorem.paragraph }
+    publication_date { Faker::Number.between(from: 1900, to: 2025).to_s }
+    publisher { Faker::Book.publisher }
     item_type Item::TYPE_BOOK
-    edition '1st ed.'
+    edition { "#{Faker::Number.between(from: 1, to: 20)}th" }
     format Item::FORMAT_BOOK
     map_index_num nil
     url nil
