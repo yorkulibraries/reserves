@@ -17,6 +17,8 @@ class RequestsController < ApplicationController
   def show
     @admin_users = User.admin.active.where(location_id: @request.reserve_location.id).to_a
     @admin_users.push(current_user) unless @admin_users.include?(current_user)
+
+
   end
 
   def edit; end
@@ -151,6 +153,20 @@ class RequestsController < ApplicationController
   # Use callbacks to share common setup or constraints between actions.
   def set_request
     @request = Request.find(params[:id])
+
+    @items = @request.items.includes(:audits)
+  
+    @notes_by_item = {}
+  
+    @items.each do |item|
+      @notes_by_item[item.id] = Audited::Audit.where(
+        auditable_id: @request.id, 
+        auditable_type: "Request", 
+        associated_id: item.id, 
+        associated_type: "item", 
+        action: "note"
+      )
+    end
   end
 
   # Never trust parameters from the scary internet, only allow the white list through.

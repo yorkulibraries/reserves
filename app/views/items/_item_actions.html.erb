@@ -79,5 +79,13 @@
  <br/><br/>
   <%= render partial: 'requests/item_history_log_modal_', locals: { item: item } %>
   <!-- Adding a link with text -->
-  <%= link_to 'Add a Note / History Log', '#', data: { toggle: 'modal', target: "#item_history_popup_#{item.id}" }, class: 'btn btn-xs btn-default' %>
+  <div style="display: inline-flex; align-items: center;">
+    <%= link_to 'Add a Note / History Log', '#', data: { toggle: 'modal', target: "#item_history_popup_#{item.id}", remote: true }, class: 'btn btn-xs btn-default' %>
+    
+    <% if notes.any? %>
+      <span id="notes-icon-<%= item.id %>" style="font-size: 1.8rem;">📝</span>
+    <% else %>
+      <span id="notes-icon-<%= item.id %>" style="font-size: 1.8rem;"></span>
+    <% end %>
+  </div>
 <% end %>

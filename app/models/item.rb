@@ -2,7 +2,6 @@
 
 class Item < ApplicationRecord
   searchkick
-  
   ########################################### CONSTANTS ############################################
   METADATA_MANUAL = 'MANUAL'
   METADATA_SOLR = 'SOLR'
@@ -61,7 +60,7 @@ class Item < ApplicationRecord
   validates_length_of :publisher, maximum: 250, message: 'Cannot be longer than 250 characters'
   validates_length_of :edition, maximum: 250, message: 'Cannot be longer than 250 characters'
   validates_length_of :isbn, maximum: 250, message: 'Cannot be longer than 250 characters'
-  validates_numericality_of :isbn, allow_blank: true
+  validates_numericality_of :isbn, allow_blank: true, message: 'is not a number, please check for invalid or special characters.'
   validates_length_of :ils_barcode, maximum: 50, allow_blank: true, message: 'Cannot be longer than 250 numbers'
   # validates_numericality_of :ils_barcode, message: "Must be a number"
 

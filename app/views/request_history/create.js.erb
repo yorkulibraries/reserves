@@ -6,6 +6,11 @@
   <% textarea_selector = is_associated ? "#note-textarea_#{@aud.associated_id}" : nil %>
   <% log_url_selector = is_associated ? "#request_history_log_#{@aud.associated_id}" : "#request_history_log" %>
 
+  var notesIcon = document.getElementById("notes-icon-<%= @aud.associated_id %>");
+  if (notesIcon) {
+    notesIcon.innerHTML = '<span style="font-size: 1.8rem;">📝</span>';
+  }
+
   <% if @aud.comment.blank? %>
     $( "<%= log_error_selector %>" ).text("Note is blank. Please fill it in.").removeClass("hide");
   <% elsif @aud.comment.length > 255 %>

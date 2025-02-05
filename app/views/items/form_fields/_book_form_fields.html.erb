@@ -9,7 +9,23 @@
 
 <div class="row required">
 	<div class="col-md-6"><%= f.input :publisher, required: true %></div>
-	<div class="col-md-6"><%= f.input :isbn, label: "ISBN", required: true %></div>
+	<div class="col-md-6">
+		<div class="form-group <%= 'has-error' if f.object.errors[:isbn].present? %>">
+		<%= f.label :isbn, "ISBN", class: "control-label" %>
+
+		<%= f.input_field :isbn, required: true, class: "form-control #{'is-invalid' if f.object.errors[:isbn].present?}" %>
+
+		<% if f.object.errors[:isbn].present? %>
+			<span class="help-block text-danger"><%= f.object.errors[:isbn].first %></span>
+		<% end %>
+
+		<small class="form-text text-muted">
+			There should be only one ISBN in this field. Others should be in 'Other ISBN'
+		</small>
+		</div>
+
+	</div>
+
 </div>
 <div class="row required">
 	<div class="col-md-6"><%= f.input :other_isbn_issn, label: "Other ISBN", as: :text %></div>
