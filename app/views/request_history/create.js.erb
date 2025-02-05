@@ -8,7 +8,7 @@
 
   var notesIcon = document.getElementById("notes-icon-<%= @aud.associated_id %>");
   if (notesIcon) {
-    notesIcon.innerHTML = '<span style="font-size: 1.8rem;">📝</span>';
+    notesIcon.innerHTML = '<span style="font-size: 1.5rem;">⚠️</span>';
   }
 
   <% if @aud.comment.blank? %>

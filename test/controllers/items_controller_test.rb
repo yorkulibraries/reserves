@@ -11,13 +11,50 @@ class ItemsControllerTest < ActionDispatch::IntegrationTest
   end
 
   should 'list all items for request' do
-    create(:item)
-    create_list(:item, 3, request: @_request)
+    items = create_list(:item, 2, request: @_request)
 
-    get request_items_path(@_request)
+    items.each_with_index do |item, index|
+      Audited::Audit.create!(
+        auditable_id: @_request.id, 
+        auditable_type: "Request", 
+        associated_id: item.id, 
+        associated_type: "item", 
+        action: "note",
+        comment: "Note #{index + 1}",
+        user: @user
+      )
+    end
+
+    @notes_by_item = {}
+    @_request.items.each do |item|
+      @notes_by_item[item.id] = Audited::Audit.where(
+        auditable_id: @_request.id,
+        auditable_type: "Request",
+        associated_id: item.id,
+        associated_type: "item",
+        action: "note"
+      )
+    end
+
+    get request_path(@_request)
     assert_response :success
-    items = get_instance_var(:items)
-    assert_equal 3, items.size, '3 Items'
+
+    items.each do |item|
+      has_notes = Audited::Audit.exists?(
+        auditable_id: @_request.id,
+        auditable_type: "Request",
+        associated_id: item.id,
+        associated_type: "item",
+        action: "note"
+      )
+  
+      expected_text = has_notes ? "⚠️" : ""
+  
+      assert_select "#notes-icon-#{item.id}", text: expected_text, 
+                    message: "Notes icon should be #{has_notes ? 'present' : 'absent'} for item #{item.id}"
+    end
+
+
   end
 
   should 'show new item form' do
