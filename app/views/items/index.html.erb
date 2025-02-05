@@ -10,7 +10,7 @@
 
 	<%if @items.size > 0 %>
 		<%  @items.recent_first.each do |item| %>
-			<%= render item %>
+			<%= render partial: "items/item", locals: { item: item, notes: @notes_by_item[item.id] } %>
 		<% end %>
 	<% else %>
 		<!-- blank slate -->

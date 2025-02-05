@@ -214,7 +214,7 @@
 			<div class="items">
 				<% if @request.items.active.size > 0 %>
 					<% @request.items.active.recent_first.each do |item| %>
-						<%= render partial: "items/item", locals: { item: item, notes: @notes_by_item[item.id] } %> 	
+						<%= render partial: "items/item", locals: { item: item, notes: @notes_by_item[item.id] } %>
 					<% end %>
 				<% end %>
 

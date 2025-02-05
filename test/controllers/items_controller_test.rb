@@ -36,7 +36,7 @@ class ItemsControllerTest < ActionDispatch::IntegrationTest
       )
     end
 
-    get request_path(@_request)
+    get request_items_path(@_request)
     assert_response :success
 
     items.each do |item|

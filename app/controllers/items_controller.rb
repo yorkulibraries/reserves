@@ -11,6 +11,18 @@ class ItemsController < ApplicationController
              else
                @request.items.active
              end
+
+    @notes_by_item = {}
+
+    @items.each do |item|
+      @notes_by_item[item.id] = Audited::Audit.where(
+        auditable_id: @request.id,
+        auditable_type: "Request",
+        associated_id: item.id,
+        associated_type: "item",
+        action: "note"
+      )
+    end    
   end
 
   def show
