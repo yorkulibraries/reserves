@@ -105,7 +105,6 @@
     <input type="hidden" name="status" value="<%= AcquisitionRequest::STATUS_ACQUIRED %>"/>
     <%= f.input :acquisition_source_type, label: "Source", collection: Setting.acquisition_sources %>
     <%= f.input :acquisition_source_name, label: "Source Name", as: :string %>
-    <%= f.input :acquisition_notes, label: "Notes",  hint: "This note will be sent along with the acquisition email."  %>
     <%= f.button :submit, "Item Acquired", class: "btn btn-success btn-sm", data: { confirm: "Are you sure?" } %>
     &nbsp;&nbsp; or
     <a class="btn btn-link red btn-sm" data-toggle="collapse" data-slide-up="#acquire_form" href="#cancel_form">
