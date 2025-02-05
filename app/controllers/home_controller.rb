@@ -38,13 +38,13 @@ class HomeController < ApplicationController
 
     elsif location_id == 'all'
       @location = Location.new(name: 'All Locations')
-      @admin_users = User.admin.active
+      @admin_users = User.admin.active.where(is_reserves_staff: true)
       # no need to filter by location
     else
       @location = Location.find_by_id(location_id) # for admin and supervisors
 
       @location = current_user.location if current_user.role == User::STAFF_ROLE # for regular users
-      @admin_users = User.admin.active.where(location_id: @location.id)
+      @admin_users = User.admin.active.where(location_id: @location.id, is_reserves_staff: true) 
 
       @requests = @requests.where(reserve_location_id: @location.id)
     end

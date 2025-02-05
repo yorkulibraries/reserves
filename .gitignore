@@ -19,3 +19,4 @@ yarn.lock
 .bundle
 *.sql.gz
 *.sql
+*.bk

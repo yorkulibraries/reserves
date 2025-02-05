@@ -1,10 +1,11 @@
 # frozen_string_literal: true
 
 # Read about factories at https://github.com/thoughtbot/factory_girl
+require 'faker'
 
 FactoryGirl.define do
   factory :user do
-    name 'Jeremy Clarkson'
+    name { Faker::Name.unique.name }
     sequence(:email, 1000) { |n| "jereymy#{n}@yorku.ca" }
     phone '124'
     user_type User::FACULTY

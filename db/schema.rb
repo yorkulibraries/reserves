@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_08_20_132657) do
+ActiveRecord::Schema[7.0].define(version: 2025_02_04_150650) do
   create_table "acquisition_requests", id: :integer, charset: "utf8mb3", collation: "utf8mb3_unicode_ci", force: :cascade do |t|
     t.integer "item_id"
     t.integer "requested_by_id"
@@ -183,6 +183,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_08_20_132657) do
     t.datetime "last_login"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.boolean "is_reserves_staff"
   end
 
 end

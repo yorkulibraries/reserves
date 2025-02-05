@@ -22,7 +22,8 @@
       	<tr class="user">
       		<td>
       			<strong><%= link_to user.name, user %></strong><br/>
-      				<strong class="blend small">Location:</strong> <%= user.location.name rescue nil %>
+      			<strong class="blend small">Location:</strong> <%= user.location.name rescue nil %><br/>
+						<strong class="blend small">Is Reserves Staff:</strong> <%= (user.is_reserves_staff ? 'Yes':'No') rescue nil %>
       		</td>
       		<td>
       			<strong class="blend small">Department:</strong> <%= user.department %><br/>

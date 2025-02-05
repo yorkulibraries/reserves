@@ -93,5 +93,20 @@ SimpleForm.setup do |config|
   # config.label_class = "col-xs-2 col-sm-2 col-md-2 col-lg-2 control-label"
   # config.input_class = "form-control" #not yet supported
   # config.default_wrapper = :bootstrap
+
+  config.wrappers :custom_boolean, tag: 'div', class: 'form-group', error_class: 'has-error', valid_class: 'has-success' do |b|
+    b.use :html5
+    b.optional :readonly
+  
+    b.wrapper :form_check_wrapper, tag: 'div', class: 'checkbox-inline' do |bb|
+      bb.wrapper tag: 'label' do |bbb|
+        bbb.use :input, class: 'checkbox-inline'
+        bbb.use :label_text
+      end
+      bb.use :full_error, wrap_with: { tag: 'span', class: 'help-block' }
+      bb.use :hint, wrap_with: { tag: 'p', class: 'help-block' }
+    end
+  end
+  
   config.default_wrapper = :bootstrap3
 end

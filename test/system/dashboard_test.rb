@@ -87,8 +87,35 @@ class DashboardTest < ApplicationSystemTestCase
     assert_equal 1, rows_count
   end
 
+  should "show only show is_reserves_staff in the assigned_to list" do 
+    @reserves_staff = create_list(:user, 3, admin:true, is_reserves_staff: true, role: User::MANAGER_ROLE)
+    @non_reserves_staff = create_list(:user, 4, admin:true, is_reserves_staff: false, role: User::MANAGER_ROLE)
+
+    login_as(@admin_user)
+    visit root_url
+
+    within all('.btn-group.pull-right .btn-group-sm').first do
+      find('.dropdown-toggle', text: 'Assigned to:').click
+    end
+
+    dropdown_items = all('.dropdown-menu li a') # Get all items in the dropdown
+
+    # Ensure the correct number of users appear. The minus -2 is Any and Nobody of the list.
+    assert_equal @reserves_staff.count, dropdown_items.count - 2, "Dropdown list contains incorrect users"
+  
+    # Ensure only correct users appear
+    @reserves_staff.each do |user|
+      assert_text user.name
+    end
+  
+    @non_reserves_staff.each do |user|
+      refute_text user.name
+    end
+
+  end
+
   test 'Filter assigned to' do
-    @user_assign = FactoryGirl.create(:user, admin: true, role: User::MANAGER_ROLE, name: 'Filter User')
+    @user_assign = FactoryGirl.create(:user, admin: true, role: User::MANAGER_ROLE, name: 'Filter User', is_reserves_staff: true)
     @request_filter = FactoryGirl.create(:request, assigned_to: @user_assign, requester: @user_assign )
     @request_filter2 = FactoryGirl.create(:request, assigned_to: @user_assign, requester: @user_assign)
     login_as(@admin_user)
