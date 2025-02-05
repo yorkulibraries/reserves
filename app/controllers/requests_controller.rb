@@ -15,7 +15,8 @@ class RequestsController < ApplicationController
   end
 
   def show
-    @admin_users = User.admin.active.where(location_id: @request.reserve_location.id).to_a
+    # @admin_users = User.admin.active.where(location_id: @request.reserve_location.id, is_reserves_staff: true).to_a
+    @admin_users = User.admin.active.where(is_reserves_staff: true).to_a
     @admin_users.push(current_user) unless @admin_users.include?(current_user)
 
 

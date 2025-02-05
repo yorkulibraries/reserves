@@ -57,6 +57,7 @@
 				<% if @user.admin? %>
 					<div class="col-md-4">
 						<%= f.association :location, collection: Location.active, required: @user.admin? %>
+						<%= f.input :is_reserves_staff, label: "Is Reserves Staff", as: :boolean, wrapper: :custom_boolean, :input_html => { :class => "" }%>
 					</div>
 
 					<div class="col-md-4">

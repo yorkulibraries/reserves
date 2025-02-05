@@ -139,4 +139,9 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     assert_equal User::INSTRUCTOR_ROLE, user.role, 'Should default to Instructor Role'
     assert_redirected_to users_url
   end
+
+  should "should permit is_reserves_staff in user_params" do
+    patch user_path(@user), params: { user: { is_reserves_staff: true } }
+    assert_equal true, @user.reload.is_reserves_staff
+  end
 end

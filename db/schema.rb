@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_11_25_230111) do
+ActiveRecord::Schema[7.0].define(version: 2025_02_04_150650) do
   create_table "acquisition_requests", id: :integer, charset: "utf8mb3", collation: "utf8mb3_unicode_ci", force: :cascade do |t|
     t.integer "item_id"
     t.integer "requested_by_id"
@@ -196,6 +196,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_11_25_230111) do
     t.string "univ_id"
     t.index ["univ_id"], name: "index_users_on_univ_id", unique: true
     t.index ["username"], name: "index_users_on_username", unique: true
+    t.boolean "is_reserves_staff"
   end
 
 end

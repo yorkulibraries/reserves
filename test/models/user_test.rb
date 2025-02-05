@@ -37,4 +37,8 @@ class UserTest < ActiveSupport::TestCase
     assert_equal 2, User.admin.size, 'Should be 2 staff'
     assert_equal 3, User.users.size, 'Should be 3 regular users'
   end
+
+  should "should have is_reserves_staff column" do
+    assert_includes User.column_names, "is_reserves_staff"
+  end
 end

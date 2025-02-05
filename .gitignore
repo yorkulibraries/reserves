@@ -22,3 +22,4 @@ yarn.lock
 *.sql
 *.sql.gz
 log/*
+*.bk
