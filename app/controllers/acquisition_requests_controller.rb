@@ -44,6 +44,16 @@ class AcquisitionRequestsController < ApplicationController
 
     respond_to do |format|
       if @acquisition_request.save
+        
+        @notes = {}
+        @notes[@acquisition_request.item.id] = Audited::Audit.where(
+          auditable_id: @acquisition_request.item.request.id,
+          auditable_type: "Request",
+          associated_id: @acquisition_request.item.id,
+          associated_type: "Item",
+          action: "note"
+        )
+
         format.html do
           redirect_to acquisition_request_path(@acquisition_request),
                       notice: 'Acquisition Request was successfully created.'
