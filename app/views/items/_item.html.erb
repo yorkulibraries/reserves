@@ -72,7 +72,7 @@
 				<% end %>
 		</div>
 		<div class="col-md-2 item_actions">
-			<%= render partial: "items/item_actions", locals: { item: item, notes: notes } unless local_assigns[:hide_item_actions] == true %>
+			<%= render partial: "items/item_actions", locals: { item: item } unless local_assigns[:hide_item_actions] == true %>
 		</div>
 	</div>
 	<% if [Item::TYPE_EJOURNAL, Item::TYPE_EBOOK, Item::TYPE_MULTIMEDIA, Item::TYPE_PHOTOCOPY, Item::TYPE_COURSE_KIT].include? item.item_type %>

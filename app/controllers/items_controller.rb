@@ -12,17 +12,17 @@ class ItemsController < ApplicationController
                @request.items.active
              end
 
-    @notes_by_item = {}
+    @notes = {}
 
     @items.each do |item|
-      @notes_by_item[item.id] = Audited::Audit.where(
+      @notes[item.id] = Audited::Audit.where(
         auditable_id: @request.id,
         auditable_type: "Request",
         associated_id: item.id,
         associated_type: "item",
         action: "note"
       )
-    end    
+    end  
   end
 
   def show
@@ -62,7 +62,16 @@ class ItemsController < ApplicationController
         @request.reload
         RequestMailer.new_item_notification(@request, @item).deliver_later
 
-        format.html { redirect_to [@request, @item], notice: 'Item was successfully created.' }
+        @notes = {}
+        @notes[@item.id] = Audited::Audit.where(
+          auditable_id: @request.id,
+          auditable_type: "Request",
+          associated_id: @item.id,
+          associated_type: "Item",
+          action: "note"
+        )
+
+        format.html { redirect_to [@request, @item], notice: 'Item was successfully created.'}
         format.js
       else
         format.html { render action: 'new' }

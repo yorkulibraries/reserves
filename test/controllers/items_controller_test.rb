@@ -25,9 +25,10 @@ class ItemsControllerTest < ActionDispatch::IntegrationTest
       )
     end
 
-    @notes_by_item = {}
+    @notes = {}
+
     @_request.items.each do |item|
-      @notes_by_item[item.id] = Audited::Audit.where(
+      @notes[item.id] = Audited::Audit.where(
         auditable_id: @_request.id,
         auditable_type: "Request",
         associated_id: item.id,

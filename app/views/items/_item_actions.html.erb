@@ -82,7 +82,7 @@
   <div style="display: inline-flex; align-items: center;">
     <%= link_to 'Add a Note / History Log', '#', data: { toggle: 'modal', target: "#item_history_popup_#{item.id}", remote: true }, class: 'btn btn-xs btn-default' %>
     
-    <% if notes.any? %>
+    <% if @notes[item.id].any? %>
       <span id="notes-icon-<%= item.id %>" style="font-size: 1.5rem; margin-left: 3px;">⚠️</span>
     <% else %>
       <span id="notes-icon-<%= item.id %>" style="font-size: 1.5rem; margin-left: 3px;"></span>
