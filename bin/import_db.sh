@@ -10,3 +10,6 @@ cat drop.sql | rails db -p
 cat import.sql | rails db -p
 
 rails db:migrate
+
+[ -f "$dump" ] &&  zgrep "\` datetime NOT NULL," "$dump"
+[ -f "$dump" ] &&  zgrep "\` datetime DEFAULT NULL," "$dump"
