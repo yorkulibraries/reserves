@@ -194,9 +194,9 @@ ActiveRecord::Schema[7.0].define(version: 2025_02_04_150650) do
     t.string "unlock_token"
     t.datetime "locked_at"
     t.string "univ_id"
+    t.boolean "is_reserves_staff"
     t.index ["univ_id"], name: "index_users_on_univ_id", unique: true
     t.index ["username"], name: "index_users_on_username", unique: true
-    t.boolean "is_reserves_staff"
   end
 
 end
