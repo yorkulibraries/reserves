@@ -124,8 +124,20 @@ class ItemsController < ApplicationController
     @item.audit_comment = "#{@item.title} status changed to #{@item.status}"
 
     @item.save(validate: false)
+
+    @notes_by_item = {}
+    @notes_by_item[@item.id] = Audited::Audit.where(
+      auditable_id: @request.id,
+      auditable_type: "Request",
+      associated_id: @item.id,
+      associated_type: "Item",
+      action: "note"
+    )
+
+    @notes = @notes_by_item || {}
+
     respond_to do |format|
-      format.html { redirect_to @request, noitce: "Item status changed to #{status}" }
+      format.html { redirect_to @request, notice: "Item status changed to #{status}" }
       format.js
     end
   end
