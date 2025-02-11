@@ -65,6 +65,10 @@ class Ability
     # can get back to login
     can :back_to_login, :requestor
 
+    can :add_note, Item do |i|
+      i.request.status == Request::COMPLETED || i.request.status == Request::ACTIVE
+    end
+
     ### CANNOTS
     cannot [:update, :destroy, :assign], Request do |r|
       r.status == Request::CANCELLED || r.status == Request::COMPLETED

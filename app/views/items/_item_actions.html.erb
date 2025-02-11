@@ -75,14 +75,14 @@
   <span class="btn btn-sm gray-bg">Removed</span>
 <% end %>
 
-<% if can?(:change_status, item) && item.status != Item::STATUS_DELETED%>
+<% if can?(:add_note, item) && item.status != Item::STATUS_DELETED%>
  <br/><br/>
   <%= render partial: 'requests/item_history_log_modal_', locals: { item: item } %>
   <!-- Adding a link with text -->
   <div style="display: inline-flex; align-items: center;">
     <%= link_to 'Add a Note / History Log', '#', data: { toggle: 'modal', target: "#item_history_popup_#{item.id}", remote: true }, class: 'btn btn-xs btn-default' %>
     
-    <% if @notes[item.id].any? %>
+    <% if @notes&.dig(item.id)&.any? %>
       <span id="notes-icon-<%= item.id %>" style="font-size: 1.5rem; margin-left: 3px;">⚠️</span>
     <% else %>
       <span id="notes-icon-<%= item.id %>" style="font-size: 1.5rem; margin-left: 3px;"></span>
