@@ -66,7 +66,7 @@ class Ability
     can :back_to_login, :requestor
 
     can :add_note, Item do |i|
-      i.request.status == Request::COMPLETED || i.request.status == Request::ACTIVE
+      i.request.status == Request::COMPLETED || i.request.status == Request::OPEN
     end
 
     ### CANNOTS
