@@ -20,16 +20,18 @@
             </div>
           </div>
 
-            <div id="request_history_log_<%= item.id %>" data-url="<%= item_history_request_path(@request, item_id: item.id, format: "js") %>"></div>
-
+          <div id="request_history_log_<%= item.id %>" 
+               data-url="<%= item_history_request_path(@request, item_id: item.id, format: "js") %>">
           </div>
 
-        </div>
+        </div> <!-- Closing .modal-body -->
 
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
         </div>
+
       </div>
     </div>
   </div>
+
 <% end %>
