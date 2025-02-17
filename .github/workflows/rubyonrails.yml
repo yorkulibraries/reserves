@@ -61,4 +61,4 @@ jobs:
         run: |
           bundle exec rails db:reset
           bundle exec rails test --verbose
-          #bundle exec rails test:system
+          bundle exec rails test:system
