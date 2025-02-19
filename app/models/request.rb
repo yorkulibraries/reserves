@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Request < ApplicationRecord
-  searchkick
+  #searchkick
 
   ## CONSTANTS
   INCOMPLETE = 'incomplete'

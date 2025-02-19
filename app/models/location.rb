@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Location < ApplicationRecord
-  searchkick
+  #searchkick
   
   # SETTING: setting_bcc_request_status_change
 
