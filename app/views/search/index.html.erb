@@ -1,13 +1,26 @@
 <% title "Search Results #{@query}" %>
 <% page_header do %>
-  <h1>Search Results <small>for <%= is_number?(@query) ? "id: #{@query}" : @query %></small></h1>
+  <h1>Search Results <small>for <%= @query %></small></h1>
 <% end %>
 
 <form action="<%= search_path %>">
   <div class="input-group">
-    <span class="input-group-addon" id="basic-addon1"><i class="fa fa-search"></i></span>
-    <input type="text" class="form-control"  autocomplete="off"
-        placeholder="Search requestor, course, code, instructor, id" name="q" value="<%= @query if @query %>" title="search field">
+    <span class="input-group-addon" id="basic-addon1">
+      <i class="fa fa-search"></i>
+    </span>
+
+    <input type="text" class="form-control"
+        placeholder="Search requestor, course, code, instructor, id" 
+        name="q" value="<%= @query if @query %>" title="search field">
+
+    <div class="input-group-btn">
+    <select name="search_type" class="form-control" style="height: 34px; width: auto;">
+      <option value="all" <%= "selected" if @search_type == 'all' %>>All</option>
+      <option value="item" <%= "selected" if @search_type == 'item' %>>Item</option>
+      <option value="course" <%= "selected" if @search_type == 'course' %>>Course</option>
+      <option value="request" <%= "selected" if @search_type == 'request' %>>Request</option>
+    </select>
+    </div>
   </div>
   <input type="hidden" name="type" value="requests"/>
   <input type="submit" value="search" class="hidden">
@@ -17,7 +30,7 @@
 
 <div class="dashboard">
   <% if @requests.size > 0 %>
-    <%= paginate @requests if @requests.size > 1 %>
+    <%= paginate @combined_requests if @combined_requests.size > 1 %>
     <table class="table table-bordered ">
       <thead>
         <tr>

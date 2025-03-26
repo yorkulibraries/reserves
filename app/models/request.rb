@@ -1,7 +1,14 @@
 # frozen_string_literal: true
 
 class Request < ApplicationRecord
-  #searchkick
+
+  searchkick word_start: [:id]
+
+  def search_data
+    {
+      id: id.to_s  # Convert ID to a string
+    }
+  end
 
   ## CONSTANTS
   INCOMPLETE = 'incomplete'
