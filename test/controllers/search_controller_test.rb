@@ -24,6 +24,8 @@ class SearchControllerTest < ActionDispatch::IntegrationTest
     r = create(:request, course: c)
     create_list(:request, 3)
   
+    Course.reindex
+
     get search_path, params: {  q: "John", type: "requests", search_type: "course" }
   
     requests = get_instance_var(:requests)
@@ -93,6 +95,8 @@ class SearchControllerTest < ActionDispatch::IntegrationTest
   end
 
   should "return an empty array if nothing is found" do
+    Item.reindex
+    
     get search_path, params: { q: "searching emptiness" }
   
     requests = get_instance_var(:requests)
