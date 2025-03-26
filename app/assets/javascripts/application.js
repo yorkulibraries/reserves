@@ -12,6 +12,9 @@
 //
 //= require underscore
 //= require jquery
+// require jquery3
+//= require popper
+//= require bootstrap
 //= require jquery_ujs
 //= require jquery-ui/widgets/datepicker
 //= require jquery-ui/widgets/autocomplete

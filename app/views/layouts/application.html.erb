@@ -11,48 +11,59 @@
   <%= csrf_meta_tags %>
 </head>
 <body>
-   <div class="container">
-
-   <%= render template: "layouts/navbar"%>
-
-
-
-	<div class="heading">
-	 	<%= content_tag :h1, yield(:title) if show_title? && !content_for?(:page_header) %>
-
-		<%= yield (:page_header) if content_for?(:page_header)%>
-	</div>
-
-	<% flash.each do |name, msg| %>
-	  <div class="alert alert-<%= name == "notice" ? "success" : "info" %>">
-	    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-	    <%= msg %>
-	  </div>
-	<% end %>
-
-  <% if Setting.app_maintenance == "true" %>
-    <div class="alert alert-danger">
-      <%= Setting.app_maintenance_message %>
-    </div>
-  <% end %>
-
-	<div class="content">
-		<div class="inner">
-  		<%= yield %>
-		</div>
-	</div>
-
-	<% if content_for?(:sidebar) %>
-		<div class="sidebar">
-				<%=  yield (:sidebar) %>
-		</div>
-	<% end %>
-
-   <footer class="footer">
-      <div class="container">
-        <p class="text-muted">&copy; York University Libraries. All rights reserved. (Version: <%= Rails.application.config.git_commit_hash %>)</p>
+  
+  <div class="container shadow-lg rounded-3 border p-4 p-md-5 my-md-3 bg-white">
+    <div class="d-flex flex-column flex-md-row align-items-center">
+      <div class="p-2">
+        <%= image_tag("yib11yorklogo.gif", alt: "York University", class: "img-fluid") %>
       </div>
-   </footer>
+      <div class="flex-grow-1 text-end p-2">
+        <div class="display-6 mb-1 text-secondary">
+          <span><%= Setting.app_owner %></span>
+          <span><%= Setting.app_name %></span>
+        </div>
+      </div>
+    </div>
+    <%= render template: "layouts/navbar"%>
+
+    <div class="container py-4 px-0">
+      <div class="heading">
+        <%= content_tag :h1, yield(:title) if show_title? && !content_for?(:page_header) %>
+        <%= yield (:page_header) if content_for?(:page_header)%>
+        <hr class="yorku-hr mt-1">
+      </div>
+
+    <% flash.each do |name, msg| %>
+      <div class="alert alert-dismissible alert-<%= name == "notice" ? "success" : "info"  %>">
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <%= msg %>
+      </div>
+    <% end %>
+
+    <% if Setting.app_maintenance == "true" %>
+      <div class="alert alert-danger">
+        <%= Setting.app_maintenance_message %>
+      </div>
+    <% end %>
+
+    <div class="content">
+      <div class="inner">
+        <%= yield %>
+      </div>
+    </div>
+
+    <% if content_for?(:sidebar) %>
+      <div class="sidebar">
+          <%=  yield (:sidebar) %>
+      </div>
+    <% end %>
+
+    <footer class="footer">
+        <div class="container">
+          <p class="text-muted">&copy; York University Libraries. All rights reserved. (Version: <%= Rails.application.config.git_commit_hash %>)</p>
+        </div>
+    </footer>
+   </div>
 
 </div> <!-- Container -->
   <%= render partial: "layouts/help_modal"%>

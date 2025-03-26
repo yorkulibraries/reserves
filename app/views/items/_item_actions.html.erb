@@ -1,23 +1,23 @@
 <% if can?(:create, AcquisitionRequest) && is_request_active(@request) && item.status != Item::STATUS_DELETED %>
-<div class="acquisition_request">
+<div class="acquisition_request mb-3">
   <div class="dropdown">
-    <button class="btn btn-default btn-xs dropdown-toggle" type="button" data-toggle="dropdown">
+    <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
       Acquisition Requests
       <span class="caret"></span>
     </button>
     <ul class="dropdown-menu" role="menu">
-      <li>
+      <li class="dropdown-item">
         <%= link_to  new_acquisition_request_path(item_id: item.id), remote: true do %>
           <span class="fa fa-shopping-cart"></span> New Request
         <% end %>
       </li>
-      <li class="divider"></li>
+      <li class="dropdown-divider"></li>
       <% item.acquisition_requests.each do |acquisition_request| %>
         <% if can? :read, acquisition_request %>
-        <li role="presentation">
+        <li role="presentation" class="dropdown-item">
           <%= link_to  acquisition_request_path(acquisition_request) do%>
             <small>By <%= acquisition_request.requested_by.name %></small>
-            <span class="xsmall label label-default status-<%= acquisition_request.status %>">
+            <span class="xsmall badge status-<%= acquisition_request.status %>">
               <%= acquisition_request.status %>
             </span>
           <% end %>
@@ -32,21 +32,21 @@
 <% if can?(:update, item) && is_request_active(@request) && item.status != Item::STATUS_DELETED %>
 
   <% if item.acquisition_requests.acquired.size > 0 %>
-    <div class="acquisition_request"><span class="label label-default status-acquired">Item Acquired</span></div>
+    <div class="acquisition_request"><span class="badge status-acquired">Item Acquired</span></div>
   <% end %>
 
   <div class="btn-group">
-    <button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown">
+    <button type="button" class="btn btn-sm btn-secondary dropdown-toggle" data-bs-toggle="dropdown">
       <span class="fa fa-cog"></span> Update Item  <span class="caret"></span>
     </button>
     <ul class="dropdown-menu" role="menu">
-      <li>
+      <li class="dropdown-item">
         <%= link_to edit_request_item_path(@request, item), class: "green important", remote: true do %>
         <span class="fa fa-pencil"></span> Change Item Details
         <% end %>
       </li>
-      <li class="divider"></li>
-      <li>
+      <li class="dropdown-divider"></li>
+      <li class="dropdown-item">
         <%= link_to request_item_path(@request, item), method: :delete, data: { confirm: 'Are you sure?' }, remote: true,
         class: "red important" do %>
             <span class="fa fa-times-circle"></span> Remove item
@@ -79,13 +79,16 @@
  <br/><br/>
   <%= render partial: 'requests/item_history_log_modal_', locals: { item: item } %>
   <!-- Adding a link with text -->
-  <div style="display: inline-flex; align-items: center;">
-    <%= link_to 'Add a Note / History Log', '#', data: { toggle: 'modal', target: "#item_history_popup_#{item.id}", remote: true }, class: 'btn btn-xs btn-default' %>
-    
+  <div class="d-inline-flex align-items-center">
+    <%= link_to 'Add a Note / History Log', '#', 
+      data: { bs_toggle: 'modal', bs_target: "#item_history_popup_#{item.id}", remote: true }, 
+      class: 'btn btn-sm btn-secondary' %>
+
     <% if @notes&.dig(item.id)&.any? %>
-      <span id="notes-icon-<%= item.id %>" style="font-size: 1.5rem; margin-left: 3px;">⚠️</span>
+      <span id="notes-icon-<%= item.id %>" class="ms-2" style="font-size: 1.5rem;">⚠️</span>
     <% else %>
-      <span id="notes-icon-<%= item.id %>" style="font-size: 1.5rem; margin-left: 3px;"></span>
+      <span id="notes-icon-<%= item.id %>" class="ms-2" style="font-size: 1.5rem;"></span>
     <% end %>
   </div>
+
 <% end %>

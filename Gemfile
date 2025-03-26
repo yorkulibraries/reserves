@@ -19,6 +19,7 @@ gem 'jquery-rails', '4.5.0'
 gem 'jquery-ui-rails', '6.0.1'
 
 ## BOOTSTRAP & SIMPLE_FORM & FONTAWESOME ##
+gem 'bootstrap', '~> 5.3', '>= 5.3.3'
 gem 'font-awesome-rails', '~> 4.7'
 gem 'simple_form', '~> 5.1'
 

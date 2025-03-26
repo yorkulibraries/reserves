@@ -8,5 +8,9 @@
 		max-width: 800px;
 	}
 
-	div.required { background-color: #D9EDF7; hr { border-color: #ccc; }}
+	div.required { 
+		background-color: #D9EDF7; 
+		padding: 5px;
+		hr { border-color: #ccc; }
+	}
 }

@@ -2,7 +2,7 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         <h5 class="modal-title">
           Copy Items To This Request
         </h5>
@@ -20,7 +20,7 @@
           <span class='trivial'><%= r.course.code %></span>
 
             <a href="<%= new_request_copy_items_path(@request, from_request_id: r.id)%>"
-              data-remote="true" class="btn btn-xs btn-success pull-right">
+              data-ds-remote="true" class="btn btn-xs btn-success pull-right">
               Copy Items
             </a></p>
             <hr/>

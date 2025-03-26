@@ -1,22 +1,48 @@
 
+<div class="modal" id="history_popup" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Request History</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <% if can?(:add_note, @request) %>
+            <div class="card bg-light mb-3">
+              <div class="card-header">
+                Add a note
+              </div>
+              <div class="card-body">
+                <%= render "request_history/form", locals: { remote: true} %>
+              </div>
+            </div>
+          <% end %>
+          <div id="request_history_log" data-url="<%= history_request_path(@request, format: "js") %>">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
 
   <div class="modal fade" id="history_popup" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
 
         <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+          <button type="button" class="close" data-bs-dismiss="modal" aria-hidden="true">&times;</button>
           <h4 class="modal-title" id="myModalLabel">Request History</h4>
         </div>
 
         <div class="modal-body">
 
           <% if can?(:add_note, @request) %>
-            <div class="panel panel-default">
-              <div class="panel-heading">
+            <div class="card bg-light">
+              <div class="card-header">
                 Add a note
               </div>
-              <div class="panel-body">
+              <div class="card-body">
                 <%= render "request_history/form", locals: { remote: true} %>
               </div>
             </div>
@@ -28,7 +54,7 @@
         </div>
 
         <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-default" data-bs-dismiss="modal">Close</button>
         </div>
       </div>
     </div>
