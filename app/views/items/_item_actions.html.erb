@@ -36,12 +36,12 @@
   <% end %>
 
   <div class="btn-group">
-    <button type="button" class="btn btn-sm btn-secondary dropdown-toggle" data-bs-toggle="dropdown">
+    <button type="button" class="btn btn-sm btn-success dropdown-toggle" data-bs-toggle="dropdown">
       <span class="fa fa-cog"></span> Update Item  <span class="caret"></span>
     </button>
     <ul class="dropdown-menu" role="menu">
       <li class="dropdown-item">
-        <%= link_to edit_request_item_path(@request, item), class: "green important", remote: true do %>
+        <%= link_to edit_request_item_path(@request, item), class: "primary important", remote: true do %>
         <span class="fa fa-pencil"></span> Change Item Details
         <% end %>
       </li>
@@ -66,7 +66,7 @@
     <span class="fa fa-check bigger" id="change_<%= item.id %>" style="color: #32cd32;"></span>
     <span class="hidden">Done</span>
   <% end %>
-  <span class="label label-default <%= status_class %> item-status"><%= item.status.humanize.capitalize rescue nil %></span>
+  <span class="badge bg-secondary <%= status_class %> item-status"><%= item.status.humanize.capitalize rescue nil %></span>
 <% elsif can?(:change_status, item) && @request.status == Request::REMOVED && item.status != Item::STATUS_DELETED %>
   <%= link_to change_status_request_item_path(@request, item, status: Item::STATUS_DELETED), class: "btn btn-sm gray-bg change-item-status", remote: true, data: { confirm: "Are you sure? This ACTION IS PERMANENT." }, method: :get do %>
     <span class="fa fa-retweet orange" id="change_<%= item.id %>"></span> Remove

@@ -13,13 +13,13 @@ form {
 
 .item {
 	padding: 20px 20px;
-	font-size: 13px;
+	font-size: 14px;
 	box-shadow: (0 0 4px rgba(0, 0, 0, 0.4));
 	margin-top: 12px;
 
 	.field {
 		display: block;
-		font-size: 11px;
+		// font-size: 11px;
 		font-weight: 600;
 		letter-spacing: 0.02em;
 		margin: 10px 0 4px 0;
@@ -31,9 +31,13 @@ form {
 		font: 16px/1.4 Helvetica, arial, freesans, clean, sans-serif;
 		color: #333333;
 		margin-bottom: 0;
+		font-weight: 600;
+    background: #EFF1F3;
+    padding: 5px;
 	}
 
 	a.change-item-status {
+		
 		&.item_ready {
 			color: #32cd32;
 			border: 1px solid #32cd32;
@@ -41,14 +45,13 @@ form {
 
 		&.item_not_ready {
 			color: #555;
+			border: 1px solid #555;
 		}
 
 		&.item_ready:hover,
 		&.item_ready:focus {
 			color: #32cd32;
 		}
-
-
 	}
 
 	span.item-status {
@@ -99,36 +102,36 @@ form {
 }
 
 /** ITEM TYPE STYLES **/
-.book_bg {
+.badge.book_bg {
 	background-color: #F0E68C;
 	color: #000;
 }
 
 /* Khaki */
-.ebook_bg {
+.badge.ebook_bg {
 	background-color: #333399;
 	color: #fff;
 }
 
 /* Shade of Navy */
-.map_bg {
+.badge.map_bg {
 	background-color: #008000;
 	color: #fff;
 }
 
 /* green */
-.multimedia_bg {
+.badge.multimedia_bg {
 	background-color: #7a4a77;
 }
 
 /* Purple */
-.course_kit_bg {
+.badge.course_kit_bg {
 	background-color: #FFD700;
 	color: #000;
 }
 
 /* Gold */
-.photocopy_bg {
+.badge.photocopy_bg {
 	background-color: #ddd;
 	color: #000;
 }

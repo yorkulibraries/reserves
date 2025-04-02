@@ -1,7 +1,7 @@
 
 
 @import "themes/bootstrap45/colors";
-@import "bootstrap";
+
 
 
 /** JQuery UI **/
@@ -13,16 +13,6 @@
 // @import "font-awesome-sprockets";
 @import "font-awesome";
 
-
-@import "themes/bootstrap45/bootstrap_overrides";
-@import "themes/bootstrap45/utils";
-@import "themes/bootstrap45/base";
-@import "themes/bootstrap45/nav";
-@import "themes/bootstrap45/components";
-@import "themes/bootstrap45/common";
-@import "themes/bootstrap45/forms";
-
-
 @import "controllers/requests";
 @import "controllers/dashboard";
 @import "controllers/courses";
@@ -31,8 +21,17 @@
 @import "controllers/request_wizard";
 @import "controllers/search_records";
 @import "controllers/sessions";
-
 @import "search/primo";
+
+@import "bootstrap";
+@import "themes/bootstrap45/bootstrap_overrides";
+// @import "themes/bootstrap45/utils";
+@import "themes/bootstrap45/base";
+// @import "themes/bootstrap45/nav";
+// @import "themes/bootstrap45/components";
+// @import "themes/bootstrap45/common";
+// @import "themes/bootstrap45/forms";
+
 
 // TBD
 // @import "common";

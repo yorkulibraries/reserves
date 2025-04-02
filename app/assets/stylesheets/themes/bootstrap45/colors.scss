@@ -12,7 +12,19 @@ $york-red-dark:    #8C0000;
 $york-light-blue:  #ACE6F8;
 $york-bright-blue: #3AC2EF;
 
-$primary: #0652a5;
-$info: #0D5C68 ;
-$success: #218739; 
-$warning: #916D03;
+$primary: #0f69A0;
+$success: #2E856E; 
+$warning: #D89D00; //E4A11B
+$danger: #B82025; 
+$light: #FAFAFA;
+$info: #e5ded1;
+// $dark: #004F6D;
+
+// Override Bootstrap typography variables
+$font-size-base: 1rem; // Default is 1rem
+$h1-font-size: 2rem;
+$h2-font-size: 1.75rem;
+$h3-font-size: 1.5rem;
+$h4-font-size: 1.25rem;
+$h5-font-size: 1rem;
+$h6-font-size: 0.875rem;
