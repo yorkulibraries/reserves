@@ -96,7 +96,8 @@ class SearchControllerTest < ActionDispatch::IntegrationTest
 
   should "return an empty array if nothing is found" do
     Item.reindex
-    
+    Course.reindex
+
     get search_path, params: { q: "searching emptiness" }
   
     requests = get_instance_var(:requests)
