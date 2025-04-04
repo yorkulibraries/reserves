@@ -24,6 +24,7 @@ class SearchControllerTest < ActionDispatch::IntegrationTest
     r = create(:request, course: c)
     create_list(:request, 3)
   
+    Item.reindex
     Course.reindex
 
     get search_path, params: {  q: "John", type: "requests", search_type: "course" }
