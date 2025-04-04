@@ -46,6 +46,7 @@ class UserSystemTest < ApplicationSystemTestCase
 
     assert_text 'Search Results'
 
+
     assert_selector "tbody tr", count: 2
   end
 
@@ -62,9 +63,6 @@ class UserSystemTest < ApplicationSystemTestCase
     find('input[name="q"]').send_keys(:enter)
 
     assert_text 'Search Results'
-
-    page.driver.browser.manage.window.resize_to(1920, 2500)
-    save_screenshot()
   end
 
   should "search item" do 
