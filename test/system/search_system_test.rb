@@ -40,7 +40,7 @@ class UserSystemTest < ApplicationSystemTestCase
 
     find("a[name='search button']").click
 
-    fill_in 'q', with: '2013_GL_ECON'
+    fill_in 'q', with: 'ECON'
 
     find('input[name="q"]').send_keys(:enter)
 
