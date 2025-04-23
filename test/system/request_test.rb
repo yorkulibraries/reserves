@@ -108,16 +108,23 @@ class RequestTest < ApplicationSystemTestCase
 
     click_link 'Book'
 
+    assert_selector '#item_form', visible: true
+
     fill_in 'item_title', with: 'Book Title'
     fill_in 'item_author', with: 'Book Author'
     fill_in 'item_publisher', with: 'Book Publisher'
     fill_in 'item_isbn', with: '123456789'
     select('2 Hours', from: 'item_loan_period')
 
-    click_button 'Create Item'
+    click_button 'Create Item' 
+    save_page
 
+    sleep(1)
+    # Ensure the modal disappears completely before proceeding
+    assert_no_selector '#item_form', visible: true
+    
     click_link 'I am done, submit this request'
-
+    
     assert_text 'Request #'
     assert_text 'Open'
 
@@ -323,7 +330,7 @@ class RequestTest < ApplicationSystemTestCase
 
     click_link @request_open.course.name
 
-    find("a[data-target='#item_history_popup_#{@item_open.id}']").click
+    find("a[data-bs-target='#item_history_popup_#{@item_open.id}']").click
 
     assert_selector('.modal', visible: true, wait: 5)
 

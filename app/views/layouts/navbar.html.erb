@@ -1,122 +1,116 @@
-<nav class="navbar navbar-default navbar-fixed-top yul-navbar" role="navigation">
-  <div class="container">
-    <!-- Brand and toggle get grouped for better mobile display -->
-    <div class="navbar-header">
-      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-        <span class="sr-only">Toggle navigation</span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </button>
+<nav class="navbar navbar-expand-lg navbar-light bg-light rounded" aria-label="Reserves NavBar">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="<%= root_path %>"><%= Setting.app_name %></a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#reservesNavBar" aria-controls="Reserves NavBar" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
 
-      <%= link_to "http://www.yorku.ca", class: "navbar-brand" do %>
-        <%= image_tag("yib11yorklogo.gif", alt: "York University") %>
+    <div class="collapse navbar-collapse" id="reservesNavBar">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <% if current_user.admin? && can?(:change_status, Request) %>
+          <li class="nav-item <%= link_active_if?("home", "index") %>"><a class="nav-link" href="<%= root_path %>">Dashboard</a></li>
+        <% end %>
+        <li class="nav-item <%= link_active_if?("users", "requests") %> dropdown">
+          <a class="nav-link" href="#" name="requests" class="dropdown-toggle" data-bs-toggle="dropdown">My Requests</a>
+          <ul class='dropdown-menu'>
+            <li class="dropdown-item"><a href="<%= requests_user_path(current_user) %>">Current Requests</a></li>
+            <li class="dropdown-item"><%= link_to "Removed Requests", requests_user_path(current_user, removed: true) %></li>
+          </ul>
+        </li>
+        <%= link_to "New Request", new_request_step_one_path, class: "btn btn-sm my-auto btn-primary active me-2", id: "new_request_button", role: "button" %>
+
+
+      </ul>
+      <!-- Search Bar -->      
+      <% if can? :search, :requests %>
+        <form class="me-3" role="search" action="<%= search_path %>" >
+          <div class="form-group">
+            <label for="q" class="sr-only">search</label>
+            <input type="text" class="form-control search-box" placeholder="Search" name="q" value="<%= @query if @query %>" title="search field" aria-label="Search">
+            
+          </div>
+        </form>
       <% end %>
-      <%= link_to root_path, class: "navbar-brand" do %>
-        <span class="small"><%= Setting.app_owner %></span>
-        <span><%=  Setting.app_name %></span>
-      <% end %>
+      <!-- Right Nav -->
+      <ul class="nav navbar">
+        <li class="nav-item">
+          <a class="nav-link" name="help button" data-bs-toggle="modal" data-target="#help_assistance_modal" aria-label="Help">
+            <span class="fa fa-question"></span>
+          </a>
+        </li>
+
+        <% if can? :search, :requests %>
+        <li class="nav-item dropdown" onmouseover="$('.search-box').focus();">
+          <a class="nav-link" name="search button" class="dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-label="Search">
+            <span class="fa fa-search"></span>
+          </a>
+          <ul class="dropdown-menu">
+            <li class="dropdown-item w-100">
+            <form class="navbar-form navbar-left" role="search" action="<%= search_path %>" >
+              <div class="form-group">
+                <label for="q" class="sr-only">search</label>
+                <input type="text" class="form-control search-box" placeholder="Search" name="q" value="<%= @query if @query %>" title="search field">
+                <input type="submit" value="search" class="hidden">
+              </div>
+            </form>
+            </li>
+          </ul>
+        </li>
+        <% end %>
+
+        <% if can? :create, AcquisitionRequest %>
+        <li class="nav-item"><%= link_to acquisition_requests_path, title: "Acquisition Lists", class: "nav-link" do %>
+            <span class="fa fa-shopping-cart"></span>
+          <% end %>
+        </li>
+        <% end %>
+
+        <% if current_user.admin? && can?(:manage, User) %>
+          <li class="nav-item dropdown <%= link_active_if?(["users", "staff", "locations", "loan_periods", "courses"], "index") %>">
+            <a role="button" name="settings button" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" aria-label="Settings"><span class="fa fa-cog"></span> <b class="caret"></b></a>
+            <ul class="dropdown-menu">
+              <li><%= link_to "Users", users_path, class: "dropdown-item" %></li>
+              <li><%= link_to "Admin", admin_users_users_path, class: "dropdown-item" %></li>
+              <li><%= link_to "Locations", locations_path, class: "dropdown-item" %></li>
+              <li><%= link_to "Loan Periods", loan_periods_path, class: "dropdown-item" %></li>
+              <li><%= link_to "Courses", courses_path, class: "dropdown-item" %></li>
+              <li class="dropdown-divider"></li>
+              <li><%= link_to "Reports", reports_path, class: "dropdown-item" %></li>
+              <li class="dropdown-divider"></li>
+              <li role="presentation" class="dropdown-header">Application Settings</li>
+              <li><%= link_to "General", edit_settings_path, class: "dropdown-item" %></li>
+              <li><%= link_to "Help", help_settings_path, class: "dropdown-item" %></li>
+              <li><%= link_to "Email", email_settings_path, class: "dropdown-item" %></li>
+              <li><%= link_to "Catalog Search", cat_search_settings_path, class: "dropdown-item" %></li>
+              <li><%= link_to "Requests & Items", item_request_settings_path, class: "dropdown-item" %></li>
+              <li><%= link_to "Course Subjects", settings_subjects_path, class: "dropdown-item" %></li>
+              <li><%= link_to "Course Faculties", settings_faculties_path, class: "dropdown-item" %></li>
+              <li><%= link_to "Acquisition Requests", acquisition_requests_settings_path, class: "dropdown-item" %></li>
+              <li><%= link_to "Primo and Alma", primo_alma_settings_path, class: "dropdown-item" %></li>
+            </ul>
+          </li>
+        <% end %>
+
+        <li class="nav-item dropdown">
+          <a name="profile button" role="button" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" aria-label="Account Details">
+            <i class="fa fa-user"></i> <b class="caret"></b></a>
+          <ul class="dropdown-menu">
+            <li  class="nav-header" style="font-size: 12px; text-align: left; padding-left: 20px; font-weight:bold;"><%= current_user.name %></li>
+            <li class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="<%= user_path(current_user) %>">My Profile</a></li>
+            <!-- li><a href="#">Contact Reserves</a></li-->
+            <li class="dropdown-divider"></li>
+
+            <% if session[:back_to_id] %>
+              <li><a class="dropdown-item" href="<%= back_to_my_login_path %>"><span class="fa fa-arrow-circle-left"></span> Back To Dashboard</a></li>
+            <% else %>
+              <li><%= link_to "Logout", logout_path, class: "dropdown-item" %></li>
+            <% end %>
+          </ul>
+        </li>
+      </ul>
+      
     </div>
-
-    <!-- Collect the nav links, forms, and other content for toggling -->
-    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-      <% if user_signed_in? %>
-        <ul class="nav navbar-nav">
-            <% if current_user.admin? && can?(:change_status, Request) %>
-              <li class="<%= link_active_if?("home", "index") %>"><a href="<%= root_path %>">Dashboard</a></li>
-            <% end %>
-
-            <li class="<%= link_active_if?("users", "requests") %> dropdown">
-              <a href="#" name="requests" class="dropdown-toggle" data-toggle="dropdown">My Requests</a>
-              <ul class='dropdown-menu'>
-                <li><a href="<%= requests_user_path(current_user) %>">Current Requests</a></li>
-                <li><%= link_to "Removed Requests", requests_user_path(current_user, removed: true) %></li>
-              </ul>
-            </li>
-        </ul>
-
-        <a href="<%= new_request_step_one_path %>" role="button" id="new_request_button" class="navbar-left btn-sm btn btn-primary active navbar-btn">
-          New Request
-        </a>
-
-        <ul class="nav navbar-nav navbar-right">
-          <li>
-            <a name="help button" data-toggle="modal" data-target="#help_assistance_modal" aria-label="Help">
-              <span class="fa fa-question"></span>
-            </a>
-          </li>
-
-          <% if can? :search, :requests %>
-          <li class="dropdown" onmouseover="$('.search-box').focus();">
-            <a name="search button" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-label="Search">
-              <span class="fa fa-search"></span>
-            </a>
-            <ul class="dropdown-menu">
-              <li>
-              <form class="navbar-form navbar-left" role="search" action="<%= search_path %>" >
-                <div class="form-group">
-                  <label for="q" class="sr-only">search</label>
-                  <input type="text" class="form-control search-box" placeholder="Search" name="q" value="<%= @query if @query %>" title="search field">
-                  <input type="submit" value="search" class="hidden">
-                </div>
-              </form>
-              </li>
-            </ul>
-          </li>
-          <% end %>
-
-          <% if can? :create, AcquisitionRequest %>
-          <li><%= link_to acquisition_requests_path, title: "Acquisition Lists" do %>
-              <span class="fa fa-shopping-cart"></span>
-            <% end %>
-          </li>
-          <% end %>
-
-          <% if current_user.admin? && can?(:manage, User) %>
-            <li class="dropdown <%= link_active_if?(["users", "staff", "locations", "loan_periods", "courses"], "index") %>">
-              <a role="button" name="settings button" class="dropdown-toggle" data-toggle="dropdown" aria-label="Settings"><span class="fa fa-cog"></span> <b class="caret"></b></a>
-              <ul class="dropdown-menu">
-                <li><%= link_to "Users", users_path %></li>
-                <li><%= link_to "Admin", admin_users_users_path %></li>
-                <li><%= link_to "Locations", locations_path %></li>
-                <li><%= link_to "Loan Periods", loan_periods_path %></li>
-                <li><%= link_to "Courses", courses_path %></li>
-                <li class="divider"></li>
-                <li><%= link_to "Reports", reports_path %></li>
-                <li class="divider"></li>
-                <li role="presentation" class="dropdown-header">Application Settings</li>
-                <li><%= link_to "General", edit_settings_path %></li>
-                <li><%= link_to "Help", help_settings_path %></li>
-                <li><%= link_to "Email", email_settings_path %></li>
-                <li><%= link_to "Catalog Search", cat_search_settings_path %></li>
-                <li><%= link_to "Requests & Items", item_request_settings_path %></li>
-                <li><%= link_to "Course Subjects", settings_subjects_path %></li>
-                <li><%= link_to "Course Faculties", settings_faculties_path %></li>
-                <li><%= link_to "Acquisition Requests", acquisition_requests_settings_path %></li>
-                <li><%= link_to "Primo and Alma", primo_alma_settings_path %></li>
-              </ul>
-            </li>
-          <% end %>
-
-          <li class="dropdown">
-            <a name="profile button" role="button" class="dropdown-toggle" data-toggle="dropdown" aria-label="Account  Details">
-              <i class="fa fa-user"></i> <b class="caret"></b></a>
-            <ul class="dropdown-menu">
-              <li  class="nav-header" style="font-size: 12px; text-align: left; padding-left: 20px; font-weight:bold;"><%= current_user.name %></li>
-              <li class="divider"></li>
-              <li><a href="<%= user_path(current_user) %>">My Profile</a></li>
-              <!-- li><a href="#">Contact Reserves</a></li-->
-              <li class="divider"></li>
-
-              <% if session[:back_to_id] %>
-                <li><a href="<%= back_to_my_login_path %>"><span class="fa fa-arrow-circle-left"></span> Back To Dashboard</a></li>
-              <% else %>
-                <li><%= link_to "Logout", logout_path %></li>
-              <% end %>
-            </ul>
-          </li>
-        </ul>
-      <% end %>
-    </div><!-- /.navbar-collapse -->
   </div>
 </nav>
+

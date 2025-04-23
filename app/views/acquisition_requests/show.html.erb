@@ -80,7 +80,7 @@
                 <input type="hidden" name="status" value="<%= AcquisitionRequest::STATUS_CANCELLED %>"/>
                 <%= f.button :submit, "Cancel Request", class: "btn btn-danger btn-sm", data: { confirm: "Are you sure?" } %>
                 &nbsp;&nbsp; or
-                <a class="btn btn-link red btn-sm" data-toggle="collapse" data-slide-down="#acquire_form" href="#cancel_form">
+                <a class="btn btn-link red btn-sm" data-bs-toggle="collapse" data-slide-down="#acquire_form" href="#cancel_form">
                  Close
                 </a>
               <% end %>
@@ -107,7 +107,7 @@
     <%= f.input :acquisition_source_name, label: "Source Name", as: :string %>
     <%= f.button :submit, "Item Acquired", class: "btn btn-success btn-sm", data: { confirm: "Are you sure?" } %>
     &nbsp;&nbsp; or
-    <a class="btn btn-link red btn-sm" data-toggle="collapse" data-slide-up="#acquire_form" href="#cancel_form">
+    <a class="btn btn-link red btn-sm" data-bs-toggle="collapse" data-slide-up="#acquire_form" href="#cancel_form">
       Cancel Request
     </a>
   <% end %>

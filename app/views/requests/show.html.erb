@@ -1,45 +1,45 @@
-<% title "Request # #{@request.id}" %>
+<% title "Request # #{@request.id}"  %>
 <% page_header do %>
-<div class="row">
-	<div class="col-md-6">
+<div class="row mb-3">
+	<div class="col-md-8">
 		<h1>
 		Request #<%= @request.id%>
 		<small class="request">
 			<% if @request.rolledover? %>
-				<a href="<%= request_path(@request.rollover_parent)%>" class="label label-primary">R</a>
+				<a href="<%= request_path(@request.rollover_parent)%>" class="badge bg-primary">R</a>
 			<% end %>
 
-				<span class="label label-default status-<%= @request.status.parameterize %>"><%= @request.status == Request::REMOVED ? "Removed" : @request.status.humanize %></span>
-				<span class="label label-default"><%= @request.reserve_location.name %></span>
-			</small>
+				<span class="badge status-<%= @request.status.parameterize %>"><%= @request.status == Request::REMOVED ? "Removed" : @request.status.humanize %></span>
+				<span class="badge bg-secondary"><%= @request.reserve_location.name %></span>
+		 </small>
 		</h1>
 	</div>
-	<div class="col-md-6">
-		<div class="btn-group pull-right">
+	<div class="col-md-4 d-flex justify-content-end align-self-center">
+		<div class="btn-group btn-group-sm align-self-start">
 			<% if can? :assign, @request %>
-				<div class="btn-group">
-				  <button type="button" class="btn btn-default btn-sm dropdown-toggle " data-toggle="dropdown">
+			<div class="btn-group" role="group" aria-label="Button group with nested dropdown">
+				<div class="btn-group" role="group">
+					<button id="btnGroupDrop1" type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
 						<strong>Assigned to:</strong>
-				    <%= @request.assigned_to ? @request.assigned_to.name : "Nobody" %> <span class="caret"></span>
-				  </button>
-				  <ul class="dropdown-menu" role="menu">
-						<li>&nbsp; &nbsp;<strong>Assign to:</strong></li>
-						<li class="divider"></li>
-				   	<% @admin_users.each do |u| %>
-							<li><%= link_to u.name, assign_request_url(@request, who: u.id), method: :post %></li>
+						<%= @request.assigned_to ? @request.assigned_to.name : "Nobody" %>
+					</button>
+					<ul class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+						<li class="dropdown-header"><strong>Assign to:</strong></li>
+						<li><hr class="dropdown-divider"></li>
+						<% @admin_users.each do |u| %>
+							<li><%= link_to u.name, assign_request_url(@request, who: u.id), method: :post, class: "dropdown-item" %></li>
 						<% end %>
-						<% if @request.assigned_to != nil %>
-					    <li class="divider"></li>
-					    <li><%= link_to "Nobody", assign_request_url(@request, who: nil), method: :post %></li>
+						<% if @request.assigned_to.present? %>
+							<li><hr class="dropdown-divider"></li>
+							<li><%= link_to "Nobody", assign_request_url(@request, who: nil), method: :post, class: "dropdown-item" %></li>
 						<% end %>
-				  </ul>
+					</ul>
 				</div>
-			<% end %>
+			<% end %> 		
 			<% if can?(:update, @request) && is_request_active(@request) %>
-				<%= link_to 'Update Request', edit_request_path(@request), class: "btn btn-success btn-sm" %>
+				<%= link_to 'Update Request', edit_request_path(@request), class: "btn btn-success mb-0" %>
 			<% end %>
-
-
+			</div>
 		</div>
 	</div>
 </div>
@@ -47,21 +47,20 @@
 <% end %>
 
 <div class="request">
-
-	<div class="panel panel-success">
-	  <div class="panel-heading">
-	    <h3 class="panel-title">
+	<div class="card shadow-sm border-0 mb-4">
+		<div class="card-header bg-info">
+			<h4 class="card-title mb-0">
 				Requestor Details
 				<% if can? :change_owner, @request %>
 
-					<button class="btn btn-primary btn-xs xsmall-i pull-right" title="Change Owner" data-toggle="modal" data-target="#change_owner_form">
+					<button class="btn btn-light btn-xs xsmall-i pull-right" title="Change Owner" data-bs-toggle="modal" data-target="#change_owner_form">
 						Change Owner <span class="fa fa-exchange"></span>
 					</button>
 				<% end %>
-			</h3>
-	  </div>
+			</h4>
+		</div>
 
-		<div class="panel-body">
+  	<div class="card-body p-4 bg-light rounded-bottom">
 			<div class="table-responsive">
 		  	<table class="table table-bordered">
 		  		<tr>
@@ -109,34 +108,32 @@
 	<%= render partial: "change_owner" %>
 	<!-- COURSE INFO -->
 
-	<div class="panel panel-success">
-	  <div class="panel-heading">
-	    <h3 class="panel-title">Course Information</h3>
+	<div class="card shadow-sm border-0 mb-4">
+		<div class="card-header bg-info">
+			<h4 class="card-title mb-0">Course Information</h4>
 	  </div>
-		<div class="panel-body"><%= render partial: @request.course %></div>
+		<div class="card-body p-4 bg-light rounded-bottom">
+			<%= render partial: @request.course %>
+		</div>
 	</div>
 
-
-
 	<!-- REQUEST INFO -->
-
-	<div class="panel panel-success">
-	  <div class="panel-heading">
-	    <h3 class="panel-title">Request Information</h3>
+	<div class="card shadow-sm border-0 mb-4">
+		<div class="card-header bg-info">
+			<h4 class="card-title mb-0">Request Information</h4>	
 	  </div>
-		<div class="panel-body">
-			<div class="row">
+		<div class="card-body p-4 bg-light rounded-bottom">
+			<div class="row mb-3">
 				<div class="col-md-3">
 					<% if can?(:manage, @request) %>
 						<span class="field">Assigned to</span><br/>
 						<%= @request.assigned_to ? @request.assigned_to.name : "Nobody" %>
-						
 					<% else %>
 						<span class="field">Status</span><br/>
 						<%= @request.status ? @request.status.upcase : "Unknown" %>
 						<br/><br/>
 						<span class="field">Request History Log</span><br/>
-						<a data-toggle="modal" href="#history_popup" data-target="#history_popup" class="btn btn-xs btn-default">
+						<a data-bs-toggle="modal" href="#history_popup" data-target="#history_popup" class="btn btn-xs btn-default">
 							View Log
 						</a>
 					<% end %>
@@ -192,11 +189,11 @@
 	<hr/>
 
 	<!-- ITEMS -->
-	<div class="panel panel-info">
-		<div class="panel-heading">
-			<h3 class="panel-title">Requested Items</h3>
-		</div>
-		<div class="panel-body">
+	<div class="card shadow-sm border-0 mb-4">
+		<div class="card-header bg-primary text-white">
+			<h4 class="card-title mb-0">Requested Items</h4>
+	  </div>
+		<div class="card-body p-4 bg-light rounded-bottom">
 			<% if is_request_active(@request) %>
 				<%= render partial: "items/add_item" %>
 			<% end %>

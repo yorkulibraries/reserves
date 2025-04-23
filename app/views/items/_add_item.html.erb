@@ -1,5 +1,5 @@
 <div class="add-items mb-3">
-  <span class="btn btn-link btn-lg add-title green"><span class="fa fa-plus-square green"></span> Add an item:</span>
+  <span class="btn btn-link btn-lg add-title green"><span class="fa fa-plus-square"></span> Add an item:</span>
   <% Item::TYPES.reject { |t| @request.reserve_location.disallowed_item_types.include?(t) }.each do |type| %>
     <%= link_to type.humanize, new_request_item_path(@request, type: type), remote: true, class: "btn btn-link item-option" %>
   <% end %>

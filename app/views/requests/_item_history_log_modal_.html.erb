@@ -1,21 +1,23 @@
 <% if can?(:add_note, @request) %>
 
-  <div class="modal fade" id="item_history_popup_<%= item.id %>" tabindex="-1" role="dialog">
-    <div class="modal-dialog">
-      <div class="modal-content">
+ <div class="modal fade" id="item_history_popup_<%= item.id %>" tabindex="-1" aria-labelledby="itemHistoryLabel_<%= item.id %>" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
 
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-          <h4 class="modal-title" id="myModalLabel">Item History</h4>
-        </div>
+      <div class="modal-header">
+        <h4 class="modal-title" id="itemHistoryLabel_<%= item.id %>">Item History</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
 
         <div class="modal-body">
 
-          <div class="panel panel-default">
-            <div class="panel-heading">
+          <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-info">
+              
+              <!-- Basic Info -->
               Add a note
             </div>
-            <div class="panel-body">
+            <div class="card-body p-4 bg-light rounded-bottom">
               <%= render partial: 'request_history/form', locals: { remote: true, item_id: item.id } %> 
             </div>
           </div>
@@ -27,7 +29,7 @@
         </div> <!-- Closing .modal-body -->
 
         <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-default" data-bs-dismiss="modal">Close</button>
         </div>
 
       </div>

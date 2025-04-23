@@ -1,38 +1,59 @@
-	<div class="well">
-		<h4>Please review the Fair Dealing Guidelines and York’s Copyright and You website when placing items on reserve </h4>
+	<div class="card p-3 mb-3 bg-light bg-gradient">
+		<p class="fw-bold text-info fs-5">Please review the Fair Dealing Guidelines and York’s Copyright and You website when placing items on reserve </p>
 		<ul>
 			<li>
-				<a href="http://copyright.info.yorku.ca/files/2013/10/4.-Application-of-the-Fair-Dealing-Policy-for-Universities-to-Library-Copying1.pdf ">
+				<a class="" href="http://copyright.info.yorku.ca/files/2013/10/4.-Application-of-the-Fair-Dealing-Policy-for-Universities-to-Library-Copying1.pdf ">
 					Fair Dealings Guidelines
 				</a>
 			</li>
-			<li><a href="http://copyright.info.yorku.ca/">York's Copyright Website</a></li>
+			<li><a class="" href="http://copyright.info.yorku.ca/">York's Copyright Website</a></li>
 		</ul>
 	</div>
 
 	<!-- REQUEST DETAILS -->
-	<div class="panel panel-success">
-	  <div class="panel-heading">
-	    <h3 class="panel-title">Requestor Details</h3>
-	  </div>
-	  <div class="panel-body">
-	    <div class="row">
-	      <div class="col-sm-1"><strong>Name</strong></div>
-	      <div class="col-sm-3"><%= @request.requester.name%></div>
-	      <div class="col-sm-1"><strong>Email</strong></div>
-    		<div class="col-sm-3"><%= @request.requester.email %></div>
-	      <div class="col-sm-1"><strong>Type</strong></div>
-        <div class="col-sm-3"><%= @request.requester.user_type.upcase %></div>
-      </div>
-      <hr/>
-	    <div class="row">
-  		<%= f.fields_for @request.requester do |requester_fields |%>
-  			<div class="col-sm-4"><%= requester_fields.input :phone, required: true %></div>
-  			<div class="col-sm-4"><%= requester_fields.input :office, required: true  %></div>
-  			<div class="col-sm-4"><%= requester_fields.input :department, required: true, label: "Faculty/Department" %></div>
-  		<% end %>
-  		</div>
+	<div class="card shadow-sm border-0 mb-4">
+		<div class="card-header bg-info">
+			<h3 class="card-title mb-0">Requestor Details</h3>
+		</div>
 
+  	<div class="card-body p-4 bg-light rounded-bottom">
+			<!-- Basic Info -->
+			<div class="row mb-3">
+				<div class="col-md-4 mb-2">
+					<strong class="text-secondary">Name:</strong>
+					<div><%= @request.requester.name %></div>
+				</div>
+				<div class="col-md-4 mb-2">
+					<strong class="text-secondary">Email:</strong>
+					<div><%= @request.requester.email %></div>
+				</div>
+				<div class="col-md-4 mb-2">
+					<strong class="text-secondary">Type:</strong>
+					<div><%= @request.requester.user_type.upcase %></div>
+				</div>
+			</div>
+
+			<hr class="my-3">
+
+			<!-- Editable Fields -->
+			<div class="row g-3">
+				<%= f.fields_for @request.requester do |requester_fields| %>
+					<div class="col-md-4">
+						<%= requester_fields.label :phone, class: "form-label fw-semibold" %>
+						<%= requester_fields.text_field :phone, class: "form-control", required: true %>
+					</div>
+
+					<div class="col-md-4">
+						<%= requester_fields.label :office, class: "form-label fw-semibold" %>
+						<%= requester_fields.text_field :office, class: "form-control", required: true %>
+					</div>
+
+					<div class="col-md-4">
+						<%= requester_fields.label :department, "Faculty/Department", class: "form-label fw-semibold" %>
+						<%= requester_fields.text_field :department, class: "form-control", required: true %>
+					</div>
+				<% end %>
+			</div>
   	</div>
 	</div>
 
@@ -41,15 +62,15 @@
 	</div>
 	<!-- COURSE INFO -->
 
-	<div class="panel panel-success">
-	  <div class="panel-heading">
-	    <h3 class="panel-title">Course Information</h3>
+	<div class="card mb-3">
+	  <div class="card-header bg-info">
+			<h3 class="card-title mb-0">Course Information</h3>
 	  </div>
-	  <div class="panel-body">
+	  <div class="card-body p-4 bg-light rounded-bottom">
 			<%= f.fields_for :course do |builder| %>
 				<%= render  "courses/form_fields", f: builder %>
 			<% end %>
-			<div class="row">
+			<div class="row mb-3">
 				<div class="col-md-6 <%= 'has-error' if f.object.errors[:requester_email].present? %>">
 				  <%= f.label :requester_email, "Instructor Email", class: ("text-danger" if f.object.errors[:requester_email].present?) %>
   
@@ -75,13 +96,12 @@
 
 	<!-- REQUEST INFO -->
 
-	<div class="panel panel-success">
-	  <div class="panel-heading">
-	    <h3 class="panel-title">Request Information</h3>
+	<div class="card mb-3">
+	  <div class="card-header bg-info">
+			<h3 class="card-title mb-0">Request Information</h3>
 	  </div>
-	  <div class="panel-body">
-		  <div class="row">
-
+	  <div class="card-body p-4 bg-light rounded-bottom">
+		  <div class="row mb-3">
 		    <div class="col-sm-3">
 					<%= f.input :reserve_location_id, collection: Location.active, required: true, hint: "Where do you want students to pick up your items?" %>
 		    </div>
@@ -99,7 +119,7 @@
 
 
 
-	<div class="row">
+	<div class="row mb-3">
 	  <div class="col-md-8">
 
 			 <% if @request.new_record?  %>
