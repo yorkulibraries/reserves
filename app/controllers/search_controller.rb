@@ -90,6 +90,7 @@ class SearchController < ApplicationController
         ],
         match: :word_start
       )
+      Item.reindex
       item_request_ids = items.map(&:request_id).compact
       item_requests = item_request_ids.any? ? Request.where(id: item_request_ids) : Request.none
       
@@ -98,7 +99,7 @@ class SearchController < ApplicationController
         fields: [{ code: :text_middle }, { name: :word_start }, { instructor: :word_start }],
         match: :word_start
       )
-  
+      Course.reindex
       course_ids = courses.map(&:id).compact
       course_requests = course_ids.any? ? Request.where(course_id: course_ids) : Request.none
     end

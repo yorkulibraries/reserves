@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 class Item < ApplicationRecord
-  searchkick word_start: [:title, :author, :isbn, :ils_barcode, :other_isbn_issn, :publisher, :callnumber]
+  searchkick word_start: [:title, :author, :isbn, :ils_barcode, :other_isbn_issn, :publisher, :callnumber],
+             callbacks: :async
 
 
   ########################################### CONSTANTS ############################################
