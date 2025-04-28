@@ -9,13 +9,14 @@ class SearchController < ApplicationController
     @query = q = params[:q]
     @type = params[:type]
     @search_type = params[:search_type].presence || 'all'
-
+    @page = params[:page] || 1
+  
     if @type == 'users'
       @users = search_users(q)
     else
-      @requests = search_requests(q, @search_type)
+      @requests = search_requests(q, @search_type, @page)
     end
-
+  
     respond_to do |format|
       format.html
       format.js
@@ -37,75 +38,71 @@ class SearchController < ApplicationController
   def search_requests(q, search_type = "all", page = 1)
     return Request.none if q.blank?
   
-    item_requests = Request.none
-    course_requests = Request.none
-    requests = Request.none
-
+    item_request_ids = []
+    course_request_ids = []
+    direct_request_ids = []
+  
     case search_type
     when "item"
       items = Item.search(
         q,
         fields: [
-          { title: :word_start }, 
-          { author: :word_start }, 
+          { title: :word_start },
+          { author: :word_start },
           { isbn: :word_start },
-          { ils_barcode: :word_start }, 
-          { other_isbn_issn: :word_start }, 
-          { publisher: :word_start },  
+          { ils_barcode: :word_start },
+          { other_isbn_issn: :word_start },
+          { publisher: :word_start },
           { callnumber: :word_start }
         ],
-        match: :word_start
+        match: :word_start,
+        load: false
       )
-      item_request_ids = items.map(&:request_id).compact
-      item_requests = item_request_ids.any? ? Request.where(id: item_request_ids) : Request.none
+      item_request_ids = items.map { |i| i["request_id"] }.compact
   
     when "course"
       courses = Course.search(
         q,
         fields: [{ code: :text_middle }, { name: :word_start }, { instructor: :word_start }],
-        match: :word_start
+        match: :word_start,
+        load: false
       )
-      course_ids = courses.map(&:id).compact
-      course_requests = course_ids.any? ? Request.where(course_id: course_ids) : Request.none
-
+      course_ids = courses.map { |c| c["id"].to_i }.compact
+      course_request_ids = Request.where(course_id: course_ids).pluck(:id)
+  
     when "request"
-      #q = params[:q].to_s
-      requests = Request.search(where: { id: q.to_i })
-      
-      request_ids = requests.map(&:id).compact
-      requests = request_ids.any? ? Request.where(id: request_ids) : Request.none
+      requests = Request.search(where: { id: q.to_i },load: false)
 
-      
+      direct_request_ids = requests.map(&:id).compact
+  
     when "all"
       items = Item.search(
         q,
-        fields: [
-          { title: :word_start }, 
-          { author: :word_start }, 
-          { isbn: :word_start },
-          { ils_barcode: :word_start }, 
-          { other_isbn_issn: :word_start }, 
-          { publisher: :word_start },  
-          { callnumber: :word_start }
-        ],
-        match: :word_start
+        fields: %i[title^10 author isbn ils_barcode other_isbn_issn publisher callnumber],
+        match: :word_start,
+        load: false
       )
-      Item.reindex
-      item_request_ids = items.map(&:request_id).compact
-      item_requests = item_request_ids.any? ? Request.where(id: item_request_ids) : Request.none
-      
+      item_request_ids = items.map { |i| i["request_id"] }.compact
+  
       courses = Course.search(
         q,
         fields: [{ code: :text_middle }, { name: :word_start }, { instructor: :word_start }],
-        match: :word_start
+        match: :word_start,
+        load: false
       )
-      Course.reindex
-      course_ids = courses.map(&:id).compact
-      course_requests = course_ids.any? ? Request.where(course_id: course_ids) : Request.none
+      course_ids = courses.map { |c| c["id"].to_i }.compact
+      course_request_ids = Request.where(course_id: course_ids).pluck(:id)
     end
   
-    @combined_requests = (course_requests.to_a + item_requests.to_a + requests.to_a).uniq
+    # Combine IDs and make sure they're unique
+    request_ids = (item_request_ids + course_request_ids + direct_request_ids).uniq
   
-    @combined_requests = Kaminari.paginate_array(@combined_requests, total_count: @combined_requests.size).page(page).per(10)
-  end
+    # Let ActiveRecord handle pagination — no array slicing
+    @combined_requests = Request.where(id: request_ids)
+                                .includes(:course, :requester)
+                                .order(created_at: :desc, id: :desc)
+                                .page(page)
+                                .per(10)
+  end  
+  
 end

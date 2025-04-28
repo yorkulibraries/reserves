@@ -39,6 +39,7 @@
           </a>
         </li>
 
+        <!--
         <% if can? :search, :requests %>
         <li class="nav-item dropdown" onmouseover="$('.search-box').focus();">
           <a class="nav-link" name="search button" class="dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-label="Search">
@@ -57,7 +58,7 @@
           </ul>
         </li>
         <% end %>
-
+        -->
         <% if can? :create, AcquisitionRequest %>
         <li class="nav-item"><%= link_to acquisition_requests_path, title: "Acquisition Lists", class: "nav-link" do %>
             <span class="fa fa-shopping-cart"></span>

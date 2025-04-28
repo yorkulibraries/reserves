@@ -243,6 +243,9 @@ GEM
     kaminari-activerecord (1.2.2)
       activerecord
       kaminari-core (= 1.2.2)
+    kaminari-bootstrap (3.0.1)
+      kaminari (>= 0.13.0)
+      rails
     kaminari-core (1.2.2)
     liquid (5.7.0)
       bigdecimal
@@ -451,6 +454,7 @@ DEPENDENCIES
   jquery-rails (= 4.5.0)
   jquery-ui-rails (= 6.0.1)
   kaminari (~> 1.2, >= 1.2.2)
+  kaminari-bootstrap
   liquid (~> 5.4)
   minitest (~> 5.16, >= 5.16.3)
   minitest-around (~> 0.5.0)

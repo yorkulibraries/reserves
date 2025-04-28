@@ -1,37 +1,42 @@
 <% title "Search Results #{@query}" %>
+
 <% page_header do %>
   <h1>Search Results <small>for <%= @query %></small></h1>
 <% end %>
 
-<form action="<%= search_path %>">
+<form action="<%= search_path %>" method="get">
   <div class="input-group">
-    <span class="input-group-addon" id="basic-addon1">
+    <span class="input-group-text" id="basic-addon1">
       <i class="fa fa-search"></i>
     </span>
 
     <input type="text" class="form-control"
-        placeholder="Search requestor, course, code, instructor, id" 
-        name="q" value="<%= @query if @query %>" title="search field">
+           placeholder="Search requestor, course, code, instructor, id"
+           name="q"
+           value="<%= @query if @query %>"
+           title="search field">
 
-    <div class="input-group-btn">
-    <select name="search_type" class="form-control" style="height: 34px; width: auto;">
-      <option value="all" <%= "selected" if @search_type == 'all' %>>All</option>
-      <option value="item" <%= "selected" if @search_type == 'item' %>>Item</option>
-      <option value="course" <%= "selected" if @search_type == 'course' %>>Course</option>
-      <option value="request" <%= "selected" if @search_type == 'request' %>>Request</option>
-    </select>
+    <div class="input-group-append">
+      <select name="search_type" class="form-select" style="height: 100%; width: auto;">
+        <option value="all" <%= "selected" if @search_type == 'all' %>>All</option>
+        <option value="item" <%= "selected" if @search_type == 'item' %>>Item</option>
+        <option value="course" <%= "selected" if @search_type == 'course' %>>Course</option>
+        <option value="request" <%= "selected" if @search_type == 'request' %>>Request</option>
+      </select>
     </div>
   </div>
+
   <input type="hidden" name="type" value="requests"/>
-  <input type="submit" value="search" class="hidden">
+  <input type="submit" value="Search" class="btn btn-primary d-none">
 </form>
 
 <hr/>
 
 <div class="dashboard">
-  <% if @requests.size > 0 %>
-    <%= paginate @combined_requests if @combined_requests.size > 1 %>
-    <table class="table table-bordered ">
+  <% if @combined_requests.any? %>
+    <%= paginate @combined_requests if @combined_requests.total_count > 1 %>
+
+    <table class="table table-bordered">
       <thead>
         <tr>
           <th>ID, Status, When</th>
@@ -39,31 +44,38 @@
           <th>Requestor</th>
         </tr>
       </thead>
-      <% @requests.each do |request| %>
+
+      <% @combined_requests.each do |request| %>
         <tr class="click_redirect request" data-id="<%= request.id %>" data-redirect-path="<%= request_path(request) %>">
           <td class="requested_date">
-            <span class="strong">#<%= request.id %></span>
-            <span class="label status-<%= request.status.parameterize %> pull-right"><%= request.status %></span><br/>
-            <%= request.created_at.strftime("%b %d, %Y") rescue nil %>
+            <span class="fw-bold">#<%= request.id %></span>
+            <span class="badge status-<%= request.status.parameterize %> float-end"><%= request.status %></span><br>
+            <small class="text-muted"><%= request.created_at.strftime("%b %d, %Y") rescue nil %></small>
           </td>
+
           <td class="course">
             <a class="name" href="<%= request_path(request) %>"><%= request.course.name %></a>
-            <span class="code"><%= request.course.code %></span>
+            <div class="text-muted"><%= request.course.code %></div>
           </td>
+
           <td class="course">
-            <span class="weak">instructor</span><br/>
-            <span class="strong"><%= request.course.instructor%> </span>
+            <span class="text-muted">Instructor</span><br/>
+            <span class="fw-bold"><%= request.course.instructor %></span>
           </td>
+
           <td class="requestor">
-            <span class="name"><%= request.requester.name %></span>
-            <span class="department"><%= request.requester.department %></span>
+            <span class="name"><%= request.requester.name %></span><br/>
+            <span class="text-muted"><%= request.requester.department %></span>
           </td>
         </tr>
       <% end %>
     </table>
-    <%= paginate @requests if @requests.size > 1 %>
-  <% end %>
 
-  <%= blank_slate(@requests, title: "No matching requests found", description:
-      "So sorry, there are no requests found for <strong>#{@query}</strong> search", icon:"search" )  %>
+    <%= paginate @combined_requests if @combined_requests.total_count > 1 %>
+  <% else %>
+    <%= blank_slate(@combined_requests,
+      title: "No matching requests found",
+      description: "So sorry, there are no requests found for <strong>#{@query}</strong> search",
+      icon: "search") %>
+  <% end %>
 </div>

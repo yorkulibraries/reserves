@@ -2,13 +2,7 @@
 
 class Request < ApplicationRecord
 
-  searchkick word_start: [:id]
-
-  def search_data
-    {
-      id: id.to_s  # Convert ID to a string
-    }
-  end
+  searchkick callbacks: :async
 
   ## CONSTANTS
   INCOMPLETE = 'incomplete'
