@@ -62,3 +62,16 @@ jobs:
           bundle exec rails db:reset
           bundle exec rails test --verbose
           bundle exec rails test:system
+
+      - name: Create tar archive of screenshots
+        run: |
+            ( cd /home/runner/work/reserves/reserves/tmp && [ -d ./test-screenshots ] && tar cvf test-screenshots.tar ./test-screenshots ) || true
+        if: always()
+  
+      - name: Upload screenshots
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-screenshots
+          path: /home/runner/work/reserves/reserves/tmp/test-screenshots.tar
+          
