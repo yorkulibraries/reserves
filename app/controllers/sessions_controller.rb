@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 class SessionsController < ApplicationController
-  before_action :authenticate_user!, except: :destroy
+  # manually handling session user switching
+  before_action :authenticate_user!, except: [:destroy, :login_as, :back_to_my_login]
   skip_authorization_check except: %i[login_as back_to_my_login]
 
   def new
@@ -40,25 +41,26 @@ class SessionsController < ApplicationController
   def login_as
     authorize! :login_as, :requestor
 
-    who = params[:who]
-    requestor = User.find_by_id(who)
+    requestor = User.find_by_id(params[:who])
 
     if requestor && !requestor.admin?
-      session[:back_to_id] = current_user.id
+      session[:back_to_id] = current_user&.id
       name = current_user.name
 
       session[:user_id] = requestor.id
       session[:back_to_url] = request.referer
-
-      ## updated audit trail
+  
       requestor.audit_comment = "#{name} logged into #{requestor.name}'s account"
       requestor.save(validate: false)
-
+  
+      sign_out(:user) # Log out current Devise user before impersonating
+  
       redirect_to requests_user_url(requestor)
     else
       redirect_to root_url, notice: 'Requestor not found'
     end
   end
+  
 
   def back_to_my_login
     authorize! :back_to_login, :requestor
@@ -67,14 +69,16 @@ class SessionsController < ApplicationController
       requestor = current_user
 
       u = User.find_by_id(session[:back_to_id])
-
+  
       ## updated audit trail
       requestor.audit_comment = "#{u.name} logged out from #{requestor.name}'s account"
-      requestor.save(validate: false)
+      requestor.touch # This updates updated_at and triggers auditing
 
       session[:user_id] = u.id
       session[:back_to_id] = nil
 
+      sign_in(:user, u) # Re-establish Devise session for the original user
+  
       if session[:back_to_url].nil?
         redirect_to root_url
       else
@@ -82,4 +86,5 @@ class SessionsController < ApplicationController
       end
     end
   end
+  
 end

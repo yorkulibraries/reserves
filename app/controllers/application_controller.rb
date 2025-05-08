@@ -12,13 +12,20 @@ class ApplicationController < ActionController::Base
   before_action :login_required
   before_action :user_information_validity_check, if: :logged_in?
 
-  def _current_user
-    @current_user ||= User.find_by_id(session[:user_id]) if session[:user_id]
-    @current_user ||= current_user
-  end
+
+  # If session[:user_id] is set (via login_as), use that to simulate a different user
+  # without affecting the Devise login state. Falls back to Devise's current_user otherwise.
+  def current_user
+    if session[:user_id]
+      @current_user ||= User.find_by(id: session[:user_id])
+    else
+      super
+    end
+  end  
+
 
   def current_ability
-    @current_ability ||= Ability.new(_current_user, params)
+    @current_ability ||= Ability.new(current_user, params)
   end
 
   def logged_in?
@@ -33,8 +40,8 @@ class ApplicationController < ActionController::Base
   end
 
   def user_information_validity_check
-    if !_current_user.admin && (_current_user.name.blank? || _current_user.email.blank?) && controller_name == 'users'
-      redirect_to edit_user_path(_current_user),
+    if !current_user.admin && (current_user.name.blank? || current_user.email.blank?) && controller_name == 'users'
+      redirect_to edit_user_path(current_user),
                   notice: "Please update your user information before continuing."
     end
   end

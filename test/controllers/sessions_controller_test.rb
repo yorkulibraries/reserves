@@ -97,14 +97,19 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
       # session[:back_to_id] = @user.id
       # session[:user_id] = requestor.id
 
-      get login_as_url, params: { who: requestor.id }
-
-      assert_difference('Audited::Audit.count') do
-        get back_to_my_login_url
-
-        assert_equal @user.id, session[:user_id], "user id should be #{@user.id}"
-        assert_nil session[:back_to_id], 'Back to id should be nil'
+      # Simulate logging in as another user
+      assert_difference('Audited::Audit.count', 1, 'login_as should create an audit entry') do
+        get login_as_url, params: { who: requestor.id }
+        assert_equal requestor.id, session[:user_id], 'Should be impersonating requestor'
       end
+
+      # Now go back to original login
+      assert_difference('Audited::Audit.count', 1, 'back_to_my_login should create an audit entry') do
+        get back_to_my_login_url
+      end
+
+      assert_equal @user.id, session[:user_id], 'Should return to original user session'
+      assert_nil session[:back_to_id], 'Back to ID should be cleared'
     end
   end
 end
