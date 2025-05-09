@@ -24,7 +24,7 @@ class UserSystemTest < ApplicationSystemTestCase
     check "user_is_reserves_staff", visible: :all
     
     click_button('Save User Details')
-    assert User.find(@non_reserves_staff.first).is_reserves_staff    
+    assert User.find(@non_reserves_staff.first.id).is_reserves_staff    
   end
 
 end
