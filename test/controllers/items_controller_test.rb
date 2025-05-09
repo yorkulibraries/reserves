@@ -144,7 +144,7 @@ class ItemsControllerTest < ActionDispatch::IntegrationTest
     request = create(:request, status: Request::INPROGRESS)
     post request_items_path(@_request), params: { item: attributes_for(:item).except(:request) }
     r = get_instance_var(:request)
-    assert_equal Request::INPROGRESS, r.status, 'Status should in progress'
+    assert_equal Request::OPEN, r.status, 'Status should be set to open'
   end
 
   should 'change status' do

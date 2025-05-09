@@ -9,7 +9,11 @@
 				<a href="<%= request_path(@request.rollover_parent)%>" class="label label-primary">R</a>
 			<% end %>
 
-				<span class="label label-default status-<%= @request.status.parameterize %>"><%= @request.status == Request::REMOVED ? "Removed" : @request.status.humanize %></span>
+			<span id="request_status_badge" class="label label-default status-<%= @request.status.parameterize %>">
+				<%= @request.status == Request::REMOVED ? "Removed" : @request.status.humanize %>
+			</span>
+
+
 				<span class="label label-default"><%= @request.reserve_location.name %></span>
 			</small>
 		</h1>

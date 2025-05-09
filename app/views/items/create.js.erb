@@ -8,6 +8,10 @@
 
 	bootstrap_modal_close("item_form");
 
+	$("#request_status_badge").text("<%= j @request.status.humanize %>");
+	$("#request_status_badge").attr("class", "label label-default status-<%= @request.status.parameterize %>");
+
+
 	$(".items").prepend("<%= j render @item, locals: { item: @item } %>");
 	$("#item_<%= @item.id %>").effect("highlight",2000);
 	$("#item_<%= @item.id %> span.item-type").after("<span class='green pull-right fa fa-floppy-o'></span>");

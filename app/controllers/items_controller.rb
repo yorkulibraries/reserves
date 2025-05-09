@@ -59,6 +59,12 @@ class ItemsController < ApplicationController
 
     respond_to do |format|
       if @item.save
+        if @request.status == Request::INPROGRESS
+          @request.update(
+            status: Request::OPEN,
+            audit_comment: 'Status changed to OPEN after item was added'
+          )
+        end
         @request.reload
         RequestMailer.new_item_notification(@request, @item).deliver_later
 
