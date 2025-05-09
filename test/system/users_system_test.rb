@@ -23,9 +23,8 @@ class UserSystemTest < ApplicationSystemTestCase
     assert_selector "input[name='user[is_reserves_staff]']"
     check "user_is_reserves_staff", visible: :all
     
-    assert_difference 'User.where(is_reserves_staff: true).count', 1 do
-      click_button('Save User Details')
-    end
+    click_button('Save User Details')
+    assert User.find(@non_reserves_staff.first.id).is_reserves_staff    
   end
 
 end
