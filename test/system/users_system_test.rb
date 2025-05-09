@@ -21,7 +21,7 @@ class UserSystemTest < ApplicationSystemTestCase
         
     visit edit_user_url(@non_reserves_staff.first)
     assert_selector "input[name='user[is_reserves_staff]']"
-    check "user_is_reserves_staff", allow_label_click: true
+    check "user_is_reserves_staff", visible: :all
     
     assert_difference 'User.where(is_reserves_staff: true).count', 1 do
       click_button('Save User Details')
