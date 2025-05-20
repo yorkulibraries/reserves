@@ -10,7 +10,14 @@ class RequestHistoryController < ApplicationController
 
     request_audits = @request.audits.where(auditable_type: 'Request', associated_id: nil, associated_type: nil)
 
-    @audits = (associated_audits + request_audits).sort_by(&:created_at)
+    course_audits = Audited::Audit.where(
+      auditable_type: 'Request',
+      associated_type: 'Course',
+      associated_id: @request.course.id,
+      auditable_id: @request.id
+    )
+
+    @audits = (associated_audits + request_audits + course_audits).sort_by(&:created_at)
 
     @audits_grouped = @audits.reverse.group_by { |audit| audit.created_at.at_beginning_of_day }
 
