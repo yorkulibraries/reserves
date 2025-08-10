@@ -21,5 +21,6 @@ yarn.lock
 !.env
 *.sql
 *.sql.gz
+*.sh
 log/*
 *.bk

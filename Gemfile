@@ -53,6 +53,9 @@ gem 'yaml_db', '~> 0.7.0'
 # NOTIFICATIONS
 gem 'exception_notification', '~> 4.5'
 
+# citation parser
+gem 'anystyle'
+
 ## TESTING && DEVELOPMENT ##
 gem 'rb-readline'
 

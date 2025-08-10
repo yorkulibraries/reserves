@@ -7,6 +7,7 @@ require 'rails/test_help'
 require 'factory_girl_rails'
 require 'minitest/unit'
 require 'database_cleaner/active_record'
+require 'mocha/minitest'
 
 # Configure shoulda-matchers to use Minitest
 require 'shoulda/matchers'
