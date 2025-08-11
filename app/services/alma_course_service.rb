@@ -8,6 +8,18 @@ class AlmaCourseService
     self.class.base_uri Setting.alma_region + '/almaws/v1'
   end
 
+  def get_bib(mms_id)
+    get_action("bibs/#{mms_id}")
+  end
+
+  def get_nz_bibs(mms_id)
+    get_action("bibs", { :nz_mms_id => mms_id})
+  end
+
+  def get_cz_bibs(mms_id)
+    get_action("bibs", { :cz_mms_id => mms_id})
+  end
+
   def get_course(course_id)
     get_action("courses/#{course_id}")
   end
@@ -52,8 +64,60 @@ class AlmaCourseService
     put_action("courses/#{course_id}/reading-lists/#{reading_list_id}/citations/#{citation_id}", citation)
   end
 
+  def new_course
+    {
+      "code": "",
+      "name": "",
+      "section": "",
+      "academic_department": {
+        "value": ""
+      },
+      "school_faculty": {
+        "value": ""
+      },
+      "processing_department": {
+        "value": "YOR_CR"
+      },
+      "term": [
+        {
+          "value": "FW"
+        }
+      ],
+      "status": "ACTIVE",
+      "start_date": "",
+      "end_date": "",
+      "weekly_hours": "",
+      "participants": "",
+      "year": "",
+      "instructor": [
+        {
+          "primary_id": "",
+          "first_name": "",
+          "last_name": ""
+        }
+      ],
+      "campus": [
+        {
+          "campus_code": {
+            "value": ""
+          },
+          "campus_participants": ""
+        }
+      ],
+      "searchable_ids": {
+        "searchable_id": ""
+      },
+      "notes": [
+        {
+          "content": "",
+          "type": ""
+        }
+      ]
+    }
+  end
+
   def new_citation
-    citation = {
+    {
       "status": {
         "value": "BeingPrepared"
       },
@@ -169,6 +233,40 @@ class AlmaCourseService
     citations.map do |c|
       create_citation(course_id, reading_list_id, c)
     end
+  end
+
+  def citation_from_mms_id(mms_id)
+    c = new_citation
+    result = get_bib(mms_id)
+    if result[:success]
+      m = result[:data]
+    else
+      result = get_nz_bibs(mms_id)
+      if result[:success]
+        m = result[:data][:bib][0]
+      else
+        result = get_cz_bibs(mms_id)
+        m = result[:data][:bib][0] if result[:success]
+      end
+    end
+
+    if !m.nil?
+      c[:metadata][:title] = m[:title] || ''
+      c[:metadata][:author] = m[:author] || ''
+      c[:metadata][:publisher] = m[:publisher_const] || ''
+      c[:metadata][:publication_date] = m[:date_of_publication] || ''
+      c[:metadata][:edition] = m[:complete_edition] || ''
+      c[:metadata][:place_of_publication] = m[:place_of_publication] || ''
+      c[:metadata][:isbn] = m[:isbn] || ''
+      c[:metadata][:issn] = m[:issn] || ''
+      c[:metadata][:mms_id] = m[:mms_id] || ''
+    end
+    c
+  end
+
+  def create_citation_from_mms_id(course_id, reading_list_id, mms_id)
+    c = citation_from_mms_id(mms_id)
+    create_citation(course_id, reading_list_id, c)
   end
 
   private

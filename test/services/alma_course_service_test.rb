@@ -73,6 +73,214 @@ class AlmaCourseServiceTest < ActiveSupport::TestCase
     end
   end
 
+  # get_bib tests
+  test 'get_bib returns success response' do
+    mms_id = '991022101949705164'
+    success_response = {
+      body: {
+        mms_id: mms_id,
+        title: 'The Art of Happiness',
+        author: 'Dalai Lama',
+        publisher_const: 'Riverhead Books',
+        date_of_publication: '1998',
+        isbn: '9781573221115'
+      }.to_json,
+      code: 200
+    }
+
+    stubbed_response = stub(success?: true, body: success_response[:body], code: success_response[:code])
+    AlmaCourseService.stubs(:get).with(
+      "/bibs/#{mms_id}",
+      query: { apikey: 'test-api-key' },
+      headers: {
+        'Accept' => 'application/json',
+        'Content-Type' => 'application/json'
+      }
+    ).returns(stubbed_response)
+
+    result = @service.get_bib(mms_id)
+
+    assert result[:success], 'Expected success to be true'
+    assert_equal mms_id, result[:data][:mms_id], 'Expected MMS ID to match'
+    assert_equal 'The Art of Happiness', result[:data][:title], 'Expected title to match'
+    assert_equal 'Dalai Lama', result[:data][:author], 'Expected author to match'
+    assert_equal 'Riverhead Books', result[:data][:publisher_const], 'Expected publisher to match'
+    assert_equal '1998', result[:data][:date_of_publication], 'Expected publication date to match'
+  end
+
+  test 'get_bib handles API error' do
+    mms_id = '991022101949705164'
+    error_response = {
+      body: { error: 'Bibliographic record not found' }.to_json,
+      code: 404,
+      message: 'Not Found'
+    }
+
+    stubbed_response = stub(success?: false, body: error_response[:body], code: error_response[:code], message: error_response[:message])
+    AlmaCourseService.stubs(:get).with(
+      "/bibs/#{mms_id}",
+      query: { apikey: 'test-api-key' },
+      headers: {
+        'Accept' => 'application/json',
+        'Content-Type' => 'application/json'
+      }
+    ).returns(stubbed_response)
+
+    result = @service.get_bib(mms_id)
+
+    assert_not result[:success], 'Expected success to be false'
+    assert_equal 404, result[:error], 'Expected error code to be 404'
+    assert_equal 'Not Found', result[:message], 'Expected error message to match'
+    assert_equal 'Bibliographic record not found', result[:details][:error], 'Expected error details to match'
+  end
+
+  test 'get_bib handles invalid JSON in successful response' do
+    mms_id = '991022101949705164'
+    success_response = {
+      body: 'invalid json',
+      code: 200
+    }
+
+    stubbed_response = stub(success?: true, body: success_response[:body], code: success_response[:code])
+    AlmaCourseService.stubs(:get).with(
+      "/bibs/#{mms_id}",
+      query: { apikey: 'test-api-key' },
+      headers: {
+        'Accept' => 'application/json',
+        'Content-Type' => 'application/json'
+      }
+    ).returns(stubbed_response)
+
+    result = @service.get_bib(mms_id)
+
+    assert_not result[:success], 'Expected success to be false'
+    assert_equal 200, result[:error], 'Expected error code to be 200'
+    assert_equal 'Invalid JSON in successful response', result[:message], 'Expected error message to match'
+    assert_equal 'Invalid JSON response', result[:details][:error], 'Expected error details to match'
+  end
+
+  # get_nz_bibs tests
+  test 'get_nz_bibs returns success response' do
+    mms_id = '991022101949705164'
+    success_response = {
+      body: {
+        bib: [{
+          mms_id: mms_id,
+          title: 'The Art of Happiness',
+          author: 'Dalai Lama',
+          publisher_const: 'Riverhead Books',
+          date_of_publication: '1998'
+        }]
+      }.to_json,
+      code: 200
+    }
+
+    stubbed_response = stub(success?: true, body: success_response[:body], code: success_response[:code])
+    AlmaCourseService.stubs(:get).with(
+      "/bibs",
+      query: { apikey: 'test-api-key', nz_mms_id: mms_id },
+      headers: {
+        'Accept' => 'application/json',
+        'Content-Type' => 'application/json'
+      }
+    ).returns(stubbed_response)
+
+    result = @service.get_nz_bibs(mms_id)
+
+    assert result[:success], 'Expected success to be true'
+    assert_equal 1, result[:data][:bib].length, 'Expected one bibliographic record'
+    assert_equal mms_id, result[:data][:bib][0][:mms_id], 'Expected MMS ID to match'
+    assert_equal 'The Art of Happiness', result[:data][:bib][0][:title], 'Expected title to match'
+    assert_equal 'Dalai Lama', result[:data][:bib][0][:author], 'Expected author to match'
+  end
+
+  test 'get_nz_bibs handles API error' do
+    mms_id = '991022101949705164'
+    error_response = {
+      body: { error: 'No network zone records found' }.to_json,
+      code: 404,
+      message: 'Not Found'
+    }
+
+    stubbed_response = stub(success?: false, body: error_response[:body], code: error_response[:code], message: error_response[:message])
+    AlmaCourseService.stubs(:get).with(
+      "/bibs",
+      query: { apikey: 'test-api-key', nz_mms_id: mms_id },
+      headers: {
+        'Accept' => 'application/json',
+        'Content-Type' => 'application/json'
+      }
+    ).returns(stubbed_response)
+
+    result = @service.get_nz_bibs(mms_id)
+
+    assert_not result[:success], 'Expected success to be false'
+    assert_equal 404, result[:error], 'Expected error code to be 404'
+    assert_equal 'Not Found', result[:message], 'Expected error message to match'
+    assert_equal 'No network zone records found', result[:details][:error], 'Expected error details to match'
+  end
+
+  # get_cz_bibs tests
+  test 'get_cz_bibs returns success response' do
+    mms_id = '991022101949705164'
+    success_response = {
+      body: {
+        bib: [{
+          mms_id: mms_id,
+          title: 'The Art of Happiness',
+          author: 'Dalai Lama',
+          publisher_const: 'Riverhead Books',
+          date_of_publication: '1998'
+        }]
+      }.to_json,
+      code: 200
+    }
+
+    stubbed_response = stub(success?: true, body: success_response[:body], code: success_response[:code])
+    AlmaCourseService.stubs(:get).with(
+      "/bibs",
+      query: { apikey: 'test-api-key', cz_mms_id: mms_id },
+      headers: {
+        'Accept' => 'application/json',
+        'Content-Type' => 'application/json'
+      }
+    ).returns(stubbed_response)
+
+    result = @service.get_cz_bibs(mms_id)
+
+    assert result[:success], 'Expected success to be true'
+    assert_equal 1, result[:data][:bib].length, 'Expected one bibliographic record'
+    assert_equal mms_id, result[:data][:bib][0][:mms_id], 'Expected MMS ID to match'
+    assert_equal 'The Art of Happiness', result[:data][:bib][0][:title], 'Expected title to match'
+    assert_equal 'Dalai Lama', result[:data][:bib][0][:author], 'Expected author to match'
+  end
+
+  test 'get_cz_bibs handles API error' do
+    mms_id = '991022101949705164'
+    error_response = {
+      body: { error: 'No community zone records found' }.to_json,
+      code: 404,
+      message: 'Not Found'
+    }
+
+    stubbed_response = stub(success?: false, body: error_response[:body], code: error_response[:code], message: error_response[:message])
+    AlmaCourseService.stubs(:get).with(
+      "/bibs",
+      query: { apikey: 'test-api-key', cz_mms_id: mms_id },
+      headers: {
+        'Accept' => 'application/json',
+        'Content-Type' => 'application/json'
+      }
+    ).returns(stubbed_response)
+
+    result = @service.get_cz_bibs(mms_id)
+
+    assert_not result[:success], 'Expected success to be false'
+    assert_equal 404, result[:error], 'Expected error code to be 404'
+    assert_equal 'Not Found', result[:message], 'Expected error message to match'
+    assert_equal 'No community zone records found', result[:details][:error], 'Expected error details to match'
+  end
+
   # get_course tests
   test 'get_course returns success response' do
     course_id = '12345'
@@ -805,6 +1013,24 @@ class AlmaCourseServiceTest < ActiveSupport::TestCase
     assert_equal 'Citation not found', result[:details][:error], 'Expected error details to match'
   end
 
+  # new_course tests
+  test 'new_course returns a properly structured course' do
+    course = @service.new_course
+    assert_equal '', course[:code], 'Expected code to be empty'
+    assert_equal '', course[:name], 'Expected name to be empty'
+    assert_equal '', course[:section], 'Expected section to be empty'
+    assert_equal 'YOR_CR', course[:processing_department][:value], 'Expected processing department to be YOR_CR'
+    assert_equal 'FW', course[:term][0][:value], 'Expected term to be FW'
+    assert_equal 'ACTIVE', course[:status], 'Expected status to be ACTIVE'
+    assert_equal '', course[:start_date], 'Expected start date to be empty'
+    assert_equal '', course[:end_date], 'Expected end date to be empty'
+    assert_equal '', course[:year], 'Expected year to be empty'
+    assert_equal 1, course[:instructor].length, 'Expected one instructor'
+    assert_equal '', course[:instructor][0][:primary_id], 'Expected instructor primary_id to be empty'
+    assert_equal 1, course[:campus].length, 'Expected one campus'
+    assert_equal '', course[:campus][0][:campus_code][:value], 'Expected campus code to be empty'
+  end
+
   # new_citation tests
   test 'new_citation returns a properly structured citation' do
     citation = @service.new_citation
@@ -1009,5 +1235,364 @@ class AlmaCourseServiceTest < ActiveSupport::TestCase
     result = @service.create_citations_from_string(course_id, reading_list_id, citation_string)
 
     assert_empty result, 'Expected no citations to be created for empty string'
+  end
+
+  # citation_from_mms_id tests
+  test 'citation_from_mms_id creates citation from get_bib success' do
+    mms_id = '991022101949705164'
+    success_response = {
+      body: {
+        mms_id: mms_id,
+        title: 'The Art of Happiness',
+        author: 'Dalai Lama',
+        publisher_const: 'Riverhead Books',
+        date_of_publication: '1998',
+        complete_edition: '1st',
+        place_of_publication: 'New York',
+        isbn: '9781573221115'
+      }.to_json,
+      code: 200
+    }
+
+    stubbed_response = stub(success?: true, body: success_response[:body], code: success_response[:code])
+    AlmaCourseService.stubs(:get).with(
+      "/bibs/#{mms_id}",
+      query: { apikey: 'test-api-key' },
+      headers: {
+        'Accept' => 'application/json',
+        'Content-Type' => 'application/json'
+      }
+    ).returns(stubbed_response)
+
+    citation = @service.citation_from_mms_id(mms_id)
+
+    assert_equal 'BeingPrepared', citation[:status][:value], 'Expected status to be BeingPrepared'
+    assert_equal 'BK', citation[:type][:value], 'Expected type to be BK'
+    assert_equal 'The Art of Happiness', citation[:metadata][:title], 'Expected title to match'
+    assert_equal 'Dalai Lama', citation[:metadata][:author], 'Expected author to match'
+    assert_equal 'Riverhead Books', citation[:metadata][:publisher], 'Expected publisher to match'
+    assert_equal '1998', citation[:metadata][:publication_date], 'Expected publication date to match'
+    assert_equal '1st', citation[:metadata][:edition], 'Expected edition to match'
+    assert_equal 'New York', citation[:metadata][:place_of_publication], 'Expected place of publication to match'
+    assert_equal '9781573221115', citation[:metadata][:isbn], 'Expected ISBN to match'
+  end
+
+  test 'citation_from_mms_id falls back to get_nz_bibs on get_bib failure' do
+    mms_id = '991022101949705164'
+    error_response = {
+      body: { error: 'Bibliographic record not found' }.to_json,
+      code: 404,
+      message: 'Not Found'
+    }
+    success_response = {
+      body: {
+        bib: [{
+          mms_id: mms_id,
+          title: 'The Art of Happiness',
+          author: 'Dalai Lama',
+          publisher_const: 'Riverhead Books',
+          date_of_publication: '1998'
+        }]
+      }.to_json,
+      code: 200
+    }
+
+    stubbed_error = stub(success?: false, body: error_response[:body], code: error_response[:code], message: error_response[:message])
+    stubbed_success = stub(success?: true, body: success_response[:body], code: success_response[:code])
+
+    AlmaCourseService.stubs(:get).with(
+      "/bibs/#{mms_id}",
+      query: { apikey: 'test-api-key' },
+      headers: {
+        'Accept' => 'application/json',
+        'Content-Type' => 'application/json'
+      }
+    ).returns(stubbed_error)
+
+    AlmaCourseService.stubs(:get).with(
+      "/bibs",
+      query: { apikey: 'test-api-key', nz_mms_id: mms_id },
+      headers: {
+        'Accept' => 'application/json',
+        'Content-Type' => 'application/json'
+      }
+    ).returns(stubbed_success)
+
+    citation = @service.citation_from_mms_id(mms_id)
+
+    assert_equal 'The Art of Happiness', citation[:metadata][:title], 'Expected title to match'
+    assert_equal 'Dalai Lama', citation[:metadata][:author], 'Expected author to match'
+    assert_equal 'Riverhead Books', citation[:metadata][:publisher], 'Expected publisher to match'
+    assert_equal '1998', citation[:metadata][:publication_date], 'Expected publication date to match'
+  end
+
+  test 'citation_from_mms_id falls back to get_cz_bibs on get_bib and get_nz_bibs failure' do
+    mms_id = '991022101949705164'
+    error_response = {
+      body: { error: 'Not found' }.to_json,
+      code: 404,
+      message: 'Not Found'
+    }
+    success_response = {
+      body: {
+        bib: [{
+          mms_id: mms_id,
+          title: 'The Art of Happiness',
+          author: 'Dalai Lama',
+          publisher_const: 'Riverhead Books',
+          date_of_publication: '1998'
+        }]
+      }.to_json,
+      code: 200
+    }
+
+    stubbed_error = stub(success?: false, body: error_response[:body], code: error_response[:code], message: error_response[:message])
+    stubbed_success = stub(success?: true, body: success_response[:body], code: success_response[:code])
+
+    AlmaCourseService.stubs(:get).with(
+      "/bibs/#{mms_id}",
+      query: { apikey: 'test-api-key' },
+      headers: {
+        'Accept' => 'application/json',
+        'Content-Type' => 'application/json'
+      }
+    ).returns(stubbed_error)
+
+    AlmaCourseService.stubs(:get).with(
+      "/bibs",
+      query: { apikey: 'test-api-key', nz_mms_id: mms_id },
+      headers: {
+        'Accept' => 'application/json',
+        'Content-Type' => 'application/json'
+      }
+    ).returns(stubbed_error)
+
+    AlmaCourseService.stubs(:get).with(
+      "/bibs",
+      query: { apikey: 'test-api-key', cz_mms_id: mms_id },
+      headers: {
+        'Accept' => 'application/json',
+        'Content-Type' => 'application/json'
+      }
+    ).returns(stubbed_success)
+
+    citation = @service.citation_from_mms_id(mms_id)
+
+    assert_equal 'The Art of Happiness', citation[:metadata][:title], 'Expected title to match'
+    assert_equal 'Dalai Lama', citation[:metadata][:author], 'Expected author to match'
+    assert_equal 'Riverhead Books', citation[:metadata][:publisher], 'Expected publisher to match'
+    assert_equal '1998', citation[:metadata][:publication_date], 'Expected publication date to match'
+  end
+
+  test 'citation_from_mms_id returns empty citation when all requests fail' do
+    mms_id = '991022101949705164'
+    error_response = {
+      body: { error: 'Not found' }.to_json,
+      code: 404,
+      message: 'Not Found'
+    }
+
+    stubbed_error = stub(success?: false, body: error_response[:body], code: error_response[:code], message: error_response[:message])
+
+    AlmaCourseService.stubs(:get).with(
+      "/bibs/#{mms_id}",
+      query: { apikey: 'test-api-key' },
+      headers: {
+        'Accept' => 'application/json',
+        'Content-Type' => 'application/json'
+      }
+    ).returns(stubbed_error)
+
+    AlmaCourseService.stubs(:get).with(
+      "/bibs",
+      query: { apikey: 'test-api-key', nz_mms_id: mms_id },
+      headers: {
+        'Accept' => 'application/json',
+        'Content-Type' => 'application/json'
+      }
+    ).returns(stubbed_error)
+
+    AlmaCourseService.stubs(:get).with(
+      "/bibs",
+      query: { apikey: 'test-api-key', cz_mms_id: mms_id },
+      headers: {
+        'Accept' => 'application/json',
+        'Content-Type' => 'application/json'
+      }
+    ).returns(stubbed_error)
+
+    citation = @service.citation_from_mms_id(mms_id)
+
+    assert_equal '', citation[:metadata][:title], 'Expected title to be empty'
+    assert_equal '', citation[:metadata][:author], 'Expected author to be empty'
+    assert_equal '', citation[:metadata][:publisher], 'Expected publisher to be empty'
+    assert_equal '', citation[:metadata][:publication_date], 'Expected publication date to be empty'
+  end
+
+  # create_citation_from_mms_id tests
+  test 'create_citation_from_mms_id creates citation successfully' do
+    course_id = '12345'
+    reading_list_id = 'RL-001'
+    mms_id = '991022101949705164'
+    bib_response = {
+      body: {
+        mms_id: mms_id,
+        title: 'The Art of Happiness',
+        author: 'Dalai Lama',
+        publisher_const: 'Riverhead Books',
+        date_of_publication: '1998'
+      }.to_json,
+      code: 200
+    }
+    success_response = {
+      body: {
+        id: 'CIT-001',
+        type: { value: 'BK' },
+        metadata: { title: 'The Art of Happiness', author: 'Dalai Lama' }
+      }.to_json,
+      code: 201
+    }
+
+    stubbed_bib = stub(success?: true, body: bib_response[:body], code: bib_response[:code])
+    stubbed_create = stub(success?: true, body: success_response[:body], code: success_response[:code])
+
+    AlmaCourseService.stubs(:get).with(
+      "/bibs/#{mms_id}",
+      query: { apikey: 'test-api-key' },
+      headers: {
+        'Accept' => 'application/json',
+        'Content-Type' => 'application/json'
+      }
+    ).returns(stubbed_bib)
+
+    AlmaCourseService.stubs(:post).with(
+      "/courses/#{course_id}/reading-lists/#{reading_list_id}/citations?apikey=test-api-key",
+      headers: {
+        'Accept' => 'application/json',
+        'Content-Type' => 'application/json'
+      },
+      body: anything
+    ).returns(stubbed_create)
+
+    result = @service.create_citation_from_mms_id(course_id, reading_list_id, mms_id)
+
+    assert result[:success], 'Expected success to be true'
+    assert_equal 'CIT-001', result[:data][:id], 'Expected citation ID to match'
+    assert_equal 'The Art of Happiness', result[:data][:metadata][:title], 'Expected citation title to match'
+    assert_equal 'Dalai Lama', result[:data][:metadata][:author], 'Expected citation author to match'
+  end
+
+  test 'create_citation_from_mms_id handles API error during citation creation' do
+    course_id = '12345'
+    reading_list_id = 'RL-001'
+    mms_id = '991022101949705164'
+    bib_response = {
+      body: {
+        mms_id: mms_id,
+        title: 'The Art of Happiness',
+        author: 'Dalai Lama',
+        publisher_const: 'Riverhead Books',
+        date_of_publication: '1998'
+      }.to_json,
+      code: 200
+    }
+    error_response = {
+      body: { error: 'Invalid citation data' }.to_json,
+      code: 400,
+      message: 'Bad Request'
+    }
+
+    stubbed_bib = stub(success?: true, body: bib_response[:body], code: bib_response[:code])
+    stubbed_error = stub(success?: false, body: error_response[:body], code: error_response[:code], message: error_response[:message])
+
+    AlmaCourseService.stubs(:get).with(
+      "/bibs/#{mms_id}",
+      query: { apikey: 'test-api-key' },
+      headers: {
+        'Accept' => 'application/json',
+        'Content-Type' => 'application/json'
+      }
+    ).returns(stubbed_bib)
+
+    AlmaCourseService.stubs(:post).with(
+      "/courses/#{course_id}/reading-lists/#{reading_list_id}/citations?apikey=test-api-key",
+      headers: {
+        'Accept' => 'application/json',
+        'Content-Type' => 'application/json'
+      },
+      body: anything
+    ).returns(stubbed_error)
+
+    result = @service.create_citation_from_mms_id(course_id, reading_list_id, mms_id)
+
+    assert_not result[:success], 'Expected success to be false'
+    assert_equal 400, result[:error], 'Expected error code to be 400'
+    assert_equal 'Bad Request', result[:message], 'Expected error message to match'
+    assert_equal 'Invalid citation data', result[:details][:error], 'Expected error details to match'
+  end
+
+  test 'create_citation_from_mms_id handles failure to retrieve bib data' do
+    course_id = '12345'
+    reading_list_id = 'RL-001'
+    mms_id = '991022101949705164'
+    error_response = {
+      body: { error: 'Not found' }.to_json,
+      code: 404,
+      message: 'Not Found'
+    }
+    success_response = {
+      body: {
+        id: 'CIT-001',
+        type: { value: 'BK' },
+        metadata: { title: '', author: '' }
+      }.to_json,
+      code: 201
+    }
+
+    stubbed_error = stub(success?: false, body: error_response[:body], code: error_response[:code], message: error_response[:message])
+    stubbed_success = stub(success?: true, body: success_response[:body], code: success_response[:code])
+
+    AlmaCourseService.stubs(:get).with(
+      "/bibs/#{mms_id}",
+      query: { apikey: 'test-api-key' },
+      headers: {
+        'Accept' => 'application/json',
+        'Content-Type' => 'application/json'
+      }
+    ).returns(stubbed_error)
+
+    AlmaCourseService.stubs(:get).with(
+      "/bibs",
+      query: { apikey: 'test-api-key', nz_mms_id: mms_id },
+      headers: {
+        'Accept' => 'application/json',
+        'Content-Type' => 'application/json'
+      }
+    ).returns(stubbed_error)
+
+    AlmaCourseService.stubs(:get).with(
+      "/bibs",
+      query: { apikey: 'test-api-key', cz_mms_id: mms_id },
+      headers: {
+        'Accept' => 'application/json',
+        'Content-Type' => 'application/json'
+      }
+    ).returns(stubbed_error)
+
+    AlmaCourseService.stubs(:post).with(
+      "/courses/#{course_id}/reading-lists/#{reading_list_id}/citations?apikey=test-api-key",
+      headers: {
+        'Accept' => 'application/json',
+        'Content-Type' => 'application/json'
+      },
+      body: anything
+    ).returns(stubbed_success)
+
+    result = @service.create_citation_from_mms_id(course_id, reading_list_id, mms_id)
+
+    assert result[:success], 'Expected success to be true'
+    assert_equal 'CIT-001', result[:data][:id], 'Expected citation ID to match'
+    assert_equal '', result[:data][:metadata][:title], 'Expected citation title to be empty'
+    assert_equal '', result[:data][:metadata][:author], 'Expected citation author to be empty'
   end
 end
