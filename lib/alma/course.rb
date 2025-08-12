@@ -150,27 +150,5 @@ module Alma
         Rails.logger.info("📚 Old reading list #{old_reading_list_id} not empty (#{remaining.size} left). Not deleting.")
       end
     end
-
-    private
-
-    def self.convert_alma_item_to_citation(alma_item)
-      {
-        "type" => alma_item["type"] || { "value" => "BK" },
-        "link" => "",
-        "status" => { "value" => "BeingPrepared" },
-        "copyrights_status" => { "value" => "NOTDETERMINED" },
-        "secondary_type" => alma_item["secondary_type"] || alma_item["type"] || { "value" => "BK" },
-        "metadata" => {
-          "title" => alma_item.dig("metadata", "title") || alma_item["title"],
-          "author" => alma_item.dig("metadata", "author") || alma_item["author"],
-          "publisher" => alma_item.dig("metadata", "publisher") || alma_item["publisher"],
-          "publication_date" => alma_item.dig("metadata", "publication_date") || alma_item["publication_date"],
-          "edition" => alma_item.dig("metadata", "edition") || "",
-          "isbn" => alma_item.dig("metadata", "isbn") || alma_item["isbn"],
-          "call_number" => alma_item.dig("metadata", "call_number") || alma_item["call_number"],
-          "year" => alma_item.dig("metadata", "year") || alma_item.dig("metadata", "publication_date")
-        }
-      }
-    end
   end
 end
