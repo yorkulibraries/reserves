@@ -7,34 +7,6 @@ module Alma
   class User
     extend Alma::ApiDefaults
 
-    def self.get_all_instructors
-      results = []
-      offset = 0
-      limit = 100
-    
-      loop do
-        uri = URI("#{base_path}/users")
-        uri.query = URI.encode_www_form({
-          user_type: 'Instructor',
-          view: 'full',
-          limit: limit,
-          offset: offset
-        })
-    
-        response = perform_get_request(uri)
-        parsed = parse_json(response.body)
-    
-        break unless parsed["user"]&.any?
-    
-        results.concat(parsed["user"])
-        offset += limit
-      end
-    
-      results
-    end
-     
-
-
     def self.find_by_primary_id(primary_id:)
       uri = URI("#{base_path}/users/#{primary_id}")
       response = perform_get_request(uri)
