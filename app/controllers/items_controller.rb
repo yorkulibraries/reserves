@@ -56,11 +56,14 @@ class ItemsController < ApplicationController
     @item = @request.items.new(item_params)
     @item.status = Item::STATUS_NOT_READY
     @item.audit_comment = "Added Item: #{@item.title}"
-
+    
     respond_to do |format|
       if @item.save
         @request.reload
         RequestMailer.new_item_notification(@request, @item).deliver_later
+
+        AddCitationJob.perform_later(@item.id, current_user.id)
+        #Alma::AlmaSync.sync_item(@item, current_user)
 
         @notes = {}
         @notes[@item.id] = Audited::Audit.where(
@@ -98,6 +101,21 @@ class ItemsController < ApplicationController
   # DELETE /items/1.json
   def destroy
     @item.audit_comment = "Item #{@item.title} removed from request"
+  
+    if @item.alma_citation_id.present?
+      success = Alma::ReadingList.delete_citation(
+        course_id:       @request.alma_course_id,
+        reading_list_id: @request.alma_reading_list_id,
+        citation_id:     @item.alma_citation_id
+      )
+  
+      if success
+        @item.update_column(:alma_citation_id, nil)
+      else
+        Rails.logger.warn("⚠️ Failed to delete citation in Alma for Item##{@item.id}")
+      end
+    end
+  
     @item.destroy
     @request.reload
     respond_to do |format|

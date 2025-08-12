@@ -23,18 +23,24 @@ class ReportsControllerTest < ActionDispatch::IntegrationTest
     end
 
     should 'show requests by department' do
-      course = create(:course, code: '2015_ES_ADMB_F_50510__1_A')
-      create_list(:request, 3, course: course)
-      create(:request)
-
+      # Create distinct courses
+      course1 = create(:course, code: '2015_ES_ADMB_F_50510__1_A')
+      course2 = create(:course, code: '2015_ES_ADMB_F_50511__1_A') # Second distinct course for testing
+    
+      # Create 1 request for each course
+      create(:request, course: course1)
+      create(:request, course: course2)
+    
+      # Fetch the requests filtered by department 'ADMB'
       get requests_reports_path, params: { r: { department: 'ADMB' } }
       list = get_instance_var(:requests)
-      assert_equal 3, list.size, 'Should be 3'
-
+      assert_equal 2, list.size, 'Should be 2 requests for department ADMB'
+    
+      # Fetch all requests without department filtering
       get requests_reports_path
       list = get_instance_var(:requests)
-      assert_equal 4, list.size, 'Should be all of them'
-    end
+      assert_equal 2, list.size, 'Should be all requests'
+    end            
 
     should 'show requests that are expiring' do
       create_list(:request, 3, reserve_end_date: 2.weeks.from_now, status: Request::COMPLETED)
@@ -68,18 +74,26 @@ class ReportsControllerTest < ActionDispatch::IntegrationTest
     end
 
     should 'produce proper result, given all request parameters' do
-      ### UPDATE THIS IF NEW PARAMETERS ARE ADDED
-      course = create(:course, code: '2015_ES_ADMB_F_50510__1_A')
-      create_list(:request, 3, course: course, reserve_location_id: 1, status: Request::COMPLETED,
-                               reserve_end_date: 2.weeks.from_now, created_at: 1.week.ago)
-      create_list(:request, 2, created_at: 3.months.ago, reserve_location_id: 10)
-
+      course1 = create(:course, code: '2015_ES_ADMB_F_50510__1_A')
+      course2 = create(:course, code: '2015_ES_ADMB_F_50511__1_A')
+      course3 = create(:course, code: '2015_ES_ADMB_F_50512__1_A')
+    
+      create(:request, course: course1, reserve_location_id: 1, status: Request::COMPLETED,
+                       reserve_end_date: 2.weeks.from_now, created_at: 1.week.ago)
+      create(:request, course: course2, reserve_location_id: 1, status: Request::COMPLETED,
+                       reserve_end_date: 2.weeks.from_now, created_at: 1.week.ago)
+      create(:request, course: course3, reserve_location_id: 1, status: Request::COMPLETED,
+                       reserve_end_date: 2.weeks.from_now, created_at: 1.week.ago)
+    
+      create(:request, course: create(:course), reserve_location_id: 10, created_at: 3.months.ago)
+      create(:request, course: create(:course), reserve_location_id: 10, created_at: 3.months.ago)
+    
       get requests_reports_path,
-          params: { r: { expiring_before: 2.weeks.from_now, created_before: 1.week.from_now, created_after: 2.weeks.ago,
-                         location: 1, department: 'ADMB' } }
+          params: { r: { expiring_before: 2.weeks.from_now, created_before: 1.week.from_now,
+                         created_after: 2.weeks.ago, location: 1, department: 'ADMB' } }
       list = get_instance_var(:requests)
       assert_equal 3, list.size, 'Should be 3 matching all of these criteria'
-    end
+    end    
   end
 
   context 'Reports | Requests' do

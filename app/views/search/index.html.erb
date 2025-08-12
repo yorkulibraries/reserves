@@ -54,14 +54,24 @@
           </td>
 
           <td class="course">
-            <a class="name" href="<%= request_path(request) %>"><%= request.course.name %></a>
-            <div class="text-muted"><%= request.course.code %></div>
+            <% if request.course %>
+              <a class="name" href="<%= request_path(request) %>"><%= request.course.name %></a>
+              <div class="text-muted"><%= request.course.code %></div>
+            <% else %>
+              <span>No Course Assigned</span>
+            <% end %>
           </td>
+
 
           <td class="course">
             <span class="text-muted">Instructor</span><br/>
-            <span class="fw-bold"><%= request.course.instructor %></span>
+            <% if request.course %>
+              <span class="fw-bold"><%= request.course.instructor %></span>
+            <% else %> 
+              <span class="text-muted">No Instructor Assigned</span>
+            <% end %>
           </td>
+
 
           <td class="requestor">
             <span class="name"><%= request.requester.name %></span><br/>

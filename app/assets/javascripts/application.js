@@ -11,8 +11,9 @@
 // about supported directives.
 //
 //= require underscore
-//= require jquery
-// require jquery3
+//= require jquery3
+// require jquery
+//= require jquery-ui
 //= require popper
 //= require bootstrap
 //= require jquery_ujs
@@ -23,7 +24,9 @@
 //= require_tree .
 
 
+
 $(document).ready(function () {
+	  
 
 	$('.datepicker').datepicker({ dateFormat: 'yy-mm-dd' });
 

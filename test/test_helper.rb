@@ -7,8 +7,7 @@ require 'rails/test_help'
 require 'factory_girl_rails'
 require 'minitest/unit'
 require 'database_cleaner/active_record'
-
-# Configure shoulda-matchers to use Minitest
+require 'mocha/minitest'
 require 'shoulda/matchers'
 
 DatabaseCleaner.url_allowlist = [

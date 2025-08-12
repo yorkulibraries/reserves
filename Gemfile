@@ -41,7 +41,7 @@ gem 'caxlsx', '3.2.0'
 gem 'caxlsx_rails', '0.6.3'
 
 ## EX LIBRIS INTEGRATION ALMA, PRIMO
-gem 'alma', '~> 0.3.3'
+gem 'alma'
 gem 'primo', git: 'https://github.com/tulibraries/primo.git', branch: 'main'
 
 ## SEARCH - USING ELASTIC SEARCH
@@ -54,6 +54,8 @@ gem 'yaml_db', '~> 0.7.0'
 
 # NOTIFICATIONS
 gem 'exception_notification', '~> 4.5'
+
+#gem 'select2-rails'
 
 ## TESTING && DEVELOPMENT ##
 gem 'rb-readline'

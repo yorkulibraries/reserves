@@ -1,9 +1,8 @@
 # frozen_string_literal: true
 
 class Course < ApplicationRecord
-  searchkick word_start: [:name, :instructor],
-             text_middle: [:code],
-             callbacks: :async
+  searchkick word_start: [:name, :instructor, :code],
+             callbacks: :async       
   # COURSE FORMAT
   # YEAR_FACULTY_SUBJECT_TERM_COURSEID__CREDITS_SECTION    i.e. 2013_GL_ECON_S1_2500__3_A ignoring EN_A_LECT_01
 
@@ -21,19 +20,29 @@ class Course < ApplicationRecord
 
   TERMS = %w[F W FW Y S SU S1 S2].freeze
   TERM_NAMES = %w[Fall Winter Fall/Winter Year Summer Summer1 Summer2].freeze
+
+  TERM_NAME_TO_CODE = {
+    "Fall" => "F",
+    "Winter" => "W",
+    "Fall/Winter" => "FW",
+    "Year" => "Y",
+    "Summer" => "S",
+    "Summer1" => "S1",
+    "Summer2" => "S2"
+  }.freeze
   TERM_CREDITS = %w[1 3 4 6 9].freeze
   SUBJECTS ||= IO.readlines("#{Rails.root}/lib/course_subjects.txt").collect(&:strip)
 
   # VALIDATIONS
   validates_uniqueness_of :code, message: 'Duplicate Course Code, Someone Has Made a Request For that Course.'
 
-  validates_presence_of :name, :code, :student_count, :instructor
-  validates_presence_of :year, :faculty, :subject, :term, :credits, :section
+  #validates_presence_of :name, :code, :student_count, :instructor
+  #validates_presence_of :year, :faculty, :subject, :term, :credits, :section
   validates_presence_of :course_id, message: 'Course Number is required'
-  validates :code, format: { without: /\s/ }
+  validates :code, format: { without: /\s/, message: "cannot contain spaces" }
   validates_numericality_of :course_id, message: 'Course Number must be a number'
-  validates_numericality_of :year, message: 'Year must be a number'
-  validates_numericality_of :credits, message: 'Credits must be a number'
+  #validates_numericality_of :year, message: 'Year must be a number'
+  #validates_numericality_of :credits, message: 'Credits must be a number'
   validates_numericality_of :student_count, message: 'Enrollment must be a number'
   validates_numericality_of :student_count, greater_than: 0, message: 'Student Enrollment must be greater than 0'
 
@@ -95,33 +104,32 @@ class Course < ApplicationRecord
   end
 
   def credits
+    get_value_from_code(5)
+  end
+  
+  def credits=(credits)
+    insert_into_code(5, credits)
+  end
+  
+  def section
     get_value_from_code(6)
   end
-
-  def credits=(credits)
-    insert_into_code(6, credits)
-  end
-
-  def section
-    get_value_from_code(7)
-  end
-
+  
   def section=(section)
-    insert_into_code(7, section)
-  end
+    insert_into_code(6, section)
+  end  
 
   ####### HELPER METHODS #########
 
-  def get_value_from_code(position)
-    self.code = '_______'   if code.blank?
-    code.split('_')[position]
-  end
-
   def insert_into_code(position, value)
-    self.code = '_______'   if code.blank?
-    broken = code.split('_')
-    broken[position] = value
+    broken = code&.split('_') || Array.new(7, "")
+    broken[position] = value.to_s.strip
     self.code = broken.join('_')
+  end
+  
+  def get_value_from_code(position)
+    broken = code&.split('_') || Array.new(7, "")
+    broken[position]
   end
 
   def rollover(course_year = '', course_term = '', course_section = '', course_credits = '')

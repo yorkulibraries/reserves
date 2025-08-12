@@ -6,18 +6,25 @@ class SearchControllerTest < ActionDispatch::IntegrationTest
   setup do
     @user = create(:user, admin: true, role: User::MANAGER_ROLE)
     log_user_in(@user)
+
+    Request.reindex
   end
 
   should 'search by id' do
     r = create(:request)
 
+    Request.reindex
+  
     get search_path, params: { q: r.id, type: "requests", search_type: 'request' }
-
+  
     requests = get_instance_var(:requests)
+  
     assert requests, 'Requests should not be nil'
+    
     assert_equal 1, requests.size, 'Only one'
+  
     assert_equal r.id, requests.first.id, 'Matching'
-  end
+  end  
 
   should "search by instructor name or course title" do
     c = create(:course, instructor: "John Terry", name: "Football Tacticts")

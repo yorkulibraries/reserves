@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
 require 'test_helper'
+require 'alma/alma_sync'
+require 'alma/reading_list'
+
+
 
 class RequestsControllerTest < ActionDispatch::IntegrationTest
   context 'CRUD Tests' do
@@ -51,6 +55,69 @@ class RequestsControllerTest < ActionDispatch::IntegrationTest
       assert_not_equal old_request_reserve_start_date, r.reserve_start_date, 'Old reserve start date is not there'
       assert_equal '2014-09-15', r.reserve_start_date.strftime('%Y-%m-%d'), 'Reserve date was updated'
     end
+
+    should 'sync with Alma when course_id changes on update' do
+      old_course = create(:course)
+      new_course = create(:course)
+    
+      request = create(:request, course: old_course)
+    
+      Alma::AlmaSync.expects(:sync_request).with(request, @user)
+    
+      patch request_path(request), params: {
+        request: {
+          course_id: new_course.id,
+          reserve_start_date: request.reserve_start_date
+        }
+      }
+    
+      assert_redirected_to request_path(request)
+      request.reload
+      assert_equal new_course.id, request.course_id
+    end    
+
+    should 'not sync with Alma if course_id stays the same' do
+      course = create(:course)
+      request = create(:request, course: course)
+    
+      Alma::AlmaSync.expects(:sync_request).never
+    
+      patch request_path(request), params: {
+        request: {
+          course_id: course.id,
+          reserve_start_date: request.reserve_start_date
+        }
+      }
+    
+      assert_redirected_to request_path(request)
+    end    
+
+    should 'call Alma::ReadingList.delete when archiving a completed request' do
+      request = create(:request, status: Request::COMPLETED, alma_course_id: 'COURSE123', alma_reading_list_id: 'LIST456')
+    
+      Alma::ReadingList.expects(:delete)
+        .with(course_id: 'COURSE123', reading_list_id: 'LIST456')
+        .returns(true)
+    
+      get archive_request_path(request)
+    
+      r = get_instance_var(:request)
+      assert_equal Request::REMOVED, r.status
+      assert_equal Date.today.beginning_of_day, r.removed_at.beginning_of_day
+    end     
+
+    should 'still archive request even if Alma::ReadingList.delete fails' do
+      request = create(:request, status: Request::COMPLETED, alma_course_id: 'COURSE123', alma_reading_list_id: 'LIST456')
+    
+      Alma::ReadingList.expects(:delete)
+        .with(course_id: 'COURSE123', reading_list_id: 'LIST456') 
+        .returns(false)    
+    
+      get archive_request_path(request)
+    
+      r = get_instance_var(:request)
+      assert_equal Request::REMOVED, r.status
+    end    
 
     should 'destroy request' do
       request = create(:request)

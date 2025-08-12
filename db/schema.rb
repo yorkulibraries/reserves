@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2025_02_04_150650) do
+ActiveRecord::Schema[7.0].define(version: 2025_06_25_151515) do
   create_table "acquisition_requests", id: :integer, charset: "utf8mb3", collation: "utf8mb3_unicode_ci", force: :cascade do |t|
     t.integer "item_id"
     t.integer "requested_by_id"
@@ -66,6 +66,7 @@ ActiveRecord::Schema[7.0].define(version: 2025_02_04_150650) do
     t.string "code_term"
     t.string "code_credits"
     t.string "code_section"
+    t.string "alma_instructor_id"
   end
 
   create_table "courses_faculties", charset: "latin1", force: :cascade do |t|
@@ -112,6 +113,7 @@ ActiveRecord::Schema[7.0].define(version: 2025_02_04_150650) do
     t.string "ils_barcode"
     t.boolean "physical_copy_required", default: false
     t.string "other_isbn_issn"
+    t.string "alma_citation_id"
   end
 
   create_table "loan_periods", id: :integer, charset: "utf8mb3", force: :cascade do |t|
@@ -154,6 +156,8 @@ ActiveRecord::Schema[7.0].define(version: 2025_02_04_150650) do
     t.datetime "rolledover_at"
     t.datetime "removed_at"
     t.integer "removed_by_id"
+    t.string "alma_course_id"
+    t.string "alma_reading_list_id"
   end
 
   create_table "settings", id: :integer, charset: "utf8mb3", force: :cascade do |t|
@@ -183,7 +187,6 @@ ActiveRecord::Schema[7.0].define(version: 2025_02_04_150650) do
     t.datetime "last_login"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.boolean "is_reserves_staff"
     t.string "encrypted_password", default: "", null: false
     t.string "username", null: false
     t.integer "sign_in_count", default: 0, null: false
@@ -195,6 +198,7 @@ ActiveRecord::Schema[7.0].define(version: 2025_02_04_150650) do
     t.string "unlock_token"
     t.datetime "locked_at"
     t.string "univ_id"
+    t.boolean "is_reserves_staff"
     t.index ["univ_id"], name: "index_users_on_univ_id", unique: true
     t.index ["username"], name: "index_users_on_username", unique: true
   end

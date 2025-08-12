@@ -32,8 +32,32 @@
 // @import "themes/bootstrap45/common";
 // @import "themes/bootstrap45/forms";
 
+//@import "select2";
 
 // TBD
 // @import "common";
 // @import "forms";
 // @import "layout";
+
+// Custom inline styles
+
+  /* limit the height of the jQuery UI autocomplete menu and make it scroll */
+  .ui-autocomplete {
+    max-height: 200px;     /* adjust to whatever height you want */
+    overflow-y: auto;      /* vertical scroll */
+    overflow-x: hidden;    /* no horizontal scroll */
+    padding-right: 20px;   /* avoid cutting off text on the scrollbar */
+    z-index: 1000;         /* ensure it sits above other elements */
+  }
+  .ui-autocomplete {
+    list-style: none;   /* no bullets */
+    margin: 0;
+    padding: 0;
+  }
+
+  .ui-autocomplete li {
+    list-style: none;   /* just in case */
+    margin: 0;
+    padding: .2em .5em; /* your prefered spacing */
+  }
+

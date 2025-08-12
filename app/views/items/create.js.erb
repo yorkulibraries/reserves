@@ -1,11 +1,11 @@
 <% if @item.errors.size == 0 %>
 
-	if ($(".items-empty-slate").size() > 0) {
+	if ($(".items-empty-slate").length > 0) {
 		$(".items-empty-slate").before("<div class='items'></div>");
 		$(".items-empty-slate").remove();
 		$("#submit_request_button").removeClass("hide");
 	}
-
+	alert("Your item is being processed. It will appear in Alma shortly.");
 	bootstrap_modal_close("item_form");
 
 	$(".items").prepend("<%= j render @item, locals: { item: @item } %>");

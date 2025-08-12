@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Request < ApplicationRecord
-
+  validate :one_request_per_course, on: :create
   searchkick callbacks: :async
 
   ## CONSTANTS
@@ -39,7 +39,7 @@ class Request < ApplicationRecord
 
   ## VALIDATIONS
 
-  validates :course, presence: { message: 'Cannot be empty' }
+  validates :course, presence: { message: 'Cannot be empty' }, on: :create
   # :requester_id, :course_id, :item_id ,:assigned_to_id, :department_id,
   validates_presence_of :reserve_start_date, :reserve_location_id, :course, :reserve_end_date,
                         message: 'Cannot be empty'
@@ -138,10 +138,19 @@ class Request < ApplicationRecord
   ### ELASRTIC SEARCH HELPERS ##
   def search_data
     {
-      course_name: course.name,
-      course_code: course.code,
-      course_instructor: course.instructor,
-      requester_name: requester.name
+      course_name: course&.name || 'No Course Assigned',
+      course_code: course&.code || 'Unknown Code',
+      course_instructor: course&.instructor || 'No Instructor Assigned',
+      requester_name: requester&.name || 'Unknown Requester'
     }
+  end    
+
+  private
+
+  def one_request_per_course
+    return unless course_id.present?
+    if Request.exists?(course_id: course_id)
+      errors.add(:course_id, "already has a request")
+    end
   end
 end

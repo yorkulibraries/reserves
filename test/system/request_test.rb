@@ -12,8 +12,12 @@ class RequestTest < ApplicationSystemTestCase
     @admin_user = create(:user, admin: true, role: User::MANAGER_ROLE)
     @user = FactoryGirl.create(:user, role: User::INSTRUCTOR_ROLE)
     FactoryGirl.create(:loan_period)
-    @request_open = FactoryGirl.create(:request, requester: @user)
-    @request_completed = FactoryGirl.create(:request, status: Request::COMPLETED, requester: @user)
+
+    @course = create(:course, code: '2025_GL_ECON_S1_2500__3_A')
+    @course1 = create(:course, code: '2025_GL_ECON_S1_2500__3_B')
+
+    @request_open = create(:request, requester: @user, course: @course)
+    @request_completed = create(:request, status: Request::COMPLETED, requester: @user, course: @course1)
 
     @item_open = FactoryGirl.create(:item, request: @request_open)
     @item_completed = FactoryGirl.create(:item, request: @request_completed)
@@ -42,6 +46,22 @@ class RequestTest < ApplicationSystemTestCase
 
   end
 
+  test 'search for non-existing course' do
+    login_as(@user)
+    visit root_url
+
+    click_link('New Request')
+
+    # Search for a non-existing course
+    fill_in 'request_course_id', with: 'Non-existing Course'
+
+    # Submit the form
+    click_button 'Continue to Step Two'
+
+    # Ensure that an appropriate error message is displayed for no results
+    assert_text 'No course found matching your search'
+  end
+
   test 'Submit empty request' do
     login_as(@user)
     visit root_url
@@ -53,8 +73,7 @@ class RequestTest < ApplicationSystemTestCase
     click_button 'Continue to Step Two'
 
     assert_text "Submit New Request - Step One"
-    assert_text "can't be blank"
-    assert_text "Cannot be empty"
+    assert_text "Course cannot be empty"
   end
 
   test 'Complete step one' do
@@ -63,15 +82,8 @@ class RequestTest < ApplicationSystemTestCase
 
     click_link('New Request')
     academic_year = "#{Time.current.year}/#{Time.current.year + 1}"
-    fill_in 'request_course_attributes_name', with: 'Course Title'
-    select academic_year, from: 'request_course_attributes_year'
-    select "AP", from: 'request_course_attributes_faculty'
-    select "ACTG", from: 'request_course_attributes_subject'
-    fill_in 'request_course_attributes_course_id', with: '1234'
-    select "F", from: 'request_course_attributes_term'
-    select "1", from: 'request_course_attributes_credits'
-    select "A", from: 'request_course_attributes_section'
-    fill_in 'request_course_attributes_instructor', with: 'Mr Instructor'
+    fill_in 'request_course_id', with: 'ECON', wait: 5
+
     fill_in 'request_course_attributes_student_count', with: '1234'
     fill_in 'request_requester_email', with: 'email@test.com'
     first_option = find('#request_reserve_location_id').all('option')[1]
@@ -88,15 +100,7 @@ class RequestTest < ApplicationSystemTestCase
 
     click_link('New Request')
     academic_year = "#{Time.current.year}/#{Time.current.year + 1}"
-    fill_in 'request_course_attributes_name', with: 'Course Title'
-    select academic_year, from: 'request_course_attributes_year'
-    select "AP", from: 'request_course_attributes_faculty'
-    select "ACTG", from: 'request_course_attributes_subject'
-    fill_in 'request_course_attributes_course_id', with: '1234'
-    select "F", from: 'request_course_attributes_term'
-    select "1", from: 'request_course_attributes_credits'
-    select "A", from: 'request_course_attributes_section'
-    fill_in 'request_course_attributes_instructor', with: 'Mr Instructor'
+    fill_in 'request_course_id', with: 'ECON'
     fill_in 'request_course_attributes_student_count', with: '1234'
     fill_in 'request_requester_email', with: 'email@test.com'
     first_option = find('#request_reserve_location_id').all('option')[1]
@@ -133,43 +137,42 @@ class RequestTest < ApplicationSystemTestCase
     assert_text 'Course Title'
   end
 
+  
   test 'Update request details' do
+    # Ensure the autocomplete endpoint has data to return
+    Course.reindex
+  
     login_as(@user)
     visit root_url
-
-    within('table.request tbody') do
-      first('a.name').click
-    end
-
+  
+    within('table.request tbody') { first('a.name').click }
     click_link 'Update Request'
-
     assert_text 'Make Changes To Request'
-
-    fill_in 'request_course_attributes_name', with: 'Course Title Update'
-    fill_in 'request_course_attributes_instructor', with: 'Instructor Update'
-
-    academic_year = "#{Time.current.year}/#{Time.current.year + 1}"
-    select academic_year, from: 'request_course_attributes_year'
-
+  
+    field = find('#request_course_search', visible: true)
+    field.click
+  
+    # Type slowly to guarantee key events & minLength(4) behavior
+    '2025_GL_ECON'.each_char { |ch| field.send_keys(ch) }
+  
+    # Wait for any suggestion to appear (the wrapper is the clickable element)
+    assert_selector('ul.ui-autocomplete li .ui-menu-item-wrapper', wait: 10)
+  
+    # Option A (most resilient): use keyboard to select the first suggestion
+    field.send_keys(:arrow_down, :enter)
+  
+    # OR Option B (explicit match): click a specific suggestion text
+    # find('ul.ui-autocomplete li .ui-menu-item-wrapper',
+    #      text: '2025_GL_ECON_S1_2500__3_A', match: :first).click
+  
+    # Now the hidden field should be set by your select handler
+    assert_field('request_course_attributes_course_id',
+                 with: @course.id.to_s,
+                 visible: :all)
+  
     click_button 'Update Request Details'
-
     assert_text 'Request was successfully updated.'
-    assert_text 'Course Title Update'
-    assert_text 'Instructor Update'
-  end
-
-  test 'Attemping alphabetic course number' do
-    login_as(@user)
-    visit root_url
-
-    click_link('New Request')
-
-    assert_text "Submit New Request - Step One"
-
-    fill_in 'request_course_attributes_course_id', with: 'ABCD'
-
-    assert_equal "", find_field('request_course_attributes_course_id').value
-  end
+  end            
 
   test 'Update request item' do
     login_as(@user)

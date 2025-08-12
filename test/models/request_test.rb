@@ -151,4 +151,25 @@ class RequestTest < ActiveSupport::TestCase
 
     assert_equal open_requests.size + incomplete_current.size, Request.all.size
   end
+
+  should 'not allow more than one request per course' do
+    course = create(:course)
+    user_1 = create(:user)
+    user_2 = create(:user)
+
+    first_request = create(:request, course: course, requester: user_1)
+
+    # Second request with same course but different user
+    second_request = build(:request, course: course, requester: user_2)
+
+    assert_not second_request.valid?, 'Second request for same course should be invalid'
+    assert_includes second_request.errors[:course_id], 'already has a request'
+  end
+
+  should 'allow request if course has no other requests' do
+    course = create(:course)
+    request = build(:request, course: course)
+    
+    assert request.valid?, 'Request should be valid when no existing request exists for course'
+  end
 end

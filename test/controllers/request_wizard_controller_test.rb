@@ -22,7 +22,7 @@ class RequestWizardControllerTest < ActionDispatch::IntegrationTest
   should 'create the request from step one and move onto step two (set status to INCOMPLETE)' do
     assert_difference('Request.count') do
       request_attributes = attributes_for(:request, reserve_location_id: @location.id)
-      request_attributes[:course_attributes] = attributes_for(:course)
+      request_attributes[:course_attributes] = { course_id: @course.id }
       request_attributes[:user] = { office: '1234 building', department: 'Department of sorts', phone: '1232312312321' }
 
       post new_request_step_one_save_path, params: { request: request_attributes }
@@ -36,19 +36,22 @@ class RequestWizardControllerTest < ActionDispatch::IntegrationTest
 
   should 'create a new course with the same user and reuse it by avoiding diplay an error message' do
     request_attributes = attributes_for(:request, reserve_location_id: @location.id)
-    request_attributes[:course_attributes] = attributes_for(:course)
+    request_attributes[:course_attributes] = { course_id: @course.id }
     request_attributes[:user] = { office: '1234 building', department: 'Department of sorts', phone: '1232312312321' }
 
     post new_request_step_one_save_path, params: { request: request_attributes }
-    request = get_instance_var(:request)
-    assert_equal 0, request.errors.size, "Should be no errors, #{request.errors.messages.inspect}"
+
+    existing = get_instance_var(:request)
+
     post new_request_step_one_save_path, params: { request: request_attributes }
-    assert_redirected_to new_request_step_two_path(request), 'Should redirect to Step Two'
+  
+    assert_redirected_to request_path(existing), 'Should redirect to existing request'
+    assert_equal 'You already have a request for that course.', flash[:notice]
   end
 
   should 'not create a new course with a different user and diplay an error message' do
     request_attributes = attributes_for(:request, reserve_location_id: @location.id)
-    request_attributes[:course_attributes] = attributes_for(:course)
+    request_attributes[:course_attributes] = { course_id: @course.id }
     request_attributes[:user] = { office: '1234 building', department: 'Department of sorts', phone: '1232312312321' }
 
     post new_request_step_one_save_path, params: { request: request_attributes }
@@ -58,24 +61,21 @@ class RequestWizardControllerTest < ActionDispatch::IntegrationTest
     logout
     log_user_in(@user2)
     post new_request_step_one_save_path, params: { request: request_attributes }
-    request = get_instance_var(:request)
 
-    assert_response :success
-    assert_equal 1, request.errors.size, "Should be 1 error, #{request.errors.messages.inspect}"
+    assert_redirected_to request_path(Request.find_by(course_id: @course.id))
+    assert_equal 'You already have a request for that course.', flash[:notice]
   end
 
   should 'handle empty new request' do
     assert_no_difference('Request.count') do
       request_attributes = attributes_for(:request, reserve_location_id: @location.id)
-      request_attributes[:course_attributes] = attributes_for(:course, name: '', code: '')
+      request_attributes[:course_attributes] = { course_id: nil }
       request_attributes[:user] = { office: '', department: '', phone: '' }
 
       post new_request_step_one_save_path, params: { request: request_attributes }
-      request = get_instance_var(:request)
-      assert_not_empty request.errors, 'There should be validation errors'
 
       assert_response :success
-      assert_match /can&#39;t be blank/, @response.body
+      assert_match /Course not found/, @response.body
     end
 
   end
@@ -126,4 +126,77 @@ class RequestWizardControllerTest < ActionDispatch::IntegrationTest
     assert_match /You must add at least one active item for this request to be submitted!/, @response.body
   end
 
+  should 'not allow saving if course_id is invalid' do
+    request_attributes = attributes_for(:request, reserve_location_id: @location.id)
+    request_attributes[:course_attributes] = { course_id: 9999 } # invalid ID
+    request_attributes[:user] = { office: '', department: '', phone: '' }
+  
+    assert_no_difference('Request.count') do
+      post new_request_step_one_save_path, params: { request: request_attributes }
+    end
+  
+    assert_response :success
+    assert_match /Course not found/, @response.body
+  end
+  
+  should 'redirect to existing request if one already exists for course_id' do
+    course = create(:course)
+    existing_request = create(:request, course: course)
+  
+    request_attributes = attributes_for(:request, reserve_location_id: @location.id)
+    request_attributes[:course_attributes] = { course_id: course.id }
+    request_attributes[:user] = { office: '', department: '', phone: '' }
+  
+    post new_request_step_one_save_path, params: { request: request_attributes }
+  
+    assert_redirected_to request_path(existing_request)
+    assert_equal 'You already have a request for that course.', flash[:notice]
+  end
+  
+  should 'call Alma::AlmaSync.sync_request on successful save' do
+    course = create(:course)
+    request_attributes = attributes_for(:request, reserve_location_id: @location.id)
+    request_attributes[:course_attributes] = { course_id: course.id }
+    request_attributes[:user] = { office: '', department: '', phone: '' }
+  
+    Alma::AlmaSync.expects(:sync_request).once
+  
+    post new_request_step_one_save_path, params: { request: request_attributes }
+  
+    request = get_instance_var(:request)
+    assert_redirected_to new_request_step_two_path(request)
+  end
+
+  should 'update current user contact details during save' do
+    course = create(:course)
+    user_attrs = { office: 'New Tower', department: 'New Dept', phone: '9876543210' }
+  
+    request_attributes = attributes_for(:request, reserve_location_id: @location.id)
+    request_attributes[:course_attributes] = { course_id: course.id }
+    request_attributes[:user] = user_attrs
+  
+    post new_request_step_one_save_path, params: { request: request_attributes }
+  
+    @user.reload
+    assert_equal 'New Tower', @user.office
+    assert_equal 'New Dept', @user.department
+    assert_equal '9876543210', @user.phone
+  end
+  
+  should 'handle Alma::AlmaSync.sync_request failure gracefully' do
+    course = create(:course)
+    request_attributes = attributes_for(:request, reserve_location_id: @location.id)
+    request_attributes[:course_attributes] = { course_id: course.id }
+    request_attributes[:user] = { office: '', department: '', phone: '' }
+  
+    Alma::AlmaSync.expects(:sync_request).raises(StandardError.new("💥 API went boom"))
+  
+    assert_nothing_raised do
+      post new_request_step_one_save_path, params: { request: request_attributes }
+    end
+  
+    request = get_instance_var(:request)
+    assert_redirected_to new_request_step_two_path(request)
+  end  
+  
 end

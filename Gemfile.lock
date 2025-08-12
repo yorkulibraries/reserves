@@ -431,7 +431,7 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
-  alma (~> 0.3.3)
+  alma
   audited (~> 5.4, >= 5.4.3)
   bootstrap (~> 5.3, >= 5.3.3)
   byebug (~> 11.1, >= 11.1.3)
