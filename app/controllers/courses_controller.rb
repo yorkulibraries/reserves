@@ -53,6 +53,20 @@ class CoursesController < ApplicationController
     end
   end
 
+  def autocomplete
+    academic_start = Date.today.month < 9 ? Date.today.year - 1 : Date.today.year
+    allowed_years = [academic_start.to_s, (academic_start + 1).to_s]
+    courses = Course.search(params[:term],
+                            fields: [:code, :name],
+                            match: :word_start,
+                            where:  { code_year: allowed_years },
+                            load:   false,
+                            limit:  100)
+    render json: courses.map { |c|
+      { label: "#{c.code} / #{c.name} / #{c.instructor}", value: c.id }
+    }
+  end
+
   # DELETE /courses/1
   # DELETE /courses/1.json
   def destroy
@@ -73,6 +87,6 @@ class CoursesController < ApplicationController
 
   # Never trust parameters from the scary internet, only allow the white list through.
   def course_params
-    params.require(:course).permit(:name, :code, :student_count, :instructor)
+    params.require(:course).permit(:name, :code, :student_count, :instructor, :course_number, :year, :faculty, :subject, :term, :section, :credits)
   end
 end

@@ -2,13 +2,13 @@
 
 Rails.application.routes.draw do
   get 'search' => 'search#index', as: 'search'
-
+  
   ## LOGIN AND OUT
   get 'logout' => 'sessions#destroy', as: 'logout'
   get 'login' => 'sessions#new', as:  'login'
   get 'login_as' => 'sessions#login_as', as: 'login_as'
   get 'back_to_my_login' => 'sessions#back_to_my_login', as: 'back_to_my_login'
-
+  get '/courses/autocomplete', to: 'courses#autocomplete', as: :autocomplete_courses
   # put devise path at root since /users/ already used by the users_controller
   devise_for :user, :path => ''
 
@@ -96,6 +96,10 @@ Rails.application.routes.draw do
   post 'requests/new/step_one/save' => 'request_wizard#save', as: :new_request_step_one_save
   get 'requests/new/step_two/:id' => 'request_wizard#step_two', as: :new_request_step_two
   post 'requests/new/finish/:id' => 'request_wizard#finish', as: :new_request_finish
+
+  namespace :alma do
+    get 'users/lookup_by_name', to: 'users#lookup_by_name'
+  end
 
   root 'home#index'
 end

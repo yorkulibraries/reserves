@@ -19,6 +19,7 @@ gem 'jquery-rails', '4.5.0'
 gem 'jquery-ui-rails', '6.0.1'
 
 ## BOOTSTRAP & SIMPLE_FORM & FONTAWESOME ##
+gem 'bootstrap', '~> 5.3', '>= 5.3.3'
 gem 'font-awesome-rails', '~> 4.7'
 gem 'simple_form', '~> 5.1'
 
@@ -28,6 +29,7 @@ gem 'cancancan', '~> 3.4'
 gem 'devise'
 gem 'email_validator', '~> 2.2', '>= 2.2.3'
 gem 'kaminari', '~> 1.2', '>= 1.2.2'
+gem 'kaminari-bootstrap'
 gem 'liquid', '~> 5.4'
 gem 'rails-settings-cached', '~> 2.8', '>= 2.8.2'
 gem 'rsolr', '~> 2.5'
@@ -39,7 +41,7 @@ gem 'caxlsx', '3.2.0'
 gem 'caxlsx_rails', '0.6.3'
 
 ## EX LIBRIS INTEGRATION ALMA, PRIMO
-gem 'alma', '~> 0.3.3'
+gem 'alma'
 gem 'primo', git: 'https://github.com/tulibraries/primo.git', branch: 'main'
 
 ## SEARCH - USING ELASTIC SEARCH

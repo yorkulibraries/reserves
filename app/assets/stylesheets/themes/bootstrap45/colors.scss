@@ -1,0 +1,30 @@
+//YorkU Colors
+/* 2021 YorkU colours */
+/* http://toolbox.info.yorku.ca/visual-identity/colours/ */
+$york-grey-dark:   #686260;
+$york-grey-medium: #B7AEA9;
+$york-grey-pewter: #D6CFCA;
+$york-grey-light:  #E8E4DF;
+$york-grey-lighter: #FAFAFA;
+$york-red-pms-186: #E31837;
+$york-red-medium:  #B82025;
+$york-red-dark:    #8C0000;
+$york-light-blue:  #ACE6F8;
+$york-bright-blue: #3AC2EF;
+
+$primary: #0f69A0;
+$success: #2E856E; 
+$warning: #D89D00; //E4A11B
+$danger: #B82025; 
+$light: #FAFAFA;
+$info: #e5ded1;
+// $dark: #004F6D;
+
+// Override Bootstrap typography variables
+$font-size-base: 1rem; // Default is 1rem
+$h1-font-size: 2rem;
+$h2-font-size: 1.75rem;
+$h3-font-size: 1.5rem;
+$h4-font-size: 1.25rem;
+$h5-font-size: 1rem;
+$h6-font-size: 0.875rem;

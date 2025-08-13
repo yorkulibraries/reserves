@@ -1,10 +1,12 @@
 # frozen_string_literal: true
 
 class Course < ApplicationRecord
-  #searchkick
-  
+  searchkick word_start: [:name, :instructor, :code],
+             callbacks: :async       
   # COURSE FORMAT
   # YEAR_FACULTY_SUBJECT_TERM_COURSEID__CREDITS_SECTION    i.e. 2013_GL_ECON_S1_2500__3_A ignoring EN_A_LECT_01
+  # eg: HTTP_PYORK_COURSES=2024_GS_ALDR_F_6304__3_A_EN_A_ONLN_01
+  # parts = ["2024", "GS", "ALDR", "F", "6304", "", "3", "A", "EN", "A", "ONLN", "01"]
 
   # CONSTANTS
   FACULTIES = %w[AP ED ES FA GL GS HH LE LIB LW S SB SC SCS YUL].freeze
@@ -20,6 +22,16 @@ class Course < ApplicationRecord
 
   TERMS = %w[F W FW Y S SU S1 S2].freeze
   TERM_NAMES = %w[Fall Winter Fall/Winter Year Summer Summer1 Summer2].freeze
+
+  TERM_NAME_TO_CODE = {
+    "Fall" => "F",
+    "Winter" => "W",
+    "Fall/Winter" => "FW",
+    "Year" => "Y",
+    "Summer" => "S",
+    "Summer1" => "S1",
+    "Summer2" => "S2"
+  }.freeze
   TERM_CREDITS = %w[1 3 4 6 9].freeze
   SUBJECTS ||= IO.readlines("#{Rails.root}/lib/course_subjects.txt").collect(&:strip)
 
@@ -28,9 +40,9 @@ class Course < ApplicationRecord
 
   validates_presence_of :name, :code, :student_count, :instructor
   validates_presence_of :year, :faculty, :subject, :term, :credits, :section
-  validates_presence_of :course_id, message: 'Course Number is required'
-  validates :code, format: { without: /\s/ }
-  validates_numericality_of :course_id, message: 'Course Number must be a number'
+  validates_presence_of :course_number, message: 'Course Number is required'
+  validates :code, format: { without: /\s/, message: "cannot contain spaces" }
+  validates_numericality_of :course_number, message: 'Course Number must be a number'
   validates_numericality_of :year, message: 'Year must be a number'
   validates_numericality_of :credits, message: 'Credits must be a number'
   validates_numericality_of :student_count, message: 'Enrollment must be a number'
@@ -85,42 +97,41 @@ class Course < ApplicationRecord
     insert_into_code(3, term)
   end
 
-  def course_id
+  def course_number
     get_value_from_code(4)
   end
 
-  def course_id=(course_id)
-    insert_into_code(4, course_id)
+  def course_number=(course_number)
+    insert_into_code(4, course_number)
   end
 
   def credits
     get_value_from_code(6)
   end
-
+  
   def credits=(credits)
     insert_into_code(6, credits)
   end
-
+  
   def section
     get_value_from_code(7)
   end
-
+  
   def section=(section)
     insert_into_code(7, section)
-  end
+  end  
 
   ####### HELPER METHODS #########
 
-  def get_value_from_code(position)
-    self.code = '_______'   if code.blank?
-    code.split('_')[position]
-  end
-
   def insert_into_code(position, value)
-    self.code = '_______'   if code.blank?
-    broken = code.split('_')
-    broken[position] = value
+    broken = code&.split('_') || Array.new(7, "")
+    broken[position] = value.to_s.strip
     self.code = broken.join('_')
+  end
+  
+  def get_value_from_code(position)
+    broken = code&.split('_') || Array.new(7, "")
+    broken[position]
   end
 
   def rollover(course_year = '', course_term = '', course_section = '', course_credits = '')

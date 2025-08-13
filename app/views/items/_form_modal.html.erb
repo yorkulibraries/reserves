@@ -1,27 +1,24 @@
-<div class="modal wide" id="item_form">
+<div class="modal wide" id="item_form" tabindex="-1" aria-labelledby="item_form_label" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
-
+      <!-- Modal Header -->
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-        <h4 class="modal-title"><%= @item.new_record? ? "Adding" : "Updating" %> a <%= @item.item_type.humanize %> Item</h4>
+        <h4 class="modal-title" id="item_form_label"><%= @item.new_record? ? "Adding" : "Updating" %> a <%= @item.item_type.humanize %> Item</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
+
       <div class="modal-body">
-
-
-
         <% unless [Item::TYPE_PHOTOCOPY, Item::TYPE_COURSE_KIT].include? @item.item_type %>
           <%= render "search/primo/new", search_type: @item.item_type %>
         <% end %>
 
         <%= simple_form_for [@request, @item], remote: true do |f| %>
-  				<div class="row small required">
-  					<div class="col-md-4 black strong pull-right">
-  						<span class="fa fa-exclamation"></span> All fields in blue area are mandatory.
-  					</div>
-  				</div>
-
-
+          <!-- Info Row -->
+          <div class="row small required py-3">
+            <div class="col-md-12 fw-bold text-mute">
+              <i class="fa fa-exclamation"></i> All fields in the blue area are mandatory.
+            </div>
+          </div>
 
           <%= render partial: "items/form_fields/#{@item.item_type}_form_fields", locals: { f: f } %>
           
@@ -43,8 +40,8 @@
 
           <hr/>
           <div class="text-right">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel Changes</button>
-             <%= f.button :submit, class: "btn btn-success" %>
+            <button type="button" class="btn btn-warning" data-bs-dismiss="modal">Cancel Changes</button>
+             <%= f.button :submit, class: "btn-success" %>
           </div>
         <% end %>
       </div>

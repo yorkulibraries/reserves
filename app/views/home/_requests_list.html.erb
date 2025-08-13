@@ -1,6 +1,6 @@
 <div class="table-responsive">
-  <table class="table">
-    <thead>
+  <table class="table table-striped align-middle">
+    <thead class="table-light">
       <tr>
         <th>ID &amp; Date</th>
         <th>Course</th>
@@ -33,8 +33,8 @@
             <span class="label label-primary rollover">R</span>
           <% end %>
           <a class="name" href="<%= request_path(request) %>">
-            <%= request.course.name %></a>
-            <span class="code"><%= request.course.code %></span>
+            <%= request.course&.name || "—" %></a>
+            <span class="code"><%= request.course&.code || "" %></span>
         </td>
         <td class="items small">
           <% if request.status == Request::REMOVED %>

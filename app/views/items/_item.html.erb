@@ -1,10 +1,10 @@
 <div class="item" id="item_<%= item.id %>" data-id="<%= item.id %>">
-	<div class="row">
+	<div class="row mb-3">
 		<div class="col-md-10">
 			<h3><%= item.title %></h3>
 		</div>
 		<div class="col-md-2">
-			<span class="label label-default item-type <%= item.item_type %>_bg"><%= item.item_type.humanize.upcase %></span>
+			<span class="badge badge-dark item-type <%= item.item_type %>_bg"><%= item.item_type.humanize.upcase %></span>
 			<br/><span class="small">Item <strong>#<%= item.id %></strong></span>
 		</div>
 	</div>

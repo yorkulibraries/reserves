@@ -67,7 +67,7 @@
 						<td class="note strong black"><%= simple_format event.comment %></td>
 					<% else %>
 						<td class="what">
-							<span class="label label-default type-<%= type.underscore.downcase %>">
+							<span class="badge type-<%= type.underscore.downcase %>">
 								<%= defined?(audit_what) ? audit_what : type.tableize.singularize.humanize %></span>
 						</td>
 						<td class="comment black"><%= event.comment ? event.comment : event.action %></td>

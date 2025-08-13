@@ -1,8 +1,10 @@
 # frozen_string_literal: true
 
 class Item < ApplicationRecord
-  #searchkick
-  
+  searchkick word_start: [:title, :author, :isbn, :ils_barcode, :other_isbn_issn, :publisher, :callnumber],
+             callbacks: :async
+
+
   ########################################### CONSTANTS ############################################
   METADATA_MANUAL = 'MANUAL'
   METADATA_SOLR = 'SOLR'

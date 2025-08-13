@@ -26,13 +26,47 @@ class RequestsController < ApplicationController
 
   def update
     @request.audit_comment = 'Request Updated'
+    old_course = @request
+    nested_course_id = request_params.dig(:course_attributes, :course_id)
+
+    if nested_course_id.blank?
+      flash.now[:alert] = 'Course cannot be empty'
+      return render :step_one
+    end
+
+    new_course = Course.find_by(id: nested_course_id)
+  
+    if new_course.blank?
+      flash.now[:alert] = 'Course not found. Please select a valid course.'
+      return render :step_one
+    end
+
+    old_course_id = old_course.id.to_s.strip
+    old_alma_course_id = old_course.alma_course_id.to_s.strip
+
+
+    @request.course_id = nested_course_id
+
+
+    existing = Request.find_by(course_id: nested_course_id)
+  
+    if existing
+      flash[:notice] = 'You already have a request for that course.'
+      return redirect_to request_path(existing)
+    end 
     respond_to do |format|
       if params[:request][:user]
         @request.requester.update(office: params[:request][:user][:office],
                                   department: params[:request][:user][:department], phone: params[:request][:user][:phone])
       end
-      # params[:audit_comment] = "Updated Request"
-      if @request.update(request_params)
+      if @request.update(request_params.except(:course_attributes))  
+        if nested_course_id != old_course_id
+          Rails.logger.info("🔄 Course changed for Request##{@request.id}, syncing Alma...")
+          Alma::AlmaSync.sync_request(@request, current_user)
+
+          Alma::Course.update_items_course_and_reading_list(new_course, old_alma_course_id)
+        end
+  
         format.html { redirect_to @request, notice: 'Request was successfully updated.' }
         format.json { head :no_content }
       else
@@ -40,7 +74,7 @@ class RequestsController < ApplicationController
         format.json { render json: @request.errors, status: :unprocessable_entity }
       end
     end
-  end
+  end           
 
   def destroy
     @request.audit_comment = 'Request Deleted'
@@ -114,6 +148,20 @@ class RequestsController < ApplicationController
 
   def archive
     if @request.status == Request::COMPLETED
+
+      if @request.alma_course_id.present? && @request.alma_reading_list_id.present?
+        success = Alma::ReadingList.delete(
+          course_id: @request.alma_course_id,
+          reading_list_id: @request.alma_reading_list_id
+        )
+  
+        if success
+          Rails.logger.info("✅ Deleted Alma reading list for Request##{@request.id}")
+        else
+          Rails.logger.warn("⚠️ Could not delete Alma reading list for Request##{@request.id}")
+        end
+      end
+
       @request.status = Request::REMOVED
       @request.removed_at = Date.today
       @request.removed_by_id = current_user.id
@@ -122,7 +170,7 @@ class RequestsController < ApplicationController
       # RequestMailer.status_change(@request, current_user).deliver_later
     end
 
-    redirect_to request_path(@request), notice: 'Your item(s) will be removed from reserve.'
+    redirect_to request_path(@request), notice: 'Your item(s) will be removed from reserve and Alma.'
   end
 
   def assign
@@ -172,10 +220,15 @@ class RequestsController < ApplicationController
 
   # Never trust parameters from the scary internet, only allow the white list through.
   def request_params
-    course_attributes = %i[id name code instructor student_count _destroy year faculty subject
-                           term credits section term course_id]
-
-    params.require(:request).permit(:requested_date, :reserve_start_date, :reserve_end_date, :status, :reserve_location_id, :course_id, :reserve_location, :audit_comment, :requester_email,
-                                    course_attributes: course_attributes)
+    params.require(:request).permit(
+      :requested_date,
+      :reserve_start_date,
+      :reserve_end_date,
+      :status,
+      :reserve_location_id,
+      :reserve_location,
+      :requester_email,
+      course_attributes: [:course_id, :student_count]  
+    )
   end
 end

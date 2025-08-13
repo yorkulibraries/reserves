@@ -65,7 +65,7 @@ class DashboardTest < ApplicationSystemTestCase
     login_as(@admin_user)
     visit root_url
 
-    assert_selector('.btn-group-sm .btn-default.dropdown-toggle', text: 'All Locations')
+    assert_selector('.btn-group-sm .btn-primary.dropdown-toggle', text: 'All Locations')
 
   end
 

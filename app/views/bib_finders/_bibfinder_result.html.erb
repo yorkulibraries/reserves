@@ -17,7 +17,7 @@
             <% end %>
           <% else %>
             <%= truncate(bib_result.author, :length => 50 ) %>
-            <span class="my_popover"  data-container=".distinct"  data-toggle="popover" data-placement="right" data-html="true" data-trigger="hover" data-content="<%= bib_result.author %>"><i class="fa fa-expand" style="z-index: 1050"></i></span>      
+            <span class="my_popover"  data-container=".distinct"  data-bs-toggle="popover" data-placement="right" data-html="true" data-trigger="hover" data-content="<%= bib_result.author %>"><i class="fa fa-expand" style="z-index: 1050"></i></span>      
           <% end %>
        </span></p>
        <% isbn = bib_result.isbn %>

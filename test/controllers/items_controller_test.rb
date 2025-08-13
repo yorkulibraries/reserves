@@ -186,4 +186,92 @@ class ItemsControllerTest < ActionDispatch::IntegrationTest
     i = get_instance_var(:item)
     assert_equal Item::STATUS_DELETED, i.status, 'Status should still be DELETED'
   end
+
+  should 'enqueue AddCitationJob on item create' do
+    assert_enqueued_with(job: AddCitationJob) do
+      post request_items_path(@_request), params: { item: attributes_for(:item).except(:request) }
+    end
+  end  
+
+  should 'toggle item status between NOT_READY and READY' do
+    item = create(:item, request: @_request, status: Item::STATUS_NOT_READY)
+  
+    get change_status_request_item_path(@_request, item)
+    assert_equal Item::STATUS_READY, get_instance_var(:item).status
+  
+    get change_status_request_item_path(@_request, item)
+    assert_equal Item::STATUS_NOT_READY, get_instance_var(:item).status
+  end
+  
+
+  should 're-render edit template if update fails' do
+    item = create(:item, request: @_request)
+  
+    patch request_item_path(@_request, item), params: { item: { title: '' } }
+  
+    assert_response :success
+    assert_template :edit
+  end
+  
+
+  should 're-render new template if item creation fails' do
+    invalid_attrs = attributes_for(:item, title: nil).except(:request) # Assume title is required
+  
+    assert_no_difference('Item.count') do
+      post request_items_path(@_request), params: { item: invalid_attrs }
+    end
+  
+    assert_response :success
+    assert_template :new
+  end  
+
+  should 'enqueue AddCitationJob on item creation' do
+    assert_enqueued_with(job: AddCitationJob) do
+      post request_items_path(@_request), params: { item: attributes_for(:item).except(:request) }
+    end
+  end
+
+  should 'call Alma::ReadingList.delete_citation on destroy if alma_citation_id is present and successful' do
+    item = create(:item, request: @_request, alma_citation_id: 'CITE123')
+    @_request.update!(alma_course_id: 'COURSE123', alma_reading_list_id: 'LIST123')
+
+    Alma::ReadingList.expects(:delete_citation)
+                     .with(course_id: 'COURSE123', reading_list_id: 'LIST123', citation_id: 'CITE123')
+                     .returns(true)
+
+    assert_no_difference('Item.count') do
+      delete request_item_path(@_request, item)
+    end
+    
+    item.reload
+    assert_equal Item::STATUS_DELETED, item.status
+                    
+  end
+
+  should 'destroy item even if Alma citation deletion fails' do
+    item = create(:item, request: @_request, alma_citation_id: 'FAKE_CITATION')
+  
+    Alma::ReadingList.expects(:delete_citation).returns(false)
+  
+    assert_no_difference('Item.count') do
+      delete request_item_path(@_request, item), xhr: true
+      item.reload
+      assert_equal 'FAKE_CITATION', item.alma_citation_id, 'Citation ID should not be cleared on failure'
+    end
+  
+    assert_response :success
+    assert_match "$(\"#item_#{item.id}", @response.body
+  end   
+
+  should 'not call Alma API on destroy if alma_citation_id is blank' do
+    item = create(:item, request: @_request, alma_citation_id: nil)
+    Alma::ReadingList.expects(:delete_citation).never
+
+    assert_no_difference('Item.count') do
+      delete request_item_path(@_request, item)
+    end
+    
+    item.reload
+    assert_equal Item::STATUS_DELETED, item.status    
+  end
 end

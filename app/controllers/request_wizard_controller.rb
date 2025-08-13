@@ -8,7 +8,7 @@ class RequestWizardController < ApplicationController
     if current_user.valid?
       @request = Request.new(status: Request::INCOMPLETE)
       @request.course = Course.new
-      @request.requester = current_user
+      @request.requester = current_user    
     else
       redirect_to edit_user_path(current_user)
     end
@@ -21,25 +21,49 @@ class RequestWizardController < ApplicationController
   def save
     @request = Request.new(request_params)
     @request.status = Request::INCOMPLETE
-    current_user.update(office: params[:request][:user][:office], department: params[:request][:user][:department],
-                        phone: params[:request][:user][:phone])
-
-    @request.course.created_by_id = current_user.id
     @request.requester_id = current_user.id
-    if @request.course.save
-      @request.audit_comment = 'Request Step One Completed'
-      if @request.save
-        redirect_to new_request_step_two_path(@request), notice: 'Proceeding to Step 2.'
-      else
-        render action: 'step_one'
+
+    nested_course_id = request_params.dig(:course_attributes, :course_id)
+
+    if nested_course_id.blank?
+      flash.now[:alert] = 'Course cannot be empty'
+      return render :step_one
+    end
+
+    @request.course = Course.find_by(id: nested_course_id)
+
+    if @request.course.blank?
+      flash.now[:alert] = 'Course not found. Please select a valid course.'
+      return render :step_one
+    end
+  
+    existing = Request.find_by(course_id: nested_course_id)
+
+    if existing
+      flash[:notice] = 'You already have a request for that course.'
+      return redirect_to request_path(existing)
+    end
+    
+    @request.course = Course.find_by(id: nested_course_id)
+
+    # Save current user contact details
+    current_user.update(
+      office: params.dig(:request, :user, :office),
+      department: params.dig(:request, :user, :department),
+      phone: params.dig(:request, :user, :phone)
+    )
+  
+    @request.audit_comment = 'Request Step One Completed'
+  
+    if @request.save
+      begin
+        Alma::AlmaSync.sync_request(@request, current_user)
+      rescue => e
+        Rails.logger.warn("Alma sync failed: #{e.message}")
       end
+      redirect_to new_request_step_two_path(@request), notice: 'Proceeding to Step 2.'
     else
-      @old_request = get_request_duplicated
-      if !@old_request.nil? &&  @old_request.course.created_by_id == current_user.id
-        redirect_to new_request_step_two_path(@old_request), notice: 'Proceeding to Step 2.'
-      elsif !@request.save
-        render action: 'step_one'
-      end
+      render :step_one
     end
   end
 
@@ -64,22 +88,24 @@ class RequestWizardController < ApplicationController
       @request.audit_comment = 'Request Step Two Completed'
       @request.status = Request::OPEN
       @request.requested_date = Date.today.to_date
-
+  
       if @request.save
         RequestMailer.status_change(@request, current_user).deliver_later
         redirect_to @request
+  
       else
         redirect_to edit_request_path(@request), alert: 'There are fields missing in this request'
       end
-
+  
     else
       redirect_to new_request_step_two_path(@request),
                   alert: 'You must add at least one active item for this request to be submitted!'      
     end
   end
+  
 
   #### PRIVATE METHODS ###
-  private
+  private 
 
   def set_request
     @request = Request.find(params[:id])
@@ -87,10 +113,16 @@ class RequestWizardController < ApplicationController
 
   # Never trust parameters from the scary internet, only allow the white list through.
   def request_params
-    course_attributes = %i[id name code instructor student_count _destroy year faculty subject term
-                           credits section term course_id]
-
-    params.require(:request).permit(:requested_date, :reserve_start_date, :reserve_end_date, :status, :reserve_location_id, :course_id, :reserve_location, :requester_email,
-                                    course_attributes: course_attributes)
+    params.require(:request).permit(
+      :requested_date,
+      :reserve_start_date,
+      :reserve_end_date,
+      :status,
+      :reserve_location_id,
+      :reserve_location,
+      :requester_email,
+      # Permit the nested hash under :course_attributes
+      course_attributes: [:course_id, :student_count]  
+    )
   end
 end
