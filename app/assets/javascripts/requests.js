@@ -117,7 +117,7 @@ $(document).ready(function() {
 		  select(event, ui) {
 			const [codePart, courseName, instructorName = ''] = ui.item.label.split(' / ');
 			$search.val(ui.item.label); // show label in the visible field
-			$('#request_course_attributes_course_id').val(ui.item.value); // submit this hidden id
+			$('#request_course_id_hidden').val(ui.item.value); // submit this hidden id
 	  
 			updateReserveDatesFromCode(codePart);
 	  
@@ -184,7 +184,7 @@ $(document).ready(function() {
 		}).on('autocompletechange', function(event, ui) {
 		  if (!ui.item) {
 			$search.val('');
-			$('#request_course_attributes_course_id').val('');
+			$('#request_course_id_hidden').val('');
 			$('#request_reserve_start_date').val('');
 			$('#request_reserve_end_date').val('');
 			$('#request_alma_instructor_id').val('');

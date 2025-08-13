@@ -14,13 +14,13 @@
 
 	<div class="row">
 		<div class="col-md-12 col-lg-12">
-			<%= f.hidden_field :course_id, id: 'request_course_attributes_course_id' %>
-
+			<%= hidden_field_tag 'request[course_id]', nil, id: 'request_course_id_hidden' %>
 			<%= text_field_tag nil, nil,
-					id: 'request_course_search',
-					placeholder: 'Search for a course',
-					autocomplete: 'off',
-					class: 'form-control' %>
+				id: 'request_course_search',
+				placeholder: 'Search for a course',
+				autocomplete: 'off',
+				class: 'form-control' %>
+
 
 			<%= hidden_field_tag 'request[alma_instructor_id]', '', id: 'request_alma_instructor_id' %>
 		</div>

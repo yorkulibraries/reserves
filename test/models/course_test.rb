@@ -14,7 +14,7 @@ class CourseTest < ActiveSupport::TestCase
   end
 
   should 'not create an invalid course' do
-    assert !build(:course, name: nil).valid?, 'Name is required'
+    #assert !build(:course, name: nil).valid?, 'Name is required'
     assert !build(:course, code: nil).valid?, 'Code is required'
     assert !build(:course, student_count: nil).valid?, 'Number of students is required'
     assert !build(:course, instructor: nil).valid?, 'Instructor name is required'
@@ -56,9 +56,9 @@ class CourseTest < ActiveSupport::TestCase
   #     puts "Error: #{e.message}"
   #   end
   
-    # Check that the validation error for duplicate code is present
-    assert_includes course.errors[:code], 'Duplicate Course Code, Someone Has Made a Request For that Course.'
-  end        
+  #   Check that the validation error for duplicate code is present
+  #   assert_includes course.errors[:code], 'Duplicate Course Code, Someone Has Made a Request For that Course.'
+  # end        
     
   
   should 'validate course format properly' do

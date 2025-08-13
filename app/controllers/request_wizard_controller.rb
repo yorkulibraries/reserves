@@ -19,42 +19,36 @@ class RequestWizardController < ApplicationController
   end
 
   def save
-    @request = Request.new(request_params)
-    @request.status = Request::INCOMPLETE
+    @request = Request.new(request_params) # <- includes :course_id directly
+    @request.status       = Request::INCOMPLETE
     @request.requester_id = current_user.id
-
-    nested_course_id = request_params.dig(:course_attributes, :course_id)
-
-    if nested_course_id.blank?
+    @request.audit_comment = 'Request Step One Completed'
+  
+    # persist user's contact edits (best-effort, don't block Step 1)
+    if params.dig(:request, :user)
+      current_user.update(
+        office:     params[:request][:user][:office],
+        department: params[:request][:user][:department],
+        phone:      params[:request][:user][:phone]
+      )
+    end
+  
+    if @request.course_id.blank?
       flash.now[:alert] = 'Course cannot be empty'
       return render :step_one
     end
-
-    @request.course = Course.find_by(id: nested_course_id)
-
-    if @request.course.blank?
+  
+    course = Course.find_by(id: @request.course_id)
+    unless course
       flash.now[:alert] = 'Course not found. Please select a valid course.'
       return render :step_one
     end
   
-    existing = Request.find_by(course_id: nested_course_id)
-
-    if existing
-      flash[:notice] = 'You already have a request for that course.'
-      return redirect_to request_path(existing)
+    if (existing = Request.find_by(course_id: course.id))
+      return redirect_to new_request_step_two_path(existing),
+                         notice: 'Proceeding to Step 2.'
     end
-    
-    @request.course = Course.find_by(id: nested_course_id)
 
-    # Save current user contact details
-    current_user.update(
-      office: params.dig(:request, :user, :office),
-      department: params.dig(:request, :user, :department),
-      phone: params.dig(:request, :user, :phone)
-    )
-  
-    @request.audit_comment = 'Request Step One Completed'
-  
     if @request.save
       begin
         Alma::AlmaSync.sync_request(@request, current_user)
@@ -65,7 +59,7 @@ class RequestWizardController < ApplicationController
     else
       render :step_one
     end
-  end
+  end  
 
   def step_two
     @items = @request.items.recent_first # if any
@@ -121,8 +115,7 @@ class RequestWizardController < ApplicationController
       :reserve_location_id,
       :reserve_location,
       :requester_email,
-      # Permit the nested hash under :course_attributes
-      course_attributes: [:course_id, :student_count]  
+      :course_id
     )
   end
 end
