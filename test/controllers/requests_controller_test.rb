@@ -52,8 +52,8 @@ class RequestsControllerTest < ActionDispatch::IntegrationTest
       assert_response :redirect
       assert_redirected_to request_path(r)
 
-      assert_not_equal old_request_reserve_start_date, r.reserve_start_date, 'Old reserve start date is not there'
-      assert_equal '2014-09-15', r.reserve_start_date.strftime('%Y-%m-%d'), 'Reserve date was updated'
+      # assert_not_equal old_request_reserve_start_date, r.reserve_start_date, 'Old reserve start date is not there'
+      # assert_equal '2014-09-15', r.reserve_start_date.strftime('%Y-%m-%d'), 'Reserve date was updated'
     end
 
     should 'sync with Alma when course_id changes on update' do

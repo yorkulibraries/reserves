@@ -10,7 +10,7 @@ module Alma
     # then stores their IDs back on the Request record.
     def self.sync_request(request, user)
       course = ::Course.find_by(id: request.course_id)
-      puts "REQUEST.COURSE_ID #{request.course_id}"
+
       unless course
         Rails.logger.error("❌ Request##{request.id} has no Course##{request.course_id}")
         return

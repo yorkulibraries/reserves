@@ -17,7 +17,7 @@
 <div class="items-empty-slate">
   <h1>Keep Item(s) on Reserve</h1>
 	<h2> <%= @request.course.name %> </h2>
-	<h3><%= @request.course.subject %> <%= @request.course.course_id %></h3>
+	<h3><%= @request.course.subject %> <%= @request.course.course_number %></h3>
   <p>This action will create a new request with the same details, course and items but set for another term.</p>
   <%= simple_form_for :rollover, url: rollover_request_path, html: { class: "form-inline" } do |f| %>
     <div class="form-group">

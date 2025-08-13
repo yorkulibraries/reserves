@@ -26,55 +26,32 @@ class RequestsController < ApplicationController
 
   def update
     @request.audit_comment = 'Request Updated'
-    old_course = @request
-    nested_course_id = request_params.dig(:course_attributes, :course_id)
-
-    if nested_course_id.blank?
-      flash.now[:alert] = 'Course cannot be empty'
-      return render :step_one
-    end
-
-    new_course = Course.find_by(id: nested_course_id)
   
-    if new_course.blank?
-      flash.now[:alert] = 'Course not found. Please select a valid course.'
-      return render :step_one
-    end
-
-    old_course_id = old_course.id.to_s.strip
-    old_alma_course_id = old_course.alma_course_id.to_s.strip
-
-
-    @request.course_id = nested_course_id
-
-
-    existing = Request.find_by(course_id: nested_course_id)
-  
-    if existing
-      flash[:notice] = 'You already have a request for that course.'
-      return redirect_to request_path(existing)
-    end 
-    respond_to do |format|
-      if params[:request][:user]
-        @request.requester.update(office: params[:request][:user][:office],
-                                  department: params[:request][:user][:department], phone: params[:request][:user][:phone])
-      end
-      if @request.update(request_params.except(:course_attributes))  
-        if nested_course_id != old_course_id
-          Rails.logger.info("🔄 Course changed for Request##{@request.id}, syncing Alma...")
-          Alma::AlmaSync.sync_request(@request, current_user)
-
-          Alma::Course.update_items_course_and_reading_list(new_course, old_alma_course_id)
-        end
-  
-        format.html { redirect_to @request, notice: 'Request was successfully updated.' }
-        format.json { head :no_content }
-      else
-        format.html { render action: 'edit' }
-        format.json { render json: @request.errors, status: :unprocessable_entity }
+    # Optional: prevent duplicate request for the same course (excluding current)
+    if (cid = params.dig(:request, :course_id)).present?
+      if Request.where(course_id: cid).where.not(id: @request.id).exists?
+        flash[:notice] = 'You already have a request for that course.'
+        return redirect_to request_path(Request.find_by(course_id: cid))
       end
     end
-  end           
+  
+    if (u = params.dig(:request, :user))
+      @request.requester.update(office: u[:office], department: u[:department], phone: u[:phone])
+    end
+  
+    old_alma_course_id = @request.alma_course_id
+  
+    if @request.update(request_params)
+      if @request.saved_change_to_course_id?
+        Alma::AlmaSync.sync_request(@request, current_user)
+        Alma::Course.update_items_course_and_reading_list(@request.course, old_alma_course_id) if old_alma_course_id.present?
+      end
+      redirect_to @request, notice: 'Request was successfully updated.'
+    else
+      render :edit
+    end
+  end  
+             
 
   def destroy
     @request.audit_comment = 'Request Deleted'
@@ -221,14 +198,8 @@ class RequestsController < ApplicationController
   # Never trust parameters from the scary internet, only allow the white list through.
   def request_params
     params.require(:request).permit(
-      :requested_date,
-      :reserve_start_date,
-      :reserve_end_date,
-      :status,
-      :reserve_location_id,
-      :reserve_location,
-      :requester_email,
-      course_attributes: [:course_id, :student_count]  
+      :requested_date, :reserve_start_date, :reserve_end_date, :status,
+      :reserve_location_id, :reserve_location, :requester_email, :course_id
     )
-  end
+  end    
 end
