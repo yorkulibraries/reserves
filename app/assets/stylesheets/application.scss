@@ -61,3 +61,13 @@
     padding: .2em .5em; /* your prefered spacing */
   }
 
+  .ui-autocomplete .ac-item { padding: 6px 10px; line-height: 1.2; }
+  .ui-autocomplete .ac-top { display:flex; gap:10px; align-items:center; }
+  .ui-autocomplete .ac-title { font-weight:600; }
+  .ui-autocomplete .ac-meta { opacity:.8; }
+  .ui-autocomplete .ac-right { margin-left:auto; display:flex; gap:6px; }
+  .ui-autocomplete .ac-pill { border:1px solid #d0d7de; border-radius:9999px; padding:0 8px; font-size:12px; }
+  .ui-autocomplete .ac-bottom { margin-top:2px; opacity:.85; font-size:12px; }
+  .ui-autocomplete mark { background:#fff3a1; padding:0 2px; }
+
+

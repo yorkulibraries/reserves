@@ -1,11 +1,10 @@
 require 'json'
 require 'date'
 require 'csv'
+require 'set'
 
 namespace :courses do
-
   task init: :environment do
-    ## LOAD DATA SCRAPED FROM YUL ICAL
     Rake::Task['courses:load_yorku_data'].invoke
   end
 
@@ -14,71 +13,56 @@ namespace :courses do
   end
 
   task load_yorku_data: :environment do
-    csv_dir       = Rails.root.join('lib', 'assets', 'course-data')
-    instructor_csv = Dir.glob(csv_dir.join('course_info.csv')).first
+    csv_dir = Rails.root.join('lib', 'assets', 'course-data')
 
-    # 1) Build instructor lookup
-    instructor_map = {}
-    if instructor_csv && File.exist?(instructor_csv)
-      CSV.foreach(instructor_csv, headers: true, quote_char: '"') do |row|
-        key = [
-          row['FACULTY']&.strip,        # code_faculty
-          row['SUBJECT']&.strip,        # code_subject
-          row['COURSE_NUMBER']&.strip,  # numeric part
-          row['CREDIT']&.strip          # code_credits
-        ]
-        instructor_map[key] = row['INSTRUCTOR_NAME']&.strip
-      end
-      puts "Loaded #{instructor_map.size} instructors from #{File.basename(instructor_csv)}"
-    else
-      puts "⚠️  Instructor CSV not found, will use empty"
-    end
-
-    # 2) Preload existing course codes
     existing_codes = Course.pluck(:code).to_set
     new_records    = []
     new_count      = 0
 
-    # 3) Process each data CSV except the instructor one
     Dir.glob(csv_dir.join('*.csv')).sort.each do |data_file|
-      next if data_file == instructor_csv
-
       puts "Processing #{File.basename(data_file)}"
-      CSV.foreach(data_file, headers: true, quote_char: '"') do |row|
-        # normalize values
-        acad_term    = row['STUDYSESSION']&.strip
-        acad_year    = row['ACADEMICYEAR']&.strip
-        fac_abbrev   = row['FACULTY_ABREV']&.strip
-        subj_abbrev  = row['SUBJECT_ABREV']&.strip
-        title        = row['COURSETITLE']&.strip
-        num          = row['COURSE_NUMBER'].to_s.gsub(/\D/, '').strip
-        creds        = row['CREDIT']&.strip
-        sect         = row['SECTION']&.strip
 
-        # composite code
-        code = [acad_year, fac_abbrev, subj_abbrev, acad_term, num, '', creds, sect].join('_')
+      CSV.foreach(data_file, headers: true, encoding: 'bom|utf-8') do |row|
+        h = row.to_h.transform_keys { |k|
+          k.to_s.encode('UTF-8', invalid: :replace, undef: :replace, replace: '')
+            .gsub("\uFEFF", '').strip.upcase
+        }.transform_values { |v| v.is_a?(String) ? v.strip : v }
 
-        # skip existing
+        acad_term        = h['STUDYSESSION']
+        acad_year        = h['ACADEMICYEAR']
+        fac_abbrev       = h['FACULTY_ABREV'] || h['FACULTY_SHORT'] || h['FACULTY']
+        subj_abbrev      = h['SUBJECT_ABREV'] || h['SUBJECT_ABREV2'] || h['SUBJECT']
+        title            = h['COURSETITLE']   || h['COURSETITLE1']
+
+        course_number_csv = h['COURSE_NUMBER']
+
+        num_for_code     = course_number_csv.to_s.gsub(/\D/, '').strip
+
+        creds            = h['CREDIT']
+        sect             = h['SECTION']
+
+        instructor_txt   = (h['INSTRUCTOR_NAME'] || h['INSTRUCTOR'] || h['PRIMARY_INSTRUCTOR'] || '').to_s.strip
+        instructor_token = instructor_txt.gsub(/[^\p{Alnum}]+/, '') # e.g., "Karen Murray" -> "KarenMurray"
+
+        base_code = [acad_year, fac_abbrev, subj_abbrev, acad_term, num_for_code, '', creds, sect].join('_')
+        code      = instructor_token.empty? ? base_code : "#{base_code}_#{instructor_token}"
+
         next if existing_codes.include?(code)
 
-        # find instructor by the four‐field key
-        instr_key      = [fac_abbrev, subj_abbrev, num, creds]
-        instructor_txt = instructor_map[instr_key] || ''
-
-        # collect for bulk insert
         new_records << {
-          code:          code,
-          code_year:     acad_year,
-          code_faculty:  fac_abbrev,
-          code_subject:  subj_abbrev,
-          code_term:     acad_term,
-          code_credits:  creds,
-          code_section:  sect,
-          name:          title,
-          student_count: 1,
-          instructor:    instructor_txt,
-          created_at:    Time.current,
-          updated_at:    Time.current
+          code:           code,
+          code_year:      acad_year,
+          code_faculty:   fac_abbrev,
+          code_subject:   subj_abbrev,
+          code_term:      acad_term,
+          code_credits:   creds,
+          code_section:   sect,
+          name:           title,
+          student_count:  1,
+          instructor:     instructor_txt,
+          course_number:  course_number_csv,
+          created_at:     Time.current,
+          updated_at:     Time.current
         }
 
         existing_codes.add(code)
@@ -86,13 +70,11 @@ namespace :courses do
       end
     end
 
-    # 4) Bulk‐insert
     if new_records.any?
       Course.insert_all(new_records)
-      puts "✅ Inserted #{new_count} new courses"
+      puts "✅ Inserted #{new_count} new courses (code includes instructor; course_number set from CSV)"
     else
       puts "No new courses to insert"
     end
   end
-
 end

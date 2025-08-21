@@ -97,6 +97,9 @@ Rails.application.routes.draw do
   get 'requests/new/step_two/:id' => 'request_wizard#step_two', as: :new_request_step_two
   post 'requests/new/finish/:id' => 'request_wizard#finish', as: :new_request_finish
 
+  post "citations/parse", to: "citations#parse"
+  post "alma/lookup", to: "alma#lookup"
+  
   namespace :alma do
     get 'users/lookup_by_name', to: 'users#lookup_by_name'
   end

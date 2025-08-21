@@ -33,17 +33,19 @@ class ItemsController < ApplicationController
   end
 
   def new
-    @item = @request.items.new
-    type = Item::TYPE_BOOK
-    type = params[:type].downcase unless params[:type].nil?
-
+    @item   = @request.items.new
+    type    = params[:type].presence&.downcase || Item::TYPE_BOOK
     @item.item_type = type
-
+  
+    # normalize source; default Book → citation if none passed
+    @source = params[:source].to_s.downcase.presence
+    @source ||= "citation" if @item.item_type == Item::TYPE_BOOK
+  
     respond_to do |format|
       format.html
       format.js
     end
-  end
+  end  
 
   def edit
     respond_to do |format|
@@ -56,8 +58,37 @@ class ItemsController < ApplicationController
     @item = @request.items.new(item_params)
     @item.status = Item::STATUS_NOT_READY
     @item.audit_comment = "Added Item: #{@item.title}"
-    
+  
     respond_to do |format|
+      # ---- Server-side fallback for "Citation" flow ----
+      raw_citation = (params[:raw_citation].presence || params.dig(:item, :raw_citation)).to_s.strip
+  
+      if @item.item_type == Item::TYPE_BOOK && raw_citation.present?
+        # If client didn't set metadata_source, assume manual for citation flow
+        manual_val = defined?(Item::METADATA_MANUAL) ? Item::METADATA_MANUAL : "manual"
+        @item.metadata_source = manual_val if @item.metadata_source.blank?
+  
+        if @item.metadata_source.to_s == manual_val.to_s
+          begin
+            entry  = AnyStyleService.parse(raw_citation)
+            mapped = CitationMapper.new(entry).to_item_attributes
+  
+            # fill only blanks (never overwrite what the user typed)
+            mapped.each do |attr, val|
+              next if val.blank?
+              @item[attr] = val if @item.send(attr).blank?
+            end
+          rescue => e
+            Rails.logger.error("[AnyStyle] parse error: #{e.class}: #{e.message}")
+            # continue without mapped fields
+          end
+  
+          unless @item.description.to_s.include?(raw_citation)
+            @item.description = [@item.description.presence, raw_citation].compact.join("\n\n")
+          end
+        end
+      end
+  
       if @item.save
         if @request.status == Request::INPROGRESS
           @request.update(
@@ -67,10 +98,10 @@ class ItemsController < ApplicationController
         end
         @request.reload
         RequestMailer.new_item_notification(@request, @item).deliver_later
-
+  
         AddCitationJob.perform_later(@item.id, current_user.id)
-        #Alma::AlmaSync.sync_item(@item, current_user)
-
+        # Alma::AlmaSync.sync_item(@item, current_user)
+  
         @notes = {}
         @notes[@item.id] = Audited::Audit.where(
           auditable_id: @request.id,
@@ -79,15 +110,15 @@ class ItemsController < ApplicationController
           associated_type: "Item",
           action: "note"
         )
-
-        format.html { redirect_to [@request, @item], notice: 'Item was successfully created.'}
+  
+        format.html { redirect_to [@request, @item], notice: 'Item was successfully created.' }
         format.js
       else
         format.html { render action: 'new' }
         format.js
       end
     end
-  end
+  end  
 
   def update
     respond_to do |format|

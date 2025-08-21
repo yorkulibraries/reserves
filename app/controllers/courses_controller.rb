@@ -55,15 +55,36 @@ class CoursesController < ApplicationController
 
   def autocomplete
     academic_start = Date.today.month < 9 ? Date.today.year - 1 : Date.today.year
-    allowed_years = [academic_start.to_s, (academic_start + 1).to_s]
-    courses = Course.search(params[:term],
-                            fields: [:code, :name],
-                            match: :word_start,
-                            where:  { code_year: allowed_years },
-                            load:   false,
-                            limit:  100)
+    allowed_years  = [academic_start.to_s, (academic_start + 1).to_s]
+
+    courses = Course.search(
+      params[:term],
+      fields: [:code, :name],
+      match:  :word_start,
+      where:  { code_year: allowed_years },
+      load:   false,
+      limit:  100
+    )
+
     render json: courses.map { |c|
-      { label: "#{c.code} / #{c.name} / #{c.instructor}", value: c.id }
+      parts = parse_code(c.code)
+      credits = parts[:credits].to_s.include?('.') ? parts[:credits] : "#{parts[:credits]}.00"
+
+      {
+        label: build_label(c, parts),
+        value: c.id,
+        code:  c.code,
+        instructor: c.instructor,
+        title: c.name,
+        faculty: parts[:faculty],
+        subject: parts[:subject],
+        number: parts[:number],
+        credits: credits,
+        section: parts[:section],
+        term: parts[:term],
+        year: parts[:year]
+      }
+
     }
   end
 
@@ -79,6 +100,54 @@ class CoursesController < ApplicationController
   end
 
   private
+
+  # Expected code examples:
+  # 2024_GS_TRAN_FW_5700__3_A
+  # 2025_ED_EDUC_F_5340__3_A_KarenMurray (extra tail is ignored)
+  #
+  # Captures: year, faculty, subject, term, number, credits, section
+  def parse_code(code)
+    return {} if code.blank?
+
+    m = code.match(
+      /\A
+        (?<year>\d{4})_
+        (?<faculty>[A-Z]+)_
+        (?<subject>[A-Z]+)_
+        (?<term>F|W|FW|Y|S|SU|S1|S2)_
+        (?<number>[A-Z0-9]+)__
+        (?<credits>[0-9]+(?:\.[0-9]{1,2})?)_
+        (?<section>[A-Z0-9]+)
+      /x
+    )
+    return {} unless m
+
+    m.named_captures.transform_keys!(&:to_sym)
+  end
+
+  def build_label(course, p)
+    if p.present?
+      credits = p[:credits].to_s.include?('.') ? p[:credits] : "#{p[:credits]}.00"
+      instructor = display_instructor(course.instructor)
+
+      # [course title] [faculty]/[subject] [course_number] [credits] [section] [instructor name]
+      # Example: "Independent Study, HH/GH 4000 3.00, A, Amrita Daftary"
+      "#{course.name}, #{p[:faculty]}/#{p[:subject]} #{p[:number]} #{credits}, #{p[:section]}, #{instructor}"
+    else
+      instructor = display_instructor(course.instructor)
+      "#{course.name}, #{course.code}, #{instructor}"
+    end
+  end
+
+  def display_instructor(name)
+    n = name.to_s.gsub(/\s*,\s*/, ', ').squeeze(' ').strip
+    if n.include?(',')
+      last, first = n.split(',', 2).map(&:strip)
+      [first, last].reject(&:blank?).join(' ')
+    else
+      n
+    end
+  end
 
   # Use callbacks to share common setup or constraints between actions.
   def set_course

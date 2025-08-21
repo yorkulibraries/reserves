@@ -115,15 +115,26 @@ $(document).ready(function() {
 			$input.autocomplete('widget').css('width', widthPx + 'px');
 		  },
 		  select(event, ui) {
-			const [codePart, courseName, instructorName = ''] = ui.item.label.split(' / ');
-			$search.val(ui.item.label); // show label in the visible field
-			$('#request_course_id_hidden').val(ui.item.value); // submit this hidden id
+			$search.val(ui.item.label);
 	  
-			updateReserveDatesFromCode(codePart);
+			$('#request_course_id_hidden').val(ui.item.value);
 	  
-			const nameParts = instructorName.trim().split(/\s+/);
-			const firstName = nameParts[0] || '';
-			const lastName  = nameParts.slice(1).join(' ');
+			updateReserveDatesFromCode(ui.item.code);
+	  
+			const rawName = (ui.item.instructor || '').trim();
+	  
+			let firstName = '', lastName = '';
+			if (/,/.test(rawName)) {
+			  // "Last, First Middle"
+			  const [last, rest] = rawName.split(',', 2);
+			  lastName  = (last || '').trim();
+			  firstName = (rest || '').trim().split(/\s+/)[0] || '';
+			} else {
+			  // "First [Middle...] Last"
+			  const parts = rawName.split(/\s+/);
+			  firstName = parts[0] || '';
+			  lastName  = parts.slice(1).join(' ');
+			}
 	  
 			if (firstName) {
 			  $.getJSON('/alma/users/lookup_by_name', { first_name: firstName, last_name: lastName }, function(users) {
@@ -181,7 +192,48 @@ $(document).ready(function() {
 	  
 			return false;
 		  }
-		}).on('autocompletechange', function(event, ui) {
+		});
+	  
+		// ---------- (two lines, highlighted) ----------
+		function esc(s){
+		  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+		}
+		function mark(text, term){
+		  if(!term) return esc(text||'');
+		  const re = new RegExp('(' + $.ui.autocomplete.escapeRegex(term) + ')','ig');
+		  return esc(text||'').replace(re,'<mark>$1</mark>');
+		}
+	  
+		const ac = $search.autocomplete('instance') || $search.data('ui-autocomplete');
+		if (ac) {
+		  ac._renderItem = function(ul, item){
+			const term = this.term;
+	  
+			const title      = mark(item.title, term);
+			const metaLeft   = `${esc(item.faculty)}/${esc(item.subject)} ${esc(item.number)} ${esc(item.credits)}`;
+			const pillsRight = `
+			  <span class="ac-pill">${esc(item.section)}</span>
+			  <span class="ac-pill">${esc(item.year)} ${esc(item.term)}</span>
+			`;
+			const instructor = mark(item.instructor || '', term);
+	  
+			const html = `
+			  <div class="ac-item">
+				<div class="ac-top">
+				  <span class="ac-title">${title}</span>
+				  <span class="ac-meta">${metaLeft}</span>
+				  <span class="ac-right">${pillsRight}</span>
+				</div>
+				<div class="ac-bottom">
+				  <span class="ac-instructor">${instructor}</span>
+				</div>
+			  </div>
+			`;
+	  
+			return $('<li>').append(html).appendTo(ul);
+		  };
+		}
+		$search.on('autocompletechange', function(event, ui) {
 		  if (!ui.item) {
 			$search.val('');
 			$('#request_course_id_hidden').val('');
@@ -190,12 +242,14 @@ $(document).ready(function() {
 			$('#request_alma_instructor_id').val('');
 		  }
 		});
-	  }
+	}
+
+
 	  
-	  // Turbo-aware init
-	  document.addEventListener('turbo:load', initRequestCourseAutocomplete);
-	  // Fallback for non-Turbo pages (keeps your other code working)
-	  $(document).ready(initRequestCourseAutocomplete);  
+	// Turbo-aware init
+	document.addEventListener('turbo:load', initRequestCourseAutocomplete);
+	// Fallback for non-Turbo pages (keeps your other code working)
+	$(document).ready(initRequestCourseAutocomplete);  
 
 	$("#rollover_course_term, #rollover_course_year").on("input_load change", function(e) {
 		var term = $("#rollover_course_term").val();

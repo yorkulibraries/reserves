@@ -1,52 +1,111 @@
-<div class="modal wide" id="item_form" tabindex="-1" aria-labelledby="item_form_label" aria-hidden="true">
+<div class="modal wide"
+     id="item_form"
+     tabindex="-1"
+     aria-labelledby="item_form_label"
+     aria-hidden="true"
+     data-initializer="<%=
+       if @item.item_type == Item::TYPE_BOOK
+         { 'primo' => 'initPrimoSearch', 'alma' => 'initAlmaLink', 'citation' => 'initCitationHelper' }[@source]
+       end
+     %>">
   <div class="modal-dialog">
     <div class="modal-content">
-      <!-- Modal Header -->
+
       <div class="modal-header">
-        <h4 class="modal-title" id="item_form_label"><%= @item.new_record? ? "Adding" : "Updating" %> a <%= @item.item_type.humanize %> Item</h4>
+        <h4 class="modal-title" id="item_form_label">
+          <%= @item.new_record? ? "Adding" : "Updating" %> a <%= @item.item_type.humanize %> Item
+          <% if @source.present? %><small class="text-muted"> · <%= @source.humanize %></small><% end %>
+        </h4>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
 
       <div class="modal-body">
-        <% unless [Item::TYPE_PHOTOCOPY, Item::TYPE_COURSE_KIT].include? @item.item_type %>
-          <%= render "search/primo/new", search_type: @item.item_type %>
+        <% if @item.item_type == Item::TYPE_BOOK %>
+          <% case @source
+             when "primo"    %>
+               <%= render "search/primo/new", search_type: @item.item_type %>
+          <% when "alma"     %>
+               <%= render "search/alma/new" %>
+          <% when "citation" %>
+               <%= render "search/citation/new" %>
+          <% else %>
+          <% end %>
+        <% else %>
+          <% unless [Item::TYPE_PHOTOCOPY, Item::TYPE_COURSE_KIT].include?(@item.item_type) %>
+            <%= render "search/primo/new", search_type: @item.item_type %>
+          <% end %>
         <% end %>
 
-        <%= simple_form_for [@request, @item], remote: true do |f| %>
-          <!-- Info Row -->
-          <div class="row small required py-3">
-            <div class="col-md-12 fw-bold text-mute">
-              <i class="fa fa-exclamation"></i> All fields in the blue area are mandatory.
+        <div id="item_form_container">
+          <%= simple_form_for [@request, @item], remote: true do |f| %>
+            <div class="row small required py-3">
+              <div class="col-md-12 fw-bold text-mute">
+                <i class="fa fa-exclamation"></i>
+                All fields in the blue area are mandatory.
+              </div>
             </div>
-          </div>
 
-          <%= render partial: "items/form_fields/#{@item.item_type}_form_fields", locals: { f: f } %>
-          
+            <%
+              type = @item.item_type.to_s
+              src  = (@source || "").to_s
 
-  				<%= f.hidden_field :metadata_source_id, value: 0, class: "form-control"  %>
-  				<%= f.hidden_field :metadata_source, value: Item::METADATA_MANUAL, class: "form-control" %>
-  		    <%= f.hidden_field :item_type, value: @item.item_type, class: "form-control" %>
+              base_partial     = "items/form_fields/#{type}_form_fields"
+              book_src_partial = "items/form_fields/book_#{src}_form_fields"
 
-  				<% if @item.errors.any? %>
-  					<div class="error_messages">
-  						<hr/>
-  						<p class="red">
-  							Oops! There seems to be a small issue with this item. Please make sure you've filled out the form correctly.<br/>
-  							If <span title="<%=raw  @item.errors.full_messages.join("<br/>") %>">the problem</span>
-  							persists, please contact the administrator of this application.
-  						</p>
-  					</div>
-  				<% end %>
+              partial_to_render =
+                if type == 'book' && src.present? && lookup_context.exists?(book_src_partial, [], true)
+                  book_src_partial
+                elsif lookup_context.exists?(base_partial, [], true)
+                  base_partial
+                else
+                  "items/form_fields/book_form_fields"
+                end
+            %>
 
-          <hr/>
-          <div class="text-right">
-            <button type="button" class="btn btn-warning" data-bs-dismiss="modal">Cancel Changes</button>
-             <%= f.button :submit, class: "btn-success" %>
-          </div>
-        <% end %>
+            <%= render partial: partial_to_render, locals: { f: f, item: @item, request: @request } %>
+
+            <%# Hidden fields: single source of truth for metadata + type %>
+            <%
+              metadata_source =
+                if @item.item_type == Item::TYPE_BOOK
+                  case @source
+                  when "primo" then (defined?(Item::METADATA_PRIMO) ? Item::METADATA_PRIMO : "primo")
+                  when "alma"  then (defined?(Item::METADATA_ALMA)  ? Item::METADATA_ALMA  : "alma")
+                  when "citation" then (defined?(Item::METADATA_MANUAL) ? Item::METADATA_MANUAL : "manual")
+                  else (defined?(Item::METADATA_MANUAL) ? Item::METADATA_MANUAL : "manual")
+                  end
+                else
+                  (defined?(Item::METADATA_MANUAL) ? Item::METADATA_MANUAL : "manual")
+                end
+            %>
+            <%= f.hidden_field :metadata_source,    value: metadata_source %>
+            <%= f.hidden_field :metadata_source_id, value: nil %>
+            <%= f.hidden_field :item_type,          value: @item.item_type %>
+
+            <% if @item.errors.any? %>
+              <div class="error_messages">
+                <hr/>
+                <p class="red">
+                  Oops! There seems to be a small issue with this item. Please make sure you've filled out the form correctly.<br/>
+                  If <span title="<%= raw @item.errors.full_messages.join("<br/>") %>">the problem</span>
+                  persists, please contact the administrator of this application.
+                </p>
+              </div>
+            <% end %>
+
+            <hr/>
+            <div class="text-right">
+              <button type="button" class="btn btn-warning" data-bs-dismiss="modal">Cancel Changes</button>
+              <%= f.button :submit, class: "btn-success" %>
+            </div>
+          <% end %>
+        </div>
+
+        <button id="show_item_form_btn" type="button" class="btn btn-sm btn-outline-secondary d-none">
+          Show manual fields
+        </button>
       </div>
 
-
-    </div><!-- /.modal-content -->
-  </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
+    </div>
+  </div>
+</div>

@@ -1,0 +1,54 @@
+<div class="alert alert-info d-flex align-items-center gap-2">
+  <i class="fa fa-link me-2"></i>
+  <div>
+    Paste an <strong>Alma MMS ID</strong> to link this item to an existing record.
+  </div>
+</div>
+
+<div class="input-group mb-3">
+  <input id="alma_mms_id"
+         type="text"
+         class="form-control"
+         placeholder="e.g., 991234567890123456"
+         pattern="[0-9Xx]+"
+         inputmode="numeric"
+         aria-label="Alma MMS ID">
+  <button id="alma_apply_btn" class="btn btn-outline-primary" type="button">Use MMS ID</button>
+</div>
+
+<small class="text-muted">
+  Tip: If you already have the Alma record open, copy the MMS ID from the record details and paste it here.
+</small>
+
+<script>
+  window.initAlmaLink = function initAlmaLink() {
+    const modal   = document.getElementById('item_form');
+    if (!modal) return;
+
+    const input   = modal.querySelector('#alma_mms_id');
+    const btn     = modal.querySelector('#alma_apply_btn');
+
+
+    const idHidden     = modal.querySelector('input[name="item[metadata_source_id]"]');
+    const sourceHidden = modal.querySelector('input[name="item[metadata_source]"]');
+
+    if (sourceHidden && !sourceHidden.value) sourceHidden.value = 'alma';
+
+    const apply = () => {
+      const mms = (input?.value || '').trim();
+      if (!mms) { input?.focus(); return; }
+      if (idHidden) idHidden.value = mms;
+
+
+      if (btn) {
+        btn.textContent = 'Linked ✔';
+        setTimeout(() => btn.textContent = 'Use MMS ID', 1500);
+      }
+    };
+
+    btn?.addEventListener('click', apply);
+    input?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); apply(); }
+    });
+  };
+</script>

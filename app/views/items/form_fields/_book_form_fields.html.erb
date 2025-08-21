@@ -33,7 +33,12 @@
 <div class="row required pb-3">
 	<hr/>
 	<div class="col-md-6"><%= f.input :loan_period, collection: LoanPeriod.all.collect { |p| p.duration }, required: true %></div>
-	<div class="col-md-6"><%= f.input :provided_by_requestor, as: :radio_buttons,  label: "Will you be providing this item?", required: true %></div>
+	<div class="col-md-6"><%= f.input :provided_by_requestor,as: :radio_buttons, label: "Will you be providing this item?", required: true, 
+								collection: [["Yes", true], ["No", false]],
+								label_html: { class: "d-block mb-1" },
+								collection_wrapper_tag: :div,
+								collection_wrapper_class: "d-flex gap-3" %>
+</div>
 </div>
 
 <div class="row required py-3" style="display:none">

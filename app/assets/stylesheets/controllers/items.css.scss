@@ -136,4 +136,13 @@ form {
 	color: #000;
 }
 
+/* Show dropdown on hover for pointer devices */
+@media (hover: hover) {
+	.hover-dropdown:hover .dropdown-menu {
+	  display: block;
+	}
+  }
+  .hover-dropdown .dropdown-toggle::after { display: none; }
+  
+
 /* Gray */

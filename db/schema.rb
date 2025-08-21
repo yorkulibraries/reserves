@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2025_06_25_151515) do
+ActiveRecord::Schema[7.0].define(version: 2025_08_20_205717) do
   create_table "acquisition_requests", id: :integer, charset: "utf8mb3", collation: "utf8mb3_unicode_ci", force: :cascade do |t|
     t.integer "item_id"
     t.integer "requested_by_id"
@@ -67,6 +67,7 @@ ActiveRecord::Schema[7.0].define(version: 2025_06_25_151515) do
     t.string "code_credits"
     t.string "code_section"
     t.string "alma_instructor_id"
+    t.string "course_number"
   end
 
   create_table "courses_faculties", charset: "latin1", force: :cascade do |t|

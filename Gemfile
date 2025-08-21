@@ -57,6 +57,7 @@ gem 'exception_notification', '~> 4.5'
 
 # citation parser
 gem 'anystyle'
+gem "anystyle-data"
 
 ## TESTING && DEVELOPMENT ##
 gem 'rb-readline'

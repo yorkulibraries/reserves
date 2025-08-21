@@ -1,6 +1,41 @@
-<div class="add-items mb-3">
-  <span class="btn btn-link btn-lg add-title green"><span class="fa fa-plus-square"></span> Add an item:</span>
+<div class="add-items mb-3 d-flex align-items-center gap-2">
+  <span class="btn btn-link btn-lg add-title green">
+    <span class="fa fa-plus-square"></span> Add an item:
+  </span>
+
   <% Item::TYPES.reject { |t| @request.reserve_location.disallowed_item_types.include?(t) }.each do |type| %>
-    <%= link_to type.humanize, new_request_item_path(@request, type: type), remote: true, class: "btn btn-link item-option" %>
+    <% if type.to_s == "book" %>
+      <div class="dropdown hover-dropdown">
+        <button
+          class="btn btn-link item-option dropdown-toggle px-0"
+          type="button"
+          data-bs-toggle="dropdown"
+          data-bs-auto-close="outside"
+          aria-expanded="false">
+          Book
+        </button>
+        <ul class="dropdown-menu shadow">
+          <li>
+            <%= link_to "Enter citation",
+                        new_request_item_path(@request, type: "book", source: "citation"),
+                        remote: true, class: "dropdown-item" %>
+          </li>
+          <li>
+            <%= link_to "Search in Primo",
+                        new_request_item_path(@request, type: "book", source: "primo"),
+                        remote: true, class: "dropdown-item" %>
+          </li>
+          <li>
+            <%= link_to "Link Alma record",
+                        new_request_item_path(@request, type: "book", source: "alma"),
+                        remote: true, class: "dropdown-item" %>
+          </li>
+        </ul>
+      </div>
+    <% else %>
+      <%= link_to type.humanize,
+                  new_request_item_path(@request, type: type),
+                  remote: true, class: "btn btn-link item-option" %>
+    <% end %>
   <% end %>
 </div>

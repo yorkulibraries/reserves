@@ -1,0 +1,18 @@
+<div class="alert alert-info d-flex align-items-center gap-2">
+  <i class="fa fa-quote-left me-2"></i>
+  <div>Paste a <strong>formatted citation</strong>. We’ll parse it and fill the form.</div>
+</div>
+
+<div class="mb-3">
+  <label for="citation_text" class="form-label">Citation</label>
+  <textarea id="citation_text" class="form-control" rows="3"
+    placeholder='e.g., Doe, J. (2019). "Understanding Algorithms." Journal of Computing, 12(3), 45–67.'></textarea>
+</div>
+
+<div class="d-flex align-items-center gap-2 mb-2">
+  <button id="citation_apply_btn" class="btn btn-outline-primary" type="button">Copy to form</button>
+  <button id="citation_clear_btn" class="btn btn-link" type="button">Clear</button>
+  <span id="citation_status" class="text-muted ms-2"></span>
+</div>
+
+<input type="hidden" name="raw_citation" id="raw_citation">

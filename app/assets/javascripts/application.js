@@ -20,9 +20,10 @@
 //= require jquery-ui/widgets/datepicker
 //= require jquery-ui/widgets/autocomplete
 //= require jquery-ui/effects/effect-highlight
+//= require citation_helper
+//= require alma_helper
 //= require_self
 //= require_tree .
-
 
 
 $(document).ready(function () {

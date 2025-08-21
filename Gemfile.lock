@@ -448,6 +448,7 @@ PLATFORMS
 DEPENDENCIES
   alma
   anystyle
+  anystyle-data
   audited (~> 5.4, >= 5.4.3)
   bootstrap (~> 5.3, >= 5.3.3)
   byebug (~> 11.1, >= 11.1.3)
