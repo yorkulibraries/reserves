@@ -25,11 +25,13 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     Capybara.default_driver = :selenium
 
     super
-
-    current_window.resize_to(1280, 800)
     
     user = FactoryGirl.create(:user)
     login_as(user, role: User::STAFF_ROLE)
+
+    current_window.resize_to(1920, 1080)
+
+    find('body', wait: Capybara.default_max_wait_time) # Ensure page is stable
   end
 
 end
