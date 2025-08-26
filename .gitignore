@@ -24,4 +24,3 @@ yarn.lock
 *.sh
 log/*
 *.bk
-*.csv
