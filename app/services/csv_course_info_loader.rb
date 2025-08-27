@@ -31,7 +31,7 @@ class CsvCourseInfoLoader
         period_faculty: cleaned_row[:periodfaculty],
         subject_abrev: cleaned_row[:subject_abrev],
         subject_abrev2: cleaned_row[:subject_abrev2],
-        subject: cleaned_row[:subject],
+        subject: cleaned_row[:subject].presence || cleaned_row[:subject_abrev],
         academic_year: cleaned_row[:academicyear],
         study_session: cleaned_row[:studysession],
         crs_id: cleaned_row[:crsid],

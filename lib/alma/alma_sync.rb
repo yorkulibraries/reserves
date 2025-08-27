@@ -24,10 +24,12 @@ module Alma
       end
     
 
-      ac = Alma::Course.find_by_code(course.code)
+      alma_code = alma_course_code_for(course)
+      list_name = reading_list_name_for(course) 
+      ac = Alma::Course.find_by_code(alma_code)
       unless ac
         ac = Alma::Course.create(
-          "code"                   => course.code,
+          "code"                   => alma_code,
           "name"                   => course.name,
           "status"                 => "ACTIVE",
           "processing_department"  => { "value" => "YOR_CR", "desc" => "York University Course Reserves" },
@@ -36,16 +38,10 @@ module Alma
           "note"                   => [{ "value" => "Created by #{user.email} via Reserves app" }],
           "instructor"             => [ { "primary_id" => instructor_id } ]
         )
-        Rails.logger.info("✅ Created Alma course #{course.code} (ID #{ac['id']})")
+        Rails.logger.info("✅ Created Alma course #{alma_code} (ID #{ac['id']})")
       end
       request.update_column(:alma_course_id, ac["id"])
 
-
-      list_name = ReadingList.generate_reading_list_name(
-        course:     course,
-        instructor: course.instructor
-      )
-      list_name = list_name.truncate(50)
       rl = ReadingList.find_by_name(ac["id"], list_name)
       unless rl
         rl = ReadingList.create(
@@ -128,6 +124,18 @@ module Alma
     end
 
     private
+
+    def self.alma_course_code_for(course)
+      subject = course.code_subject.to_s.upcase
+      number  = (course.course_number.presence || course.code.to_s[/_(.+?)__/, 1]).to_s
+      "#{subject}#{number}"
+    end
+
+    def self.reading_list_name_for(course)
+      base = alma_course_code_for(course)
+      instr = course.instructor.to_s.delete(" ")
+      "#{base}_#{instr}".slice(0, 50)
+    end
 
     def self.create_or_find_instructor(course)
       raw_name = course.instructor.to_s

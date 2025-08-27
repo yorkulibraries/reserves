@@ -124,13 +124,13 @@ class CoursesControllerTest < ActionDispatch::IntegrationTest
      
 
   should 'should return empty array if no matching courses' do
-    Course.reindex
+    CourseInfo.stubs(:search).returns([])
+  
     get autocomplete_courses_path, params: { term: 'UNMATCHABLE_TERM' }
-
     assert_response :success
     result = JSON.parse(response.body)
     assert_equal [], result
-  end
+  end  
   
   should 'destroy course' do
     assert_difference('Course.count', -1) do

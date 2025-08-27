@@ -58,23 +58,25 @@ $(document).ready(function() {
   
 	
 	function computeDates(year, term) {
+		const y = Number(year); // force numeric
+		if (!Number.isFinite(y)) return { start: '', end: '' };
 		let startMonthDay = "09-01",
 			endMonthDay   = "04-30",
-			startYear     = year,
-			endYear       = year + 1;
+			startYear     = y,
+			endYear       = y + 1;
 
 		switch(term) {
 		case "F":
 			endMonthDay = "12-31";
-			endYear     = year;
+			endYear     = y;
 			break;
 		case "W":
 			startMonthDay = "01-01";
-			startYear    = year + 1;
+			startYear    = y + 1;
 			break;
 		case "S": case "SU": case "S1": case "S2":
 			startMonthDay = "05-01";
-			startYear    = year + 1;
+			startYear    = y + 1;
 			endMonthDay  = "08-30";
 			break;
 		}
@@ -86,13 +88,7 @@ $(document).ready(function() {
 	}
 
 	
-	function updateReserveDatesFromCode(code) {
-		if (!code) return;
-		const parts = code.split('_');
-		if (parts.length < 4) return;
-
-		const year = parseInt(parts[0], 10),
-			term = parts[3];
+	function updateReserveDatesFromCode(year, term) {
 		if (isNaN(year)) return;
 
 		const { start, end } = computeDates(year, term);
@@ -115,11 +111,12 @@ $(document).ready(function() {
 			$input.autocomplete('widget').css('width', widthPx + 'px');
 		  },
 		  select(event, ui) {
+			console.log(ui)
 			$search.val(ui.item.label);
 	  
-			$('#request_course_id_hidden').val(ui.item.value);
+			$('#request_course_info_id_hidden').val(ui.item.value);
 	  
-			updateReserveDatesFromCode(ui.item.code);
+			updateReserveDatesFromCode(ui.item.year, ui.item.term);
 	  
 			const rawName = (ui.item.instructor || '').trim();
 	  
@@ -236,7 +233,7 @@ $(document).ready(function() {
 		$search.on('autocompletechange', function(event, ui) {
 		  if (!ui.item) {
 			$search.val('');
-			$('#request_course_id_hidden').val('');
+			$('#request_course_info_id_hidden').val('');
 			$('#request_reserve_start_date').val('');
 			$('#request_reserve_end_date').val('');
 			$('#request_alma_instructor_id').val('');

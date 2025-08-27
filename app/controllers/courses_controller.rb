@@ -57,25 +57,28 @@ class CoursesController < ApplicationController
     academic_start = Date.today.month < 9 ? Date.today.year - 1 : Date.today.year
     allowed_years  = [academic_start.to_s, (academic_start + 1).to_s]
 
-    courses = Course.search(
-      params[:term],
-      fields: [:code, :name],
+    term = params[:term].to_s.strip
+    courses = CourseInfo.search(
+      term,
+      fields: %i[
+        subject_abrev subject course_number course_title instructor_name faculty_abrev faculty_short
+      ],
       match:  :word_start,
-      where:  { code_year: allowed_years },
-      load:   false,
+      where:  { academic_year: allowed_years },
+      load:   true,
       limit:  100
     )
 
     render json: courses.map { |c|
-      parts = parse_code(c.code)
+      parts = info_parts(c)
       credits = parts[:credits].to_s.include?('.') ? parts[:credits] : "#{parts[:credits]}.00"
-
+      
       {
         label: build_label(c, parts),
         value: c.id,
-        code:  c.code,
-        instructor: c.instructor,
-        title: c.name,
+        code:  build_code_from_info(c, parts),
+        instructor: display_instructor(c.instructor_name),
+        title: c.course_title,
         faculty: parts[:faculty],
         subject: parts[:subject],
         number: parts[:number],
@@ -101,42 +104,54 @@ class CoursesController < ApplicationController
 
   private
 
-  # Expected code examples:
-  # 2024_GS_TRAN_FW_5700__3_A
-  # 2025_ED_EDUC_F_5340__3_A_KarenMurray (extra tail is ignored)
-  #
-  # Captures: year, faculty, subject, term, number, credits, section
-  def parse_code(code)
-    return {} if code.blank?
-
-    m = code.match(
-      /\A
-        (?<year>\d{4})_
-        (?<faculty>[A-Z]+)_
-        (?<subject>[A-Z]+)_
-        (?<term>F|W|FW|Y|S|SU|S1|S2)_
-        (?<number>[A-Z0-9]+)__
-        (?<credits>[0-9]+(?:\.[0-9]{1,2})?)_
-        (?<section>[A-Z0-9]+)
-      /x
-    )
-    return {} unless m
-
-    m.named_captures.transform_keys!(&:to_sym)
+  # Build the same “parts” hash previously from parse_code(c.code)
+  # Keys: :faculty, :subject, :number, :credits, :section, :term, :year
+  def info_parts(info)
+    faculty = (info.faculty_abrev.presence || info.faculty_short.presence || info.faculty).to_s.upcase.gsub(/[^A-Z]/, '')
+    subject = (info.subject_abrev.presence || info.subject).to_s.upcase.gsub(/[^A-Z]/, '')
+    number  = info.course_number.to_s.upcase
+    credits = info.credit.present? ? sprintf('%.2f', info.credit.to_f) : '0.00'
+    {
+      faculty: faculty,
+      subject: subject,
+      number:  number,
+      credits: credits,
+      section: info.section.to_s.upcase,
+      term:    normalize_term(info.study_session),
+      year:    info.academic_year.to_s
+    }
   end
 
   def build_label(course, p)
     if p.present?
       credits = p[:credits].to_s.include?('.') ? p[:credits] : "#{p[:credits]}.00"
-      instructor = display_instructor(course.instructor)
+      instructor = display_instructor(course.instructor_name)
 
       # [course title] [faculty]/[subject] [course_number] [credits] [section] [instructor name]
       # Example: "Independent Study, HH/GH 4000 3.00, A, Amrita Daftary"
-      "#{course.name}, #{p[:faculty]}/#{p[:subject]} #{p[:number]} #{credits}, #{p[:section]}, #{instructor}"
+      "#{course.course_title}, #{p[:faculty]}/#{p[:subject]} #{p[:number]} #{credits}, #{p[:section]}, #{instructor}"
     else
-      instructor = display_instructor(course.instructor)
-      "#{course.name}, #{course.code}, #{instructor}"
+      instructor = display_instructor(course.instructor_name)
+      "#{course.course_title}, #{course.code}, #{instructor}"
     end
+  end
+
+  def normalize_term(study_session)
+    s = study_session.to_s.strip.upcase
+    case s
+    when 'FALL', 'F' then 'F'
+    when 'WINTER', 'W' then 'W'
+    when 'FALL/WINTER', 'FW', 'F/W' then 'FW'
+    when 'Y', 'FULL YEAR' then 'Y'
+    when 'SUMMER', 'SU', 'S' then 'SU'
+    when 'S1', 'S2' then s
+    else s.presence || 'F'
+    end
+  end
+
+  def build_code_from_info(info, p)
+    return nil if p.blank?
+    [p[:year], p[:faculty], p[:subject], p[:term], p[:number]].join('_') + "__#{p[:credits]}_#{p[:section]}"
   end
 
   def display_instructor(name)
@@ -148,7 +163,7 @@ class CoursesController < ApplicationController
       n
     end
   end
-
+  
   # Use callbacks to share common setup or constraints between actions.
   def set_course
     @course = Course.find(params[:id])

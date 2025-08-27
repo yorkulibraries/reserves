@@ -11,7 +11,7 @@
 # It's strongly recommended that you check this file into your version control system.
 
 ActiveRecord::Schema[7.0].define(version: 2025_08_26_135000) do
-  create_table "acquisition_requests", charset: "utf8mb3", force: :cascade do |t|
+  create_table "acquisition_requests", id: :integer, charset: "utf8mb3", collation: "utf8mb3_unicode_ci", force: :cascade do |t|
     t.integer "item_id"
     t.integer "requested_by_id"
     t.text "acquisition_reason"
@@ -25,12 +25,12 @@ ActiveRecord::Schema[7.0].define(version: 2025_08_26_135000) do
     t.text "acquisition_source_type"
     t.text "acquisition_source_name"
     t.integer "list_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.integer "location_id"
   end
 
-  create_table "audits", charset: "utf8mb3", force: :cascade do |t|
+  create_table "audits", id: :integer, charset: "utf8mb3", force: :cascade do |t|
     t.integer "auditable_id"
     t.string "auditable_type"
     t.integer "associated_id"
@@ -74,14 +74,14 @@ ActiveRecord::Schema[7.0].define(version: 2025_08_26_135000) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "courses", charset: "utf8mb3", force: :cascade do |t|
+  create_table "courses", id: :integer, charset: "utf8mb3", force: :cascade do |t|
     t.string "name"
     t.string "code"
     t.integer "student_count"
     t.string "instructor"
     t.integer "created_by_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.string "code_year"
     t.string "code_faculty"
     t.string "code_subject"
@@ -92,21 +92,21 @@ ActiveRecord::Schema[7.0].define(version: 2025_08_26_135000) do
     t.string "course_number"
   end
 
-  create_table "courses_faculties", charset: "utf8mb3", force: :cascade do |t|
+  create_table "courses_faculties", charset: "latin1", force: :cascade do |t|
     t.string "name"
     t.string "code"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
 
-  create_table "courses_subjects", charset: "utf8mb3", force: :cascade do |t|
+  create_table "courses_subjects", charset: "latin1", force: :cascade do |t|
     t.string "name"
     t.string "code"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
 
-  create_table "items", charset: "utf8mb3", force: :cascade do |t|
+  create_table "items", id: :integer, charset: "utf8mb3", force: :cascade do |t|
     t.integer "request_id"
     t.string "metadata_source"
     t.string "metadata_source_id"
@@ -120,6 +120,8 @@ ActiveRecord::Schema[7.0].define(version: 2025_08_26_135000) do
     t.string "edition"
     t.string "loan_period"
     t.boolean "provided_by_requestor", default: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.string "item_type"
     t.string "copyright_options"
     t.text "other_copyright_options"
@@ -131,36 +133,34 @@ ActiveRecord::Schema[7.0].define(version: 2025_08_26_135000) do
     t.string "volume"
     t.string "page_number"
     t.string "issue"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
     t.string "ils_barcode"
     t.boolean "physical_copy_required", default: false
     t.string "other_isbn_issn"
     t.string "alma_citation_id"
   end
 
-  create_table "loan_periods", charset: "utf8mb3", force: :cascade do |t|
+  create_table "loan_periods", id: :integer, charset: "utf8mb3", force: :cascade do |t|
     t.string "duration"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
-  create_table "locations", charset: "utf8mb3", force: :cascade do |t|
+  create_table "locations", id: :integer, charset: "utf8mb3", force: :cascade do |t|
     t.string "name"
     t.string "contact_email"
     t.string "contact_phone"
     t.text "address"
     t.boolean "is_deleted", default: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.string "disallowed_item_types"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
     t.boolean "setting_bcc_request_status_change", default: false
     t.string "ils_location_name"
     t.boolean "setting_bcc_location_on_new_item", default: false
     t.string "acquisitions_email"
   end
 
-  create_table "requests", charset: "utf8mb3", force: :cascade do |t|
+  create_table "requests", id: :integer, charset: "utf8mb3", force: :cascade do |t|
     t.integer "requester_id"
     t.integer "course_id"
     t.integer "assigned_to_id"
@@ -172,8 +172,8 @@ ActiveRecord::Schema[7.0].define(version: 2025_08_26_135000) do
     t.date "reserve_end_date"
     t.string "status"
     t.boolean "removed_from_reserves", default: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.string "requester_email"
     t.integer "rollover_parent_id"
     t.datetime "rolledover_at"
@@ -183,17 +183,17 @@ ActiveRecord::Schema[7.0].define(version: 2025_08_26_135000) do
     t.string "alma_reading_list_id"
   end
 
-  create_table "settings", charset: "utf8mb3", force: :cascade do |t|
+  create_table "settings", id: :integer, charset: "utf8mb3", force: :cascade do |t|
     t.string "var", null: false
     t.text "value"
     t.integer "thing_id"
     t.string "thing_type", limit: 30
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.index ["thing_type", "thing_id", "var"], name: "index_settings_on_thing_type_and_thing_id_and_var", unique: true
   end
 
-  create_table "users", charset: "utf8mb3", force: :cascade do |t|
+  create_table "users", id: :integer, charset: "utf8mb3", force: :cascade do |t|
     t.string "name"
     t.string "email"
     t.string "phone"
@@ -208,8 +208,8 @@ ActiveRecord::Schema[7.0].define(version: 2025_08_26_135000) do
     t.integer "location_id"
     t.integer "created_by_id"
     t.datetime "last_login"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.string "encrypted_password", default: "", null: false
     t.string "username", null: false
     t.integer "sign_in_count", default: 0, null: false

@@ -98,11 +98,14 @@ class Course < ApplicationRecord
   end
 
   def course_number
-    get_value_from_code(4)
+    # Prefer the DB column; fall back to parsing from code
+    self[:course_number].presence || get_value_from_code(4)
   end
-
-  def course_number=(course_number)
-    insert_into_code(4, course_number)
+  
+  def course_number=(val)
+    # Write to the DB attribute AND keep code in sync
+    self[:course_number] = val
+    insert_into_code(4, val)
   end
 
   def credits
@@ -122,6 +125,12 @@ class Course < ApplicationRecord
   end  
 
   ####### HELPER METHODS #########
+
+  def display_code
+    parts = code.to_s.split("_")
+    # Base form is 8 parts: [year, faculty, subject, term, number, "", credits, section]
+    parts.length > 8 ? parts.first(8).join("_") : code.to_s
+  end
 
   def insert_into_code(position, value)
     broken = code&.split('_') || Array.new(7, "")
