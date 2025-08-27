@@ -62,7 +62,6 @@ class RequestsControllerTest < ActionDispatch::IntegrationTest
     
       request = create(:request, course: old_course)
     
-      # Controller now derives Course from course_info_id
       RequestsController.any_instance
         .stubs(:ensure_course_from_info!)
         .returns(new_course)
@@ -71,7 +70,7 @@ class RequestsControllerTest < ActionDispatch::IntegrationTest
     
       patch request_path(request), params: {
         request: {
-          course_info_id: 42, # any non-blank id; stub returns new_course
+          course_info_id: 42,
           reserve_start_date: request.reserve_start_date
         }
       }
