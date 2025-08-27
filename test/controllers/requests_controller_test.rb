@@ -62,11 +62,16 @@ class RequestsControllerTest < ActionDispatch::IntegrationTest
     
       request = create(:request, course: old_course)
     
-      Alma::AlmaSync.expects(:sync_request).with(request, @user)
+      # Controller now derives Course from course_info_id
+      RequestsController.any_instance
+        .stubs(:ensure_course_from_info!)
+        .returns(new_course)
+    
+      Alma::AlmaSync.expects(:sync_request).with(kind_of(Request), @user).once
     
       patch request_path(request), params: {
         request: {
-          course_id: new_course.id,
+          course_info_id: 42, # any non-blank id; stub returns new_course
           reserve_start_date: request.reserve_start_date
         }
       }
@@ -74,7 +79,7 @@ class RequestsControllerTest < ActionDispatch::IntegrationTest
       assert_redirected_to request_path(request)
       request.reload
       assert_equal new_course.id, request.course_id
-    end    
+    end        
 
     should 'not sync with Alma if course_id stays the same' do
       course = create(:course)
