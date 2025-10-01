@@ -172,4 +172,40 @@ class RequestTest < ActiveSupport::TestCase
     
     assert request.valid?, 'Request should be valid when no existing request exists for course'
   end
+
+  should 'expose associated data for search indexing' do
+    request = create(:request)
+
+    data = request.search_data
+
+    assert_equal request.course.name, data[:course_name]
+    assert_equal request.course.code, data[:course_code]
+    assert_equal request.course.instructor, data[:course_instructor]
+    assert_equal request.requester.name, data[:requester_name]
+  end
+
+  should 'provide fallback search data when associations missing' do
+    request = Request.new
+
+    data = request.search_data
+
+    assert_equal 'No Course Assigned', data[:course_name]
+    assert_equal 'Unknown Code', data[:course_code]
+    assert_equal 'No Instructor Assigned', data[:course_instructor]
+    assert_equal 'Unknown Requester', data[:requester_name]
+  end
+
+  should 'return reserve_location via location helper' do
+    request = create(:request)
+
+    assert_equal request.reserve_location, request.location
+  end
+
+  should 'know when a request has been rolled over' do
+    parent_request = create(:request)
+    rolled_request = create(:request, rollover_parent: parent_request)
+
+    assert rolled_request.rolledover?, 'Child request should report as rolled over'
+    refute parent_request.rolledover?, 'Original request should not report as rolled over'
+  end
 end

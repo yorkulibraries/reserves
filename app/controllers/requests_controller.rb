@@ -171,6 +171,25 @@ class RequestsController < ApplicationController
 
   def set_request
     @request = Request.find(params[:id])
+  
+    if @request.alma_course_id.present? && @request.alma_reading_list_id.present?
+      begin
+        result = Alma::ReadingListSync.sync!(request_id: @request.id, actor_id: current_user.id)
+  
+        if result[:added_local].to_i > 0
+          #flash.now[:notice] = "New Items found. Synced items with Alma."
+          flash.now[:notice] = "New Items found. Synced #{result[:added_local]} item(s) with Alma."
+        end
+  
+        if result[:failed_local].to_i > 0
+          flash.now[:alert] = "#{result[:failed_local]} item(s) failed to sync from Alma and were skipped."
+        end
+      rescue => e
+        Rails.logger.error("❌ Inline Alma sync failed for Request##{@request.id}: #{e.class}: #{e.message}")
+        flash.now[:alert] = 'Alma sync failed; displaying existing items.'
+      end
+    end
+  
     @items = @request.items.includes(:audits)
     @notes = {}
     @items.each do |item|

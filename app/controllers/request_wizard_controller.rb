@@ -24,7 +24,6 @@ class RequestWizardController < ApplicationController
     @request.requester_id = current_user.id
     @request.audit_comment = 'Request Step One Completed'
   
-    # persist user's contact edits (best-effort, don't block Step 1)
     if params.dig(:request, :user)
       current_user.update(
         office:     params[:request][:user][:office],
@@ -41,7 +40,7 @@ class RequestWizardController < ApplicationController
     end
   
     typed_count_param = params.dig(:request, :course_attributes, :student_count)
-    typed_count = typed_count_param.to_s.gsub(/[^\d]/, '') # keep digits only
+    typed_count = typed_count_param.to_s.gsub(/[^\d]/, '')
     typed_count = typed_count.presence&.to_i
   
     course = ensure_course_from_info!(course_info_id, student_count: typed_count)
@@ -116,8 +115,6 @@ class RequestWizardController < ApplicationController
     parts = parts_from_info(info)
     code  = build_code_from_info(parts, info.instructor_name)
     course = Course.find_or_initialize_by(code: code)
-    puts 'info.course_number111'
-    puts info.course_number
     if course.new_record?
       course.assign_attributes(
         name:          info.course_title.presence || info.course_title1,
@@ -131,15 +128,8 @@ class RequestWizardController < ApplicationController
         credits:       parts[:credits],
         student_count: student_count || 0
       )
-      puts 'info.course_number222'
-      puts info.course_number
-
-      puts 'course.course_number111'
-      puts course.course_number
       course.audit_comment = "Created from CourseInfo #{info.id}"
       course.save!
-      puts 'course.course_number2222'
-      puts course.course_number
     end
   
     course

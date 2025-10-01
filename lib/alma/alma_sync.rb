@@ -133,42 +133,55 @@ module Alma
 
     def self.reading_list_name_for(course)
       base = alma_course_code_for(course)
-      instr = course.instructor.to_s.delete(" ")
-      "#{base}_#{instr}".slice(0, 50)
-    end
+      instr = course.instructor.to_s.strip
+    
+      if instr.present? && instr.upcase != "TBA"
+        "#{base}_#{instr.delete(' ')}".slice(0, 50)
+      else
+        base.slice(0, 50)
+      end
+    end    
 
     def self.create_or_find_instructor(course)
-      raw_name = course.instructor.to_s
-      clean_name = raw_name.gsub(/[^A-Za-z\s]/, '').strip.gsub(/\s+/, ' ')
+      raw = course.instructor.to_s.strip
+      return nil if raw.blank? || raw.casecmp('TBA').zero?
+    
+      first_name, last_name = parse_name(raw)
+    
+      result = Alma::User.find_best_by_name(first_name:, last_name:)
+      case result[:status]
+        when :ok
+          return result[:user]['primary_id']
+        when :ambiguous
+          ids = result[:candidates].map { |u| u['primary_id'] }.join(', ')
+          Rails.logger.warn("⚠️ Multiple plausible Alma users for #{first_name} #{last_name}: #{ids}")
+          return nil
+        when :none
+          payload = {
+            "record_type"  => { "value" => "PUBLIC" },
+            "first_name"   => first_name,
+            "last_name"    => last_name,
+            "user_group"   => { "value" => "FACULTY" },
+            "account_type" => { "value" => "INTERNAL" },
+            "user_roles"   => { "user_role" => [{ "role_type" => { "value" => "INSTRUCTOR" } }] }
+          }
+          created = Alma::User.create(payload)
+          Rails.logger.info("✅ Created Alma instructor #{created['primary_id']}")
+          return created['primary_id']
+      end
+    rescue => e
+      Rails.logger.error("❌ create_or_find_instructor failed: #{e.class}: #{e.message}")
+      nil
+    end    
+
+    def self.parse_name(raw)
+      clean_name = raw.to_s.gsub(/[^A-Za-z\s]/, '').strip.gsub(/\s+/, ' ')
       parts = clean_name.split(' ')
       first_name = parts.first || ''
-      last_name = parts[1..].join(' ') || ''
-      primary_id = clean_name.delete(' ').upcase
-
-      alma_instructor = User.find_by_primary_id(primary_id: primary_id)
-      if alma_instructor.nil?
-        alma_instructor = User.find_by_name(first_name: first_name, last_name: last_name)
-      end
-      
-      if alma_instructor.nil?
-        payload = {
-          "record_type" => { "value" => "CONTACT" },
-          "first_name" => first_name,
-          "last_name" => last_name,
-          "user_group" => { "value" => "FACULTY" },
-          "account_type" => { "value" => "INTERNAL" }
-        }
-        alma_instructor = User.create(payload)
-        Rails.logger.info("✅ Created Alma instructor #{primary_id}")
-      else
-        Rails.logger.info("✅ Found existing Alma instructor")
-      end
-
-      alma_instructor["primary_id"] || alma_instructor["id"]
-    rescue => e
-      Rails.logger.error("❌ create_or_find_instructor failed: #{e.message}")
-      nil
+      last_name  = parts[1..].join(' ') || ''
+      [first_name, last_name]
     end
+    
 
     def self.perform_get_request(uri)
       http = Net::HTTP.new(uri.host, uri.port)

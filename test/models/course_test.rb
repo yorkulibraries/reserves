@@ -179,4 +179,16 @@ class CourseTest < ActiveSupport::TestCase
     assert_equal 'B', course.section
     assert_equal '9', course.credits
   end
+
+  should 'display trimmed base course code when extra segments present' do
+    course = build(:course, code: '2024_GL_ECON_F_2500__3_A_EXTRA_SEGMENT')
+
+    assert_equal '2024_GL_ECON_F_2500__3_A', course.display_code
+  end
+
+  should 'display full code when already normalized' do
+    course = build(:course, code: '2024_GL_HIST_W_3300__3_B')
+
+    assert_equal '2024_GL_HIST_W_3300__3_B', course.display_code
+  end
 end

@@ -5,7 +5,6 @@
 		$(".items-empty-slate").remove();
 		$("#submit_request_button").removeClass("hide");
 	}
-	alert("Your item is being processed. It will appear in Alma shortly.");
 	bootstrap_modal_close("item_form");
 
 	$("#request_status_badge").text("<%= j @request.status.humanize %>");

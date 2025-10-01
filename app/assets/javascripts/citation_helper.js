@@ -10,7 +10,6 @@
     const clearBtn  = q('#citation_clear_btn');
     const statusEl  = q('#citation_status');
     const formWrap  = q('#item_form_container');
-    const showBtn   = q('#show_item_form_btn');
 
     const titleEl   = q('#item_title');
     const authorEl  = q('#item_author');
@@ -34,7 +33,7 @@
 
     function showForm() {
       if (formWrap?.classList.contains('d-none')) formWrap.classList.remove('d-none');
-      showBtn?.classList.add('d-none');
+      
     }
     function setStatus(msg) { if (statusEl) statusEl.textContent = msg || ''; }
 

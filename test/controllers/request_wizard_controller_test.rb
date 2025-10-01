@@ -219,4 +219,33 @@ class RequestWizardControllerTest < ActionDispatch::IntegrationTest
     request = get_instance_var(:request)
     assert_redirected_to new_request_step_two_path(request)
   end
+
+  should 'ensure_course_from_info! creates a course with attributes from info' do
+    info = create(:course_info, instructor_name: 'Jane Doe', course_number: '2100', credit: 6, section: 'B')
+
+    controller = RequestWizardController.new
+    course = controller.send(:ensure_course_from_info!, info.id, student_count: 45)
+
+    assert course.persisted?
+    assert_equal 'Jane Doe', course.instructor
+    assert_equal 45, course.student_count
+
+    parts = controller.send(:parts_from_info, info)
+    expected_code = controller.send(:build_code_from_info, parts, info.instructor_name)
+    assert_equal expected_code, course.code
+  end
+
+  should 'ensure_course_from_info! reuse existing course when code matches' do
+    info = create(:course_info, instructor_name: 'John Smith', course_number: '3300', credit: 3, section: 'C')
+    controller = RequestWizardController.new
+    parts = controller.send(:parts_from_info, info)
+    code = controller.send(:build_code_from_info, parts, info.instructor_name)
+
+    existing = create(:course, code: code, instructor: 'John Smith')
+
+    assert_no_difference('Course.count') do
+      course = controller.send(:ensure_course_from_info!, info.id, student_count: 12)
+      assert_equal existing.id, course.id
+    end
+  end
 end

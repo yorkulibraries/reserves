@@ -3,6 +3,7 @@
 require 'application_system_test_case'
 require 'helpers/system_test_helper'
 require 'devise/test/integration_helpers' # Add this line
+require 'securerandom'
 
 class RequestTest < ApplicationSystemTestCase
   include Devise::Test::IntegrationHelpers # Include the Devise helpers
@@ -11,7 +12,8 @@ class RequestTest < ApplicationSystemTestCase
   setup do
     @admin_user = create(:user, admin: true, role: User::MANAGER_ROLE)
     @user = FactoryGirl.create(:user, role: User::INSTRUCTOR_ROLE)
-    FactoryGirl.create(:loan_period)
+    @loan_period = FactoryGirl.create(:loan_period, duration: '2 Hours')
+    @location = create(:location, name: 'Steacie Library')
 
     @course = create(:course, code: '2025_GL_ECON_S1_2500__3_A')
     @course1 = create(:course, code: '2025_GL_ECON_S1_2500__3_B')
@@ -75,6 +77,264 @@ class RequestTest < ApplicationSystemTestCase
 
     assert_text "Submit New Request - Step One"
     assert_text "Course cannot be empty"
+  end
+
+  test 'Add manual citation item from request wizard' do
+    request = build_incomplete_request
+
+    login_as(@user)
+    visit new_request_step_two_path(request)
+
+    assert_text 'Submit New Request - Step Two'
+
+    find('button', text: 'Book').click
+    within(find('.dropdown-menu', visible: true)) { click_link 'Enter citation' }
+
+    assert_selector '#item_form', visible: true
+
+    within '#item_form' do
+      fill_in 'item_title', with: 'Economics of Growth'
+      fill_in 'item_author', with: 'John Smith'
+      fill_in 'item_publisher', with: 'Academic Press'
+      fill_in 'item_isbn', with: '9781234567897'
+      fill_in 'item_other_isbn_issn', with: '9781234567890'
+      fill_in 'item_publication_date', with: '2024'
+      select @loan_period.duration, from: 'item_loan_period'
+      choose 'No'
+
+      click_button 'Create Item'
+    end
+
+    assert_no_selector '#item_form', visible: true, wait: 10
+    assert_selector '.items .item', text: 'Economics of Growth'
+
+    assert_selector '#submit_request_button', wait: 10
+    click_link 'I am done, submit this request'
+
+    assert_current_path request_path(request)
+    request.reload
+    assert_equal Request::OPEN, request.status
+    assert_text 'Request #'
+    assert_text 'Economics of Growth'
+    assert_text 'Open'
+  end
+
+  test 'Add Primo search item from request wizard' do
+    sample_record = primo_record(title: 'Primo Economics', author: 'Alex Primo')
+    BibFinder.any_instance.stubs(:search_primo).returns([sample_record])
+
+    request = build_incomplete_request
+
+    login_as(@user)
+    visit new_request_step_two_path(request)
+    assert_text 'Submit New Request - Step Two'
+
+    find('button', text: 'Book').click
+    within(find('.dropdown-menu', visible: true)) { click_link 'Search in Primo' }
+
+    assert_selector '#item_form', visible: true
+
+    within '#item_form' do
+      find('input[name="q"]').set('Economics')
+      click_button 'Go!'
+    end
+
+    assert_selector '#search_primo_results', wait: 10
+
+    within '#search_primo_results' do
+      click_link 'Use This'
+    end
+
+    assert_no_selector '#search_primo_results', wait: 10
+    within '#item_form' do
+      assert_field 'item_title', with: 'Primo Economics'
+      select @loan_period.duration, from: 'item_loan_period'
+      choose 'No'
+      click_button 'Create Item'
+    end
+
+    assert_no_selector '#item_form', visible: true, wait: 10
+    assert_selector '.items .item', text: 'Primo Economics'
+
+    assert_selector '#submit_request_button', wait: 10
+    click_link 'I am done, submit this request'
+
+    assert_current_path request_path(request)
+    request.reload
+    assert_equal Request::OPEN, request.status
+    assert_text 'Primo Economics'
+  end
+
+  test 'Add Alma linked item from request wizard' do
+    AlmaService.expects(:fetch_bib).with('991234567890123456').returns(
+      {
+        'title' => 'Linked Macroeconomics /',
+        'title_clean' => 'Linked Macroeconomics',
+        'author' => 'Jamie Alma',
+        'publication_date' => '2023',
+        'publisher' => 'Alma Press',
+        'edition' => '3rd ed.',
+        'isbn' => '9782222222222',
+        'other_isbn_issn' => '9782222222223',
+        'callnumber' => 'QA999 .A45 2023',
+        'description' => 'A linked Alma record.'
+      }
+    )
+
+    request = build_incomplete_request
+
+    login_as(@user)
+    visit new_request_step_two_path(request)
+    assert_text 'Submit New Request - Step Two'
+
+    find('button', text: 'Book').click
+    within(find('.dropdown-menu', visible: true)) { click_link 'Link Alma record' }
+
+    assert_selector '#item_form', visible: true
+
+    within '#item_form' do
+      fill_in 'alma_mms_id', with: '991234567890123456'
+      click_button 'Use MMS ID'
+
+      assert field_value_starts_with?('item_title', 'Linked Macroeconomics'), 'Expected title to start with Linked Macroeconomics'
+      assert_field 'item_author', with: 'Jamie Alma'
+      select @loan_period.duration, from: 'item_loan_period'
+      choose 'No'
+
+      click_button 'Create Item'
+    end
+
+    assert_no_selector '#item_form', visible: true, wait: 10
+    assert_selector '.items .item', text: 'Linked Macroeconomics'
+
+    assert_selector '#submit_request_button', wait: 10
+    click_link 'I am done, submit this request'
+
+    assert_current_path request_path(request)
+    request.reload
+    assert_equal Request::OPEN, request.status
+    assert_text 'Linked Macroeconomics'
+  end
+
+  test 'Manual citation flow surfaces validation errors' do
+    request = build_incomplete_request
+
+    login_as(@user)
+    visit new_request_step_two_path(request)
+    assert_text 'Submit New Request - Step Two'
+
+    find('button', text: 'Book').click
+    within(find('.dropdown-menu', visible: true)) { click_link 'Enter citation' }
+
+    assert_selector '#item_form', visible: true
+
+    within '#item_form' do
+      fill_in 'item_title', with: ' '
+      fill_in 'item_author', with: ' '
+      fill_in 'item_publisher', with: ' '
+      fill_in 'item_isbn', with: ' '
+      select @loan_period.duration, from: 'item_loan_period'
+      choose 'No'
+
+      click_button 'Create Item'
+    end
+
+    assert_selector '#item_form .error_messages', text: 'Oops!'
+    assert_selector '#item_form', visible: true
+    assert_selector '.items-empty-slate'
+  end
+
+  test 'Primo flow surfaces validation errors when data cleared' do
+    BibFinder.any_instance.stubs(:search_primo).returns([primo_record])
+    request = build_incomplete_request
+
+    login_as(@user)
+    visit new_request_step_two_path(request)
+    assert_text 'Submit New Request - Step Two'
+
+    find('button', text: 'Book').click
+    within(find('.dropdown-menu', visible: true)) { click_link 'Search in Primo' }
+
+    assert_selector '#item_form', visible: true
+
+    within '#item_form' do
+      find('input[name="q"]').set('Economics')
+      click_button 'Go!'
+    end
+
+    assert_selector '#search_primo_results', wait: 10
+    within '#search_primo_results' do
+      click_link 'Use This'
+    end
+
+    within '#item_form' do
+      assert_field 'item_title', with: 'Primo Economics', wait: 10
+      fill_in 'item_publisher', with: ' '
+      select @loan_period.duration, from: 'item_loan_period'
+      choose 'No'
+      click_button 'Create Item'
+    end
+
+    assert_selector '#item_form .error_messages', text: 'Oops!'
+    assert_selector '#item_form', visible: true
+  end
+
+  test 'Alma flow surfaces validation errors when required data removed' do
+    AlmaService.expects(:fetch_bib).with('990000000000000').returns(
+      {
+        'title' => 'Test Alma Resource /',
+        'title_clean' => 'Test Alma Resource',
+        'author' => 'Alma Author',
+        'publication_date' => '2020',
+        'publisher' => 'Alma Publisher',
+        'edition' => '1st ed.',
+        'isbn' => '9780000000000',
+        'other_isbn_issn' => '9780000000001',
+        'callnumber' => 'QA000 .A45 2020'
+      }
+    )
+
+    request = build_incomplete_request
+
+    login_as(@user)
+    visit new_request_step_two_path(request)
+    assert_text 'Submit New Request - Step Two'
+
+    find('button', text: 'Book').click
+    within(find('.dropdown-menu', visible: true)) { click_link 'Link Alma record' }
+
+    assert_selector '#item_form', visible: true
+
+    within '#item_form' do
+      fill_in 'alma_mms_id', with: '990000000000000'
+      click_button 'Use MMS ID'
+
+      assert_field 'item_author', with: 'Alma Author', wait: 10
+      fill_in 'item_author', with: ' '
+      select @loan_period.duration, from: 'item_loan_period'
+      choose 'No'
+      click_button 'Create Item'
+    end
+
+    assert_selector '#item_form .error_messages', text: 'Oops!'
+    assert_selector '#item_form', visible: true
+  end
+
+  test 'Admin assigns request to reserves staff from show page' do
+    other_staff = create(:user, admin: true, role: User::MANAGER_ROLE, is_reserves_staff: true, name: 'Jane Admin')
+
+    login_as(@admin_user)
+    visit request_path(@request_open)
+
+    assert_selector('button', text: /Assigned to:/)
+
+    find('button', text: /Assigned to:/).click
+    within(find('.dropdown-menu', visible: true)) do
+      click_link 'Jane Admin'
+    end
+
+    assert_text 'Assigned to Jane Admin'
+    assert_selector('button', text: /Assigned to:\s*Jane Admin/)
   end
 
   # COME BACK - CAN'T TRIGGER REQUEST COURSE INPUT IN TEST
@@ -175,7 +435,28 @@ class RequestTest < ApplicationSystemTestCase
   
   #   click_button 'Update Request Details'
   #   assert_text 'Request was successfully updated.'
-  # end            
+  # end
+
+  test 'visiting request syncs with Alma and shows notice' do
+    unique_suffix = SecureRandom.hex(2).upcase
+    unique_course = create(:course, code: "2026_GL_TEST_F_2100__3_A_#{unique_suffix}")
+    request = create(
+      :request,
+      requester: @user,
+      course: unique_course,
+      alma_course_id: 'COURSE1',
+      alma_reading_list_id: 'LIST1'
+    )
+
+    login_as(@admin_user)
+    Alma::ReadingListSync.expects(:sync!)
+                         .with(request_id: request.id, actor_id: @admin_user.id)
+                         .returns({ status: :ok, added_local: 1, failed_local: 0 })
+
+    visit request_path(request)
+
+    assert_text 'New Items found. Synced 1 item(s) with Alma.'
+  end
 
   test 'Update request item' do
     login_as(@user)
@@ -385,9 +666,46 @@ class RequestTest < ApplicationSystemTestCase
     within(:xpath, "//div[contains(@id, 'item_#{@item_open.id}')]") do
       assert_equal find('span.item-status').text, 'Ready'
     end
-  
   end
 
+  private
+
+  def build_incomplete_request(overrides = {})
+    defaults = {
+      status: Request::INCOMPLETE,
+      requester: @user,
+      reserve_location: @location,
+      assigned_to: nil,
+      assigned_to_id: nil,
+      requester_email: nil,
+      course: create(:course)
+    }
+
+    create(:request, defaults.merge(overrides))
+  end
+
+  def primo_record(overrides = {})
+    BibResult.new.tap do |record|
+      record.title = overrides.fetch(:title, 'Primo Economics')
+      record.author = overrides.fetch(:author, 'Alex Primo')
+      record.isbn_issn = overrides.fetch(:isbn_issn, '9781111111111')
+      record.other_isbn_issn = overrides.fetch(:other_isbn_issn, '9781111111112')
+      record.callnumber = overrides.fetch(:callnumber, 'QA123 .P75 2022')
+      record.publication_date = overrides.fetch(:publication_date, '2022')
+      record.publisher = overrides.fetch(:publisher, 'Primo Press')
+      record.edition = overrides.fetch(:edition, '2nd ed.')
+      record.item_type = overrides.fetch(:item_type, 'book')
+      record.description = overrides.fetch(:description, 'Book')
+      record.main_location = overrides.fetch(:main_location, 'Scott Library')
+      record.url = overrides.fetch(:url, 'https://example.com/primo')
+      record.rtype = overrides.fetch(:rtype, 'books')
+    end
+  end
+
+  def field_value_starts_with?(field, expected_prefix)
+    value = find_field(field, wait: 10).value
+    value&.start_with?(expected_prefix)
+  end
 end
 
 ########################################

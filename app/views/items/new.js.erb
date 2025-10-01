@@ -17,7 +17,6 @@
     }
 
     const formWrap  = modalEl.querySelector('#item_form_container');
-    const showBtn   = modalEl.querySelector('#show_item_form_btn');
     const primoBox  = modalEl.querySelector('#search_primo');
     const primoForm = primoBox ? (primoBox.querySelector('form.simple_form.search') || primoBox.querySelector('form')) : null;
     const resultsEl = modalEl.querySelector('#search_primo_results');
@@ -26,13 +25,23 @@
     const q  = (sel, root = modalEl) => root.querySelector(sel);
     const qa = (sel, root = modalEl) => Array.from(root.querySelectorAll(sel));
 
+    const showSpinner = () => {
+        if (!spinnerEl) return;
+        spinnerEl.classList.remove('hidden');
+        spinnerEl.classList.remove('d-none');
+    };
+    const hideSpinner = () => {
+        if (!spinnerEl) return;
+        spinnerEl.classList.add('hidden');
+        spinnerEl.classList.add('d-none');
+    };
+
+    // We no longer hide the form during search; ensure it's visible.
     const hideFormCompletely = () => {
-        if (formWrap) formWrap.classList.add('d-none');
-        if (showBtn)  showBtn.classList.remove('d-none');
+        if (formWrap) formWrap.classList.remove('d-none');
     };
     const showFormCompletely = () => {
         if (formWrap) formWrap.classList.remove('d-none');
-        if (showBtn)  showBtn.classList.add('d-none');
         unminimizeForm();
     };
 
@@ -65,7 +74,6 @@
 
         q('#item_loan_period')?.focus();
         formWrap.classList.remove('d-none');
-        showBtn?.classList.remove('d-none');
     }
 
     function unminimizeForm() {
@@ -85,16 +93,17 @@
     modalEl.addEventListener('shown.bs.modal', onShown);
 
     if (primoForm) {
+        // Keep the form visible; only show a spinner while the request is in-flight.
         primoForm.addEventListener('submit', () => {
-            hideFormCompletely();
-            if (spinnerEl) spinnerEl.classList.remove('hidden');
+            hideFormCompletely(); // becomes a no-op that ensures visibility
+            showSpinner();
         });
     }
 
+    // Results appearing no longer hide the form; keep it visible
     if (resultsEl) {
         const obs = new MutationObserver(() => {
-            const hasResults = resultsEl.querySelector('.single-result, .list-group-item');
-            hasResults ? hideFormCompletely() : showFormCompletely();
+            showFormCompletely();
         });
         obs.observe(resultsEl, { childList: true, subtree: true });
         modalEl.addEventListener('hidden.bs.modal', () => obs.disconnect(), { once: true });
@@ -104,12 +113,13 @@
         const a = e.target.closest('a');
         if (!a) return;
 
-        // Clear Results → restore full form (let legacy handler clear, then show form)
+        // Clear Results → ensure full form visible
         if (a.matches('[onclick^="clear_primo_search"]') || a.textContent.trim().toLowerCase() === 'clear results') {
             setTimeout(showFormCompletely, 0);
             return;
         }
 
+        // Bring the full form back when clicking "Use this"
         if (a.matches('a.usethis')) {
             e.preventDefault();
             e.stopPropagation();
@@ -118,15 +128,18 @@
             const srcHidden = q('input[name="item[metadata_source]"]');
             if (srcHidden && !srcHidden.value) srcHidden.value = 'primo';
 
-            minimizeForm();
+            // Show the full form (do not minimize)
+            showFormCompletely();
             return;
         }
     });
 
-    showBtn?.addEventListener('click', showFormCompletely);
-
     modalEl.addEventListener('alma:mms-linked', () => {
-        try { minimizeForm(); } catch {}
+        try {
+            // If you prefer keeping full form after Alma link, call showFormCompletely().
+            // minimizeForm();
+            showFormCompletely();
+        } catch {}
     });
 
     modalEl.addEventListener('click', async (e) => {
@@ -189,10 +202,12 @@
 
             btn.textContent = 'Linked ✔';
             status && (status.textContent = `MMS ${mms} loaded`);
+            showFormCompletely();
         } catch (err) {
             btn.textContent = 'Linked (unverified)';
             status && (status.textContent = 'Lookup failed — fields were cleared');
             console.warn('[alma fallback] lookup error', err);
+            showFormCompletely();
         } finally {
             btn.disabled = false;
         }
@@ -220,8 +235,6 @@
 
         const textEl    = q('#citation_text');
         const statusEl  = q('#citation_status');
-        const formWrap  = q('#item_form_container');
-        const showBtn   = q('#show_item_form_btn');
 
         const titleEl   = q('#item_title');
         const authorEl  = q('#item_author');
@@ -238,7 +251,6 @@
         const rawHidden = q('#raw_citation');
         const csrf      = document.querySelector('meta[name="csrf-token"]')?.content;
 
-        const showForm = () => { formWrap?.classList.remove('d-none'); showBtn?.classList.add('d-none'); };
         const setStatus = (msg) => { if (statusEl) statusEl.textContent = msg || ''; };
 
         if (srcHidden) srcHidden.value = 'manual';
@@ -248,7 +260,6 @@
 
         const raw = (textEl?.value || '').trim();
         if (!raw) { textEl?.focus(); return; }
-
 
         clearBiblio();
         if (rawHidden) rawHidden.value = raw;
@@ -263,7 +274,7 @@
             const data = await res.json();
             if (!res.ok || data.error) throw new Error(data.error || 'Parse failed');
 
-            showForm();
+            showFormCompletely();
 
             if (data.title)            titleEl   && (titleEl.value   = data.title);
             if (data.author)           authorEl  && (authorEl.value  = Array.isArray(data.author) ? data.author.join('; ') : data.author);
@@ -274,12 +285,13 @@
             if (data.other_isbn_issn)  otherEl   && (otherEl.value   = Array.isArray(data.other_isbn_issn) ? data.other_isbn_issn.join(', ') : data.other_isbn_issn);
             if (data.callnumber)       callEl    && (callEl.value    = data.callnumber);
             if (data.url)              urlEl     && (urlEl.value     = data.url);
+
             if (descEl)                descEl.value = data.raw_citation || raw;
 
             (titleEl?.value ? authorEl : titleEl)?.focus();
             setStatus('Parsed ✔'); setTimeout(() => setStatus(''), 1200);
         } catch (err) {
-            showForm();
+            showFormCompletely();
             if (descEl) descEl.value = raw;
             (titleEl?.value ? authorEl : titleEl)?.focus();
             setStatus('Couldn’t parse; raw citation copied to Description.');
@@ -295,16 +307,10 @@
     });
 
     if (primoForm) {
-        // show while request in-flight
-        primoForm.addEventListener('submit', () => {
-            hideFormCompletely();
-            spinnerEl?.classList.remove('d-none');
-        });
-
-        // rails-ujs lifecycle events (success/error/complete) → hide spinner
-        primoForm.addEventListener('ajax:success', () => spinnerEl?.classList.add('d-none'));
-        primoForm.addEventListener('ajax:error',   () => spinnerEl?.classList.add('d-none'));
-        primoForm.addEventListener('ajax:complete',() => spinnerEl?.classList.add('d-none'));
+        // rails-ujs lifecycle events (success/error/complete) → hide spinner only
+        primoForm.addEventListener('ajax:success', () => hideSpinner());
+        primoForm.addEventListener('ajax:error',   () => hideSpinner());
+        primoForm.addEventListener('ajax:complete',() => hideSpinner());
     }
 
 })();

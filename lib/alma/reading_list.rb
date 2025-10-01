@@ -40,8 +40,6 @@ module Alma
 
     def self.add_citation(course_id:, reading_list_id:, citation_data:)
       uri = URI("#{base_path}/courses/#{course_id}/reading-lists/#{reading_list_id}/citations")
-      puts 'uri'
-      puts uri
       http = Net::HTTP.new(uri.host, uri.port)
       http.use_ssl = true
 
@@ -118,12 +116,6 @@ module Alma
         return nil
       end
     end
-
-    def self.generate_reading_list_name(course:, instructor:)
-        code = course.code
-        instructor_name = instructor.to_s.strip.gsub(/\s+/, '_').gsub(/["',;\.\-–—]/, '') 
-        "#{code}_#{instructor_name}".truncate(100)
-    end      
 
     def self.get_citation(course_id, reading_list_id, citation_id)
       uri = URI("#{base_path}/courses/#{course_id}/reading-lists/#{reading_list_id}/citations/#{citation_id}")

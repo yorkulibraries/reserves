@@ -33,6 +33,47 @@ class RequestsControllerTest < ActionDispatch::IntegrationTest
       assert_equal 1, admins.size, 'Current user should be there'
     end
 
+    should 'sync inline with Alma when showing request and surface additions' do
+      request = create(:request, alma_course_id: 'COURSE1', alma_reading_list_id: 'LIST1')
+
+      Alma::ReadingListSync.expects(:sync!)
+                           .with(request_id: request.id, actor_id: @user.id)
+                           .returns({ status: :ok, added_local: 2, failed_local: 0 })
+
+      get request_path(request)
+
+      assert_response :success
+      assert_equal 'New Items found. Synced 2 item(s) with Alma.', flash[:notice]
+      assert_nil flash[:alert]
+    end
+
+    should 'show alert when inline Alma sync skips invalid items' do
+      request = create(:request, alma_course_id: 'COURSE1', alma_reading_list_id: 'LIST1')
+
+      Alma::ReadingListSync.expects(:sync!)
+                           .with(request_id: request.id, actor_id: @user.id)
+                           .returns({ status: :ok, added_local: 0, failed_local: 1 })
+
+      get request_path(request)
+
+      assert_response :success
+      assert_equal '1 item(s) failed to sync from Alma and were skipped.', flash[:alert]
+    end
+
+    should 'handle Alma sync failure gracefully when showing request' do
+      request = create(:request, alma_course_id: 'COURSE1', alma_reading_list_id: 'LIST1')
+
+      Alma::ReadingListSync.expects(:sync!)
+                           .with(request_id: request.id, actor_id: @user.id)
+                           .raises(StandardError.new('boom'))
+      Rails.logger.expects(:error).with(regexp_matches(/Inline Alma sync failed/))
+
+      get request_path(request)
+
+      assert_response :success
+      assert_equal 'Alma sync failed; displaying existing items.', flash[:alert]
+    end
+
     should 'show get edit form' do
       request = create(:request)
 
