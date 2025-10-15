@@ -468,9 +468,15 @@ class RequestTest < ApplicationSystemTestCase
 
     first('button', text: 'Update Item').click
 
-    #find('.btn-group button', text: 'Update Item').click
+    menu = find('.btn-group .dropdown-menu', visible: true)
+    dropdown = menu.first('.stick-on-click', minimum: 1, wait: 5)
+    toggle = dropdown.find('.dropdown-toggle', text: 'Change Item Details')
+    toggle.hover
 
-    find('.dropdown-menu a', text: 'Change Item Details').click
+    submenu = dropdown.find('.dropdown-menu', visible: :all, wait: 5)
+    page.execute_script('arguments[0].classList.add("force-open"); arguments[1].style.display = "block";', dropdown.native, submenu.native)
+
+    submenu.find('a', text: 'Enter citation', visible: :all, wait: 5).click
 
     assert_selector('.modal', visible: true, wait: 5)
 
