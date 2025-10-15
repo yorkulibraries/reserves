@@ -20,35 +20,4 @@
   Tip: If you already have the Alma record open, copy the MMS ID from the record details and paste it here.
 </small>
 
-<script>
-  window.initAlmaLink = function initAlmaLink() {
-    const modal   = document.getElementById('item_form');
-    if (!modal) return;
-
-    const input   = modal.querySelector('#alma_mms_id');
-    const btn     = modal.querySelector('#alma_apply_btn');
-
-
-    const idHidden     = modal.querySelector('input[name="item[metadata_source_id]"]');
-    const sourceHidden = modal.querySelector('input[name="item[metadata_source]"]');
-
-    if (sourceHidden && !sourceHidden.value) sourceHidden.value = 'alma';
-
-    const apply = () => {
-      const mms = (input?.value || '').trim();
-      if (!mms) { input?.focus(); return; }
-      if (idHidden) idHidden.value = mms;
-
-
-      if (btn) {
-        btn.textContent = 'Linked ✔';
-        setTimeout(() => btn.textContent = 'Use MMS ID', 1500);
-      }
-    };
-
-    btn?.addEventListener('click', apply);
-    input?.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') { e.preventDefault(); apply(); }
-    });
-  };
-</script>
+<div id="alma_status" class="small text-muted mt-2"></div>

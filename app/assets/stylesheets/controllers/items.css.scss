@@ -141,8 +141,32 @@ form {
 	.hover-dropdown:hover .dropdown-menu {
 	  display: block;
 	}
-  }
-  .hover-dropdown .dropdown-toggle::after { display: none; }
-  
+}
+.hover-dropdown .dropdown-toggle::after { display: none; }
+.dropdown-menu .hover-dropdown { position: relative; }
+.dropdown-menu .hover-dropdown .dropdown-menu {
+    top: -4px;
+    left: 100%;
+    margin-left: -2px;
+}
+.dropdown-menu .hover-dropdown > .btn-link {
+	text-decoration: none;
+}
+.dropdown-menu .hover-dropdown > .btn-link:hover,
+.dropdown-menu .hover-dropdown > .btn-link:focus {
+	text-decoration: underline;
+}
+@media (max-width: 575.98px) {
+	.dropdown-menu .hover-dropdown .dropdown-menu {
+		left: auto;
+		right: 0;
+		margin-left: 0;
+	}
+}
+
+.dropdown.hover-dropdown.force-open > .dropdown-menu,
+.dropdown-menu .hover-dropdown.force-open > .dropdown-menu {
+	display: block;
+}
 
 /* Gray */

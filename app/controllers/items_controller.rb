@@ -38,7 +38,7 @@ class ItemsController < ApplicationController
     @item.item_type = type
   
     # normalize source; default Book → citation if none passed
-    @source = params[:source].to_s.downcase.presence
+    @source = normalized_source(params[:source])
     @source ||= "citation" if @item.item_type == Item::TYPE_BOOK
   
     respond_to do |format|
@@ -48,6 +48,10 @@ class ItemsController < ApplicationController
   end  
 
   def edit
+    if @item.item_type == Item::TYPE_BOOK
+      @source = normalized_source(params[:source]) || normalized_source(@item.metadata_source)
+    end
+
     respond_to do |format|
       format.html
       format.js
@@ -200,6 +204,20 @@ class ItemsController < ApplicationController
   def barcode; end
 
   private
+
+  def normalized_source(raw)
+    value = raw.to_s.strip.downcase
+    case value
+    when "citation", "manual"
+      "citation"
+    when "primo", "solr", "search", "worldcat"
+      "primo"
+    when "alma"
+      "alma"
+    else
+      nil
+    end
+  end
 
   def set_request
     @request = Request.find(params[:request_id])

@@ -40,11 +40,46 @@
       <span class="fa fa-cog"></span> Update Item  <span class="caret"></span>
     </button>
     <ul class="dropdown-menu" role="menu">
-      <li class="dropdown-item">
-        <%= link_to edit_request_item_path(@request, item), class: "primary important", remote: true do %>
-        <span class="fa fa-pencil"></span> Change Item Details
-        <% end %>
-      </li>
+      <% if item.item_type == Item::TYPE_BOOK %>
+        <li class="dropdown-item p-0">
+          <div class="dropdown hover-dropdown stick-on-click w-100" data-stick-on-click="true">
+            <button
+              class="btn btn-link dropdown-toggle w-100 text-start primary important px-3 py-2"
+              type="button"
+              data-bs-toggle="dropdown"
+              data-bs-auto-close="outside"
+              aria-expanded="false">
+              <span class="fa fa-pencil"></span> Change Item Details
+            </button>
+            <ul class="dropdown-menu shadow">
+              <li>
+                <%= link_to "Enter citation",
+                            edit_request_item_path(@request, item, source: "citation"),
+                            remote: true,
+                            class: "dropdown-item" %>
+              </li>
+              <li>
+                <%= link_to "Search in Primo",
+                            edit_request_item_path(@request, item, source: "primo"),
+                            remote: true,
+                            class: "dropdown-item" %>
+              </li>
+              <li>
+                <%= link_to "Link Alma record",
+                            edit_request_item_path(@request, item, source: "alma"),
+                            remote: true,
+                            class: "dropdown-item" %>
+              </li>
+            </ul>
+          </div>
+        </li>
+      <% else %>
+        <li class="dropdown-item">
+          <%= link_to edit_request_item_path(@request, item), class: "primary important", remote: true do %>
+          <span class="fa fa-pencil"></span> Change Item Details
+          <% end %>
+        </li>
+      <% end %>
       <li class="dropdown-divider"></li>
       <li class="dropdown-item">
         <%= link_to request_item_path(@request, item), method: :delete, data: { confirm: 'Are you sure?' }, remote: true,
