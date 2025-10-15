@@ -70,4 +70,11 @@
   .ui-autocomplete .ac-bottom { margin-top:2px; opacity:.85; font-size:12px; }
   .ui-autocomplete mark { background:#fff3a1; padding:0 2px; }
 
+/* Remove underlines from all links globally */
+a,
+a:hover,
+a:focus,
+a:active {
+  text-decoration: none;
+}
 

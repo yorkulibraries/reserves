@@ -19,7 +19,7 @@ module Alma
         def sync!
             unless @course_id.present? && @list_id.present?
                 Rails.logger.info("ReadingListSync: skip Request##{@request.id} (missing Alma IDs)")
-                return { status: :skipped, added_local: 0, failed_local: 0, added_remote: 0 }
+                return { status: :skipped, added_local: 0, failed_local: 0, removed_local: 0, added_remote: 0 }
             end
             
             Rails.logger.tagged("ReadingListSync", "Request##{@request.id}") do
@@ -32,8 +32,9 @@ module Alma
                 alma_index  = index_alma(alma_citations)
                 local_index = index_local(local_items)
             
-                created_locals = []
-                failed_locals  = []
+            created_locals  = []
+            failed_locals   = []
+            removed_locals  = []
             
                 # --- Alma → Local (create Items that exist only in Alma)
                 ::ActiveRecord::Base.transaction do
@@ -67,7 +68,15 @@ module Alma
                 local_items.each do |item|
                 key = key_for_item(item)
                 next if alma_index.key?(key)
-            
+
+                if item.alma_citation_id.present?
+                    Rails.logger.info("ReadingListSync: removing local Item##{item.id} (missing Alma citation #{item.alma_citation_id})")
+                    item.audit_comment = "Removed during Alma sync (citation missing remotely)"
+                    item.destroy
+                    removed_locals << item.id
+                    next
+                end
+
                 begin
                     Alma::AlmaSync.sync_item(item, @actor)
                     created_remote << item.id
@@ -79,19 +88,20 @@ module Alma
             
                 Rails.logger.info(
                 "ReadingListSync done for Request##{@request.id} " \
-                "(alma→local: +#{created_locals.size}, failed: #{failed_locals.size}, local→alma: +#{created_remote.size})"
+                "(alma→local: +#{created_locals.size}, failed: #{failed_locals.size}, local removals: #{removed_locals.size}, local→alma: +#{created_remote.size})"
                 )
-            
+
                 {
                     status:       :ok,
                     added_local:  created_locals.size,
                     failed_local: failed_locals.size,
+                    removed_local: removed_locals.size,
                     added_remote: created_remote.size
                 }
             end
             rescue => e
             Rails.logger.error("ReadingListSync error for Request##{@request.id}: #{e.class}: #{e.message}")
-            { status: :error, added_local: 0, failed_local: 0, added_remote: 0 }
+            { status: :error, added_local: 0, failed_local: 0, removed_local: 0, added_remote: 0 }
         end
 
         private

@@ -180,9 +180,13 @@ class RequestsController < ApplicationController
           #flash.now[:notice] = "New Items found. Synced items with Alma."
           flash.now[:notice] = "New Items found. Synced #{result[:added_local]} item(s) with Alma."
         end
-  
+
         if result[:failed_local].to_i > 0
           flash.now[:alert] = "#{result[:failed_local]} item(s) failed to sync from Alma and were skipped."
+        end
+
+        if result[:removed_local].to_i > 0
+          flash.now[:notice] = [flash.now[:notice], "Removed #{result[:removed_local]} item(s) that no longer exist in Alma."].compact.join(' ')
         end
       rescue => e
         Rails.logger.error("❌ Inline Alma sync failed for Request##{@request.id}: #{e.class}: #{e.message}")

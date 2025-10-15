@@ -184,7 +184,9 @@ class ItemsControllerTest < ActionDispatch::IntegrationTest
     item = create(:item, request: @_request)
     old_title = item.title
 
-    patch request_item_path(@_request, item), params: { item: { title: 'New Title' } }
+    assert_enqueued_with(job: AddCitationJob, args: [item.id, @user.id]) do
+      patch request_item_path(@_request, item), params: { item: { title: 'New Title' } }
+    end
     item = get_instance_var(:item)
     assert_equal 0, item.errors.size, 'Should be no errors'
     assert_response :redirect

@@ -4,14 +4,18 @@
     const modalEl = document.getElementById('item_form');
     if (!modalEl) return;
 
-    const initName = (modalEl.dataset.initializer || "").trim();
-    if (initName && typeof window[initName] === 'function') {
-        try {
-            window[initName]();
-        } catch (e) {
-            console.error(`[items/edit.js] initializer ${initName} threw`, e);
+    if (typeof window.setupItemModal === 'function') {
+        window.setupItemModal(modalEl, { runInitializer: true });
+    } else {
+        const initName = (modalEl.dataset.initializer || "").trim();
+        if (initName && typeof window[initName] === 'function') {
+            try {
+                window[initName]();
+            } catch (e) {
+                console.error(`[items/edit.js] initializer ${initName} threw`, e);
+            }
         }
-    }
 
-    if (typeof searchRecords === 'function') searchRecords();
+        if (typeof searchRecords === 'function') searchRecords();
+    }
 })();

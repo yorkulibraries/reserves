@@ -129,6 +129,7 @@ class ItemsController < ApplicationController
       @item.audit_comment = "Updated Item: #{@item.title}"
 
       if @item.update(item_params)
+        AddCitationJob.perform_later(@item.id, current_user.id) if current_user
         format.html { redirect_to [@request, @item], notice: 'Item was successfully updated.' }
         format.js
       else

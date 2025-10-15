@@ -103,6 +103,21 @@ module Alma
         }
       }
 
+      if item.alma_citation_id.present?
+        begin
+          deleted = ReadingList.delete_citation(
+            course_id:       course_id,
+            reading_list_id: list_id,
+            citation_id:     item.alma_citation_id
+          )
+          Rails.logger.info("🧹 Removed prior Alma citation #{item.alma_citation_id} for Item##{item.id}") if deleted
+        rescue => e
+          Rails.logger.warn("⚠️ Failed to delete prior Alma citation #{item.alma_citation_id} for Item##{item.id}: #{e.message}")
+        ensure
+          item.update_column(:alma_citation_id, nil)
+        end
+      end
+
       result = ReadingList.add_citation(
         course_id:       course_id,
         reading_list_id: list_id,

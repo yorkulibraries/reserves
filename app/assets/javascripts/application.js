@@ -22,6 +22,7 @@
 //= require jquery-ui/effects/effect-highlight
 //= require citation_helper
 //= require alma_helper
+//= require item_modal
 //= require_self
 //= require_tree .
 

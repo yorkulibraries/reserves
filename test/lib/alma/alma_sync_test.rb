@@ -104,9 +104,31 @@ module Alma
         citation_data: kind_of(Hash)
       ).returns({ 'id' => 'CIT-123' })
 
+      Alma::ReadingList.expects(:delete_citation).never
+
       Alma::AlmaSync.sync_item(@item, @user)
 
       assert_equal 'CIT-123', @item.reload.alma_citation_id
+    end
+
+    should 'replace existing citation when alma_citation_id present' do
+      @item.update_column(:alma_citation_id, 'CIT-OLD')
+
+      Alma::ReadingList.expects(:delete_citation).with(
+        course_id: 'COURSE123',
+        reading_list_id: 'LIST123',
+        citation_id: 'CIT-OLD'
+      ).returns(true)
+
+      Alma::ReadingList.expects(:add_citation).with(
+        course_id: 'COURSE123',
+        reading_list_id: 'LIST123',
+        citation_data: kind_of(Hash)
+      ).returns({ 'id' => 'CIT-NEW' })
+
+      Alma::AlmaSync.sync_item(@item, @user)
+
+      assert_equal 'CIT-NEW', @item.reload.alma_citation_id
     end
 
     should 'skip Alma citation when request is missing identifiers' do
@@ -190,6 +212,27 @@ module Alma
 
       assert_equal :ok, result[:status]
       assert_equal 1, result[:added_remote]
+      assert_equal 0, result[:removed_local]
+    end
+
+    should 'remove local items when Alma citation missing' do
+      item = create(:item, request: @request, alma_citation_id: 'CIT-MISSING')
+
+      Alma::ReadingList.expects(:get_items_for_reading_list)
+                        .with('COURSE1', 'LIST1')
+                        .returns([])
+
+      Alma::AlmaSync.expects(:sync_item).never
+
+      assert_no_difference('Item.count') do
+        result = ReadingListSync.sync!(request_id: @request.id, actor_id: @actor.id)
+
+        assert_equal :ok, result[:status]
+        assert_equal 1, result[:removed_local]
+        assert_equal 0, result[:added_remote]
+      end
+
+      assert_equal Item::STATUS_DELETED, item.reload.status
     end
 
     should 'collect failed local creations when new item invalid' do
@@ -212,11 +255,12 @@ module Alma
         assert_equal :ok, result[:status]
         assert_equal 0, result[:added_local]
         assert_equal 1, result[:failed_local]
+        assert_equal 0, result[:removed_local]
       end
     end
 
     should 'normalize legacy item types before syncing' do
-      legacy_item = create(:item, request: @request, alma_citation_id: 'REMOTE1')
+      legacy_item = create(:item, request: @request, alma_citation_id: nil)
       legacy_item.update_column(:item_type, 'BK')
 
       Alma::ReadingList.expects(:get_items_for_reading_list).returns([])
@@ -233,6 +277,7 @@ module Alma
 
       result = ReadingListSync.sync!(request_id: @request.id, actor_id: @actor.id)
       assert_equal :error, result[:status]
+      assert_equal 0, result[:removed_local]
     end
 
     should 'split isbns into primary and others' do
