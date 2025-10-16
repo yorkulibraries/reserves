@@ -199,19 +199,19 @@ module Alma
       assert_equal 'CIT-10', new_item.alma_citation_id
     end
 
-    should 'create Alma citations for local-only items' do
+    should 'not create remote citation when local item lacks Alma id (async job handles it)' do
       item = create(:item, request: @request, alma_citation_id: nil)
 
       Alma::ReadingList.expects(:get_items_for_reading_list)
                         .with('COURSE1', 'LIST1')
                         .returns([])
 
-      Alma::AlmaSync.expects(:sync_item).with(item, @actor)
+      Alma::AlmaSync.expects(:sync_item).never
 
       result = ReadingListSync.sync!(request_id: @request.id, actor_id: @actor.id)
 
       assert_equal :ok, result[:status]
-      assert_equal 1, result[:added_remote]
+      assert_equal 0, result[:added_remote]
       assert_equal 0, result[:removed_local]
     end
 
@@ -264,7 +264,7 @@ module Alma
       legacy_item.update_column(:item_type, 'BK')
 
       Alma::ReadingList.expects(:get_items_for_reading_list).returns([])
-      Alma::AlmaSync.expects(:sync_item).with(legacy_item, @actor)
+      Alma::AlmaSync.expects(:sync_item).never
 
       ReadingListSync.sync!(request_id: @request.id, actor_id: @actor.id)
 

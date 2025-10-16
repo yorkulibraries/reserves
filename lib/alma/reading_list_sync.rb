@@ -64,7 +64,6 @@ module Alma
                 end
             
                 # --- Local → Alma (create citations that exist only locally)
-                created_remote = []
                 local_items.each do |item|
                 key = key_for_item(item)
                 next if alma_index.key?(key)
@@ -74,21 +73,14 @@ module Alma
                     item.audit_comment = "Removed during Alma sync (citation missing remotely)"
                     item.destroy
                     removed_locals << item.id
-                    next
-                end
-
-                begin
-                    Alma::AlmaSync.sync_item(item, @actor)
-                    created_remote << item.id
-                rescue => e
-                    Rails.logger.warn("ReadingListSync: failed to create remote citation for Item##{item.id}: #{e.class}: #{e.message}")
-                    # We don't count these in failed_locals (those are AR validation failures only)
+                else
+                    Rails.logger.info("ReadingListSync: skipping remote citation for Item##{item.id} (awaiting async sync)")
                 end
                 end
             
                 Rails.logger.info(
                 "ReadingListSync done for Request##{@request.id} " \
-                "(alma→local: +#{created_locals.size}, failed: #{failed_locals.size}, local removals: #{removed_locals.size}, local→alma: +#{created_remote.size})"
+                "(alma→local: +#{created_locals.size}, failed: #{failed_locals.size}, local removals: #{removed_locals.size}, local→alma: +0)"
                 )
 
                 {
@@ -96,7 +88,7 @@ module Alma
                     added_local:  created_locals.size,
                     failed_local: failed_locals.size,
                     removed_local: removed_locals.size,
-                    added_remote: created_remote.size
+                    added_remote: 0
                 }
             end
             rescue => e
