@@ -132,6 +132,16 @@ class CourseTest < ActiveSupport::TestCase
     assert_equal '6', course.credits, 'Credits should now be 6'
   end
 
+  should 'remove trailing zeros when updating credits segment' do
+    course = create(:course, code: '2013_GL_ECON_S1_2500__3_A')
+
+    course.credits = '3.00'
+
+    assert_equal '3', course.credits, 'Credits should strip trailing zeros'
+    assert_includes course.code, '__3_', 'Course code should embed sanitized credits'
+    refute_includes course.code, '__3.00_', 'Course code should not include decimal credits'
+  end
+
   should 'set and return a proper section' do
     course = create(:course, code: '2013_GL_ECON_S1_2500__3_A')
 

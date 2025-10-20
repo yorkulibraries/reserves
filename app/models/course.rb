@@ -35,6 +35,20 @@ class Course < ApplicationRecord
   TERM_CREDITS = %w[1 3 4 6 9].freeze
   SUBJECTS ||= IO.readlines("#{Rails.root}/lib/course_subjects.txt").collect(&:strip)
 
+  def self.normalize_code_credit(value)
+    str = value.to_s.strip
+    return '' if str.blank?
+
+    numeric_pattern = /\A-?\d+(?:\.\d+)?\z/
+    return str unless str.match?(numeric_pattern)
+
+    integer_part, decimal_part = str.split('.', 2)
+    return integer_part if decimal_part.blank? || decimal_part.match?(/\A0+\z/)
+
+    decimal_part = decimal_part.sub(/0+\z/, '')
+    decimal_part.blank? ? integer_part : "#{integer_part}.#{decimal_part}"
+  end
+
   # VALIDATIONS
   validates_uniqueness_of :code, message: 'Duplicate Course Code, Someone Has Made a Request For that Course.'
 
@@ -113,7 +127,7 @@ class Course < ApplicationRecord
   end
   
   def credits=(credits)
-    insert_into_code(6, credits)
+    insert_into_code(6, self.class.normalize_code_credit(credits))
   end
   
   def section
@@ -171,4 +185,5 @@ class Course < ApplicationRecord
     self[:code_credits] = credits
     self[:code_section] = section
   end
+
 end

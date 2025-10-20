@@ -162,7 +162,7 @@ class RequestsControllerTest < ActionDispatch::IntegrationTest
     
       r = get_instance_var(:request)
       assert_equal Request::REMOVED, r.status
-    end    
+    end
 
     should 'destroy request' do
       request = create(:request)
@@ -172,6 +172,18 @@ class RequestsControllerTest < ActionDispatch::IntegrationTest
       end
 
       assert_redirected_to requests_path
+    end
+
+    should 'build course code without decimal credit segment' do
+      info = create(:course_info, credit: 3)
+      controller = RequestsController.new
+
+      parts = controller.send(:parts_from_info, info)
+      assert_equal '3', parts[:credits], 'Credit part should be sanitized'
+
+      code = controller.send(:build_code_from_info, parts, info.instructor_name)
+      assert_includes code, '__3_', 'Code should embed sanitized credits'
+      refute_includes code, '__3.00_', 'Code should not contain decimal credits'
     end
 
     ## ADDITIONAL ACTIONS TESTS ##

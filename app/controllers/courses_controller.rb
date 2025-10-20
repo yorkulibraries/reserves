@@ -110,7 +110,8 @@ class CoursesController < ApplicationController
     faculty = (info.faculty_abrev.presence || info.faculty_short.presence || info.faculty).to_s.upcase.gsub(/[^A-Z]/, '')
     subject = (info.subject_abrev.presence || info.subject).to_s.upcase.gsub(/[^A-Z]/, '')
     number  = info.course_number.to_s.upcase
-    credits = info.credit.present? ? sprintf('%.2f', info.credit.to_f) : '0.00'
+    credit_value = info.credit.presence || '0'
+    credits = Course.normalize_code_credit(credit_value)
     {
       faculty: faculty,
       subject: subject,

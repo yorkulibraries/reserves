@@ -142,7 +142,8 @@ class RequestWizardController < ApplicationController
     faculty = (info.faculty_abrev.presence || info.faculty_short.presence || info.faculty).to_s.upcase.gsub(/[^A-Z]/, '')
     subject = (info.subject_abrev.presence || info.subject).to_s.upcase.gsub(/[^A-Z]/, '')
     number  = info.course_number.to_s.upcase
-    credits = info.credit.present? ? format('%.2f', info.credit.to_f) : '0.00'
+    credit_value = info.credit.presence || '0'
+    credits = Course.normalize_code_credit(credit_value)
     term    = normalize_term(info.study_session)
     year    = info.academic_year.to_s.split('-').first # supports "2024-2025"
     section = info.section.to_s.upcase
