@@ -1,7 +1,7 @@
 <% page_header do %>
 	<h1>Inactive Users</h1>
 <% end %>
-<p><%= link_to "Active Users", users_path, class: "pull-right" %></p>
+<p><%= link_to "Active Users", users_path, class: "float-end" %></p>
 <br/>
 <hr/>
 
@@ -11,9 +11,10 @@
 		<div class="col-md-6">
 			<ol>
 				<% @users.each do |u| %>
-				<li><%= u.name %>
+				<li class="d-flex justify-content-between align-items-center">
+						<%= u.name %>
 						<%= link_to "<span class='fa fa-check-circle'></span> Reactivate".html_safe, reactivate_user_url(u),
-								method: :post, class: "pull-right", data: { confirm: "Are you sure?" } %>
+								method: :post, class: "ms-auto btn btn-sm btn-outline-success", data: { confirm: "Are you sure?" } %>
 				</li>
 				<% end %>
 			</ol>
