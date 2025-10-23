@@ -1,103 +1,132 @@
 <% title "Reports: Dashboard" %>
 
-<div class="row">
-  <div class="col-sm-4 col-md-4">
-    <h4> Request Reports </h4>
-    <ul class="list-group">
-      <li class="list-group-item">
-        <% interval_name = distance_of_time_in_words(Setting.reports_default_interval.to_i) %>
-        <% interval = Time.now + Setting.reports_default_interval.to_i %>
-        <%= link_to "Expiring Requests in #{interval_name}", requests_reports_path(r: { expiring_before: interval.to_date } ) %>
-      </li>
-      <li class="list-group-item">
-        <p><strong>Requests Per Location, Last <%= interval_name %></strong></p>
-        <ol>
-          <% interval = Time.now - Setting.reports_default_interval.to_i %>
-          <% Location.active.each do |l| %>
-          <li><%= link_to l.name, requests_reports_path(r: { location: l.id, created_after: interval.to_date }) %></li>
-          <% end %>
-        </ol>
-      </li>
-      <li class="list-group-item">
-        <% interval = Time.now - Setting.reports_default_interval.to_i %>
-        <%= link_to "Custom Report", requests_reports_path(r: { created_after: interval.to_date} ) %>
-      </li>
-    </ul>
-  </div>
-  <div class="col-sm-4 col-md-4">
-    <h4> Item Reports </h4>
-    <ul class="list-group">
-      <li class="list-group-item">
-        <% interval_name = distance_of_time_in_words(Setting.reports_default_interval.to_i) %>
-        <% interval = Time.now - Setting.reports_default_interval.to_i %>
-        <%= link_to "Items Created in the last #{interval_name}", items_reports_path(r: { created_after: interval.to_date} ) %>
-      </li>
-      <li class="list-group-item">
-        <p><strong>Items Per Location, Last <%= interval_name %> </strong></p>
-        <ol>
-          <% Location.active.each do |l| %>
-          <li><%= link_to l.name, items_reports_path(r: { location: l.id, created_after: interval.to_date }) %></li>
-          <% end %>
-        </ol>
-      </li>
-      <li class="list-group-item">
-        <p><strong>Items By Type, Last <%= interval_name %> </strong></p>
-        <ol>
-          <% Item::TYPES.each do |type| %>
-          <li><%= link_to type, items_reports_path(r: { item_types: type, created_after: interval.to_date }) %></li>
-          <% end %>
-        </ol>
-      </li>
-      <li class="list-group-item">
-        <%= link_to "Custom Report", items_reports_path(r: { created_after: interval.to_date} ) %>
-      </li>
-    </ul>
-  </div>
-  <div class="col-sm-4 col-md-4">
-    <h4>Statistics </h4>
-    <ul class="list-group">
-      <li class="list-group-item"><h4>Fiscal - (<%= Setting.fiscal_date.strftime("%b %e, %Y") %> to Today)</h4></li>
-      <li class="list-group-item">
-        <span class="badge"><%= @ytd_requests_count %></span>
-        Requests
-      </li>
-      <li class="list-group-item">
-        <span class="badge"><%= @ytd_items_count %></span>
-        Items
-      </li>
-      <li class="list-group-item">
-        <span class="badge"><%= @ytd_courses_count %></span>
-        Courses
-      </li>
-      <li class="list-group-item">
-        <span class="badge"><%= @ytd_requestors_count %></span>
-        Requestors
-      </li>
-      <li class="list-group-item">
-        <span class="badge"><%= @ytd_staff_count %></span>
-        Staff
-      </li>
-      <li class="list-group-item"><h4>Lifetime</h4></li>
-      <li class="list-group-item">
-        <span class="badge"><%= @lt_requests_count %></span>
-        Requests
-      </li>
-      <li class="list-group-item">
-        <span class="badge"><%= @lt_items_count %></span>
-        Items
-      </li>
-      <li class="list-group-item">
-        <span class="badge"><%= @lt_courses_count %></span>
-        Courses
-      </li>
-      <li class="list-group-item">
-        <span class="badge"><%= @lt_requestors_count %></span>
-        Requestors
-      </li>
-      <li class="list-group-item">
-        <span class="badge"><%= @lt_staff_count %></span>
-        Staff
-      </li>
-    </ul>
+<div class="container py-4">
+  <% default_interval = Setting.reports_default_interval.to_i %>
+  <% interval_name = distance_of_time_in_words(default_interval) %>
+  <% interval_past = Time.current - default_interval %>
+  <% interval_future = Time.current + default_interval %>
+
+  <div class="row g-4">
+    <div class="col-12 col-lg-4">
+      <div class="card shadow-sm h-100">
+        <div class="card-body">
+          <h2 class="h5 fw-semibold mb-3 text-success">Request Reports</h2>
+          <hr />
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item px-0">
+              <%= link_to "Expiring Requests in #{interval_name}", requests_reports_path(r: { expiring_before: interval_future.to_date } ), class: "text-decoration-none" %>
+            </li>
+            <li class="list-group-item px-0">
+              <p class="fw-semibold mb-2">Requests Per Location, Last <%= interval_name %></p>
+              <ol class="list-group list-group-numbered list-group-flush small mb-0">
+                <% Location.active.each do |location| %>
+                  <li class="list-group-item border-0 ps-0">
+                    <%= link_to location.name, requests_reports_path(r: { location: location.id, created_after: interval_past.to_date }), class: "text-decoration-none" %>
+                  </li>
+                <% end %>
+              </ol>
+            </li>
+            <li class="list-group-item px-0">
+              <%= link_to "Custom Report", requests_reports_path(r: { created_after: interval_past.to_date} ), class: "text-decoration-none" %>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-lg-4">
+      <div class="card shadow-sm h-100">
+        <div class="card-body">
+          <h2 class="h5 fw-semibold mb-3 text-warning">Item Reports</h2>
+          <hr />
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item px-0">
+              <%= link_to "Items Created in the last #{interval_name}", items_reports_path(r: { created_after: interval_past.to_date} ), class: "text-decoration-none" %>
+            </li>
+            <li class="list-group-item px-0">
+              <p class="fw-semibold mb-2">Items Per Location, Last <%= interval_name %></p>
+              <ol class="list-group list-group-numbered list-group-flush small mb-0">
+                <% Location.active.each do |location| %>
+                  <li class="list-group-item border-0 ps-0">
+                    <%= link_to location.name, items_reports_path(r: { location: location.id, created_after: interval_past.to_date }), class: "text-decoration-none" %>
+                  </li>
+                <% end %>
+              </ol>
+            </li>
+            <li class="list-group-item px-0">
+              <p class="fw-semibold mb-2">Items By Type, Last <%= interval_name %></p>
+              <ol class="list-group list-group-numbered list-group-flush small mb-0">
+                <% Item::TYPES.each do |type| %>
+                  <li class="list-group-item border-0 ps-0">
+                    <%= link_to type, items_reports_path(r: { item_types: type, created_after: interval_past.to_date }), class: "text-decoration-none" %>
+                  </li>
+                <% end %>
+              </ol>
+            </li>
+            <li class="list-group-item px-0">
+              <%= link_to "Custom Report", items_reports_path(r: { created_after: interval_past.to_date} ), class: "text-decoration-none" %>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-lg-4">
+      <div class="card shadow-sm h-100">
+        <div class="card-body">
+          <h2 class="h5 fw-semibold mb-3 text-danger">Statistics</h2>
+          <hr />
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item px-0 pb-0">
+              <p class="text-uppercase text-muted small mb-1">Fiscal</p>
+              <p class="fw-semibold mb-0"><%= Setting.fiscal_date.strftime("%b %e, %Y") %> to Today</p>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+              <span class="text-muted">Requests</span>
+              <span class="badge rounded-pill text-bg-primary"><%= number_with_delimiter(@ytd_requests_count) %></span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+              <span class="text-muted">Items</span>
+              <span class="badge rounded-pill text-bg-success"><%= number_with_delimiter(@ytd_items_count) %></span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+              <span class="text-muted">Courses</span>
+              <span class="badge rounded-pill text-bg-info"><%= number_with_delimiter(@ytd_courses_count) %></span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+              <span class="text-muted">Requestors</span>
+              <span class="badge rounded-pill text-bg-warning text-dark"><%= number_with_delimiter(@ytd_requestors_count) %></span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+              <span class="text-muted">Staff</span>
+              <span class="badge rounded-pill text-bg-secondary"><%= number_with_delimiter(@ytd_staff_count) %></span>
+            </li>
+            <li class="list-group-item px-0 pt-3 pb-0 border-top">
+              <p class="text-uppercase text-muted small mb-1">Lifetime</p>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+              <span class="text-muted">Requests</span>
+              <span class="badge rounded-pill text-bg-primary"><%= number_with_delimiter(@lt_requests_count) %></span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+              <span class="text-muted">Items</span>
+              <span class="badge rounded-pill text-bg-success"><%= number_with_delimiter(@lt_items_count) %></span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+              <span class="text-muted">Courses</span>
+              <span class="badge rounded-pill text-bg-info"><%= number_with_delimiter(@lt_courses_count) %></span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+              <span class="text-muted">Requestors</span>
+              <span class="badge rounded-pill text-bg-warning text-dark"><%= number_with_delimiter(@lt_requestors_count) %></span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+              <span class="text-muted">Staff</span>
+              <span class="badge rounded-pill text-bg-secondary"><%= number_with_delimiter(@lt_staff_count) %></span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

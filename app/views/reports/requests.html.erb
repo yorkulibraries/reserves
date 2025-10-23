@@ -1,95 +1,98 @@
 <% title "Reports: Requests" %>
-<%= link_to "Reports Home", reports_path %>
-<hr/>
 
-<%= form_for :r, url: requests_reports_path, html: { class: "form-inline", method: "get"} do |f| %>
-  <div class="form-group">
-    <%= f.label "Expiring Before" %>
-    <%= f.text_field "expiring_before", class: "datepicker", value: @expiring_before %>
+<div class="container py-2">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="h4 mb-0">Filters</h2>
+    <%= link_to "Reports Home", reports_path, class: "btn btn-outline-primary btn-sm" %>
   </div>
-  <div class="form-group">
-    <%= f.label "Location" %>
-    <%= f.select "location", Location.active.collect {|p| [ p.name, p.id ] }, {include_blank: 'All',  selected: @location} %>
-  </div>
-  <div class="form-group">
-    <%= f.label "Faculty" %>
-    <%= f.select "faculty", Course::FACULTIES, {include_blank: 'All', selected: @faculty} %>
-  </div>
-  <div class="form-group">
-    <%= f.label "Department" %>
-    <%= f.select "department", Course::SUBJECTS, {include_blank: 'All', selected: @department} %>
-  </div>
-  <div class="form-group">
-    <%= f.label "Term" %>
-    <%= f.select "term", Course::TERMS, {include_blank: 'All', selected: @term} %>
-  </div>
-  <div class="form-group">
-    <%= f.label "Status" %>
-    <%= f.select "status", Request::STATUSES, {include_blank: 'All', selected: @status} %>
-  </div>
-  <div class="form-group">
-    <%= f.label "Created After" %>
-    <%= f.text_field "created_after", class: "datepicker", value: @created_after %>
-  </div>
-  <div class="form-group">
-    <%= f.label "Created Before" %>
-    <%= f.text_field "created_before", class: "datepicker", value: @created_before %>
-    <%= f.submit "Generate", data: { disable_with: "Processing"} %>
-  </div
 
-<% end %>
-
-<hr/>
-
-
-<div class="collapse" id="to_sql">
-  <div class="well">
-    <p><%= @courses.to_sql if @courses%></p>
-    <p><%= @requests.to_sql if @requests %></p>
-  </div>
-</div>
-
-<div class="requests">
-  <h3>Total Found: <%= @requests.size %>
-    <div class="pull-right">
-      <a href="<%= requests_reports_path(params: request.query_parameters, format: "xlsx") %>" class="btn btn-xs btn-default">
-        <span class="fa fa-download"></span> Exel
-      </a>
-      <button class="btn btn-xs btn-default" type="button" data-bs-toggle="collapse" data-target="#to_sql">
-        <span class="fa fa-database"></span> Sql</button>
+  <%= form_for :r, url: requests_reports_path, html: { class: "row g-3 align-items-end mb-4 bg-light p-4", method: :get } do |f| %>
+    <div class="col-12 col-md-6 col-xl-3">
+      <%= f.label "Expiring Before", class: "form-label" %>
+      <%= f.text_field "expiring_before", class: "form-control datepicker", value: @expiring_before %>
     </div>
-  </h3>
-  <ul class="list-group">
-    <% @requests_grouped.each do |id, requests| %>
-      <li class="list-group-item list-group-item-info">
-        <span class="badge"><%= requests.size %> requests</span>
-        <%= requests.first.reserve_location.name unless requests.first.reserve_location.nil? %>
-      </li>
+    <div class="col-12 col-md-6 col-xl-3">
+      <%= f.label "Location", class: "form-label" %>
+      <%= f.select "location", Location.active.collect { |p| [p.name, p.id] }, { include_blank: "All", selected: @location }, class: "form-select" %>
+    </div>
+    <div class="col-12 col-md-6 col-xl-3">
+      <%= f.label "Faculty", class: "form-label" %>
+      <%= f.select "faculty", Course::FACULTIES, { include_blank: "All", selected: @faculty }, class: "form-select" %>
+    </div>
+    <div class="col-12 col-md-6 col-xl-3">
+      <%= f.label "Department", class: "form-label" %>
+      <%= f.select "department", Course::SUBJECTS, { include_blank: "All", selected: @department }, class: "form-select" %>
+    </div>
+    <div class="col-12 col-md-6 col-xl-3">
+      <%= f.label "Term", class: "form-label" %>
+      <%= f.select "term", Course::TERMS, { include_blank: "All", selected: @term }, class: "form-select" %>
+    </div>
+    <div class="col-12 col-md-6 col-xl-3">
+      <%= f.label "Status", class: "form-label" %>
+      <%= f.select "status", Request::STATUSES, { include_blank: "All", selected: @status }, class: "form-select" %>
+    </div>
+    <div class="col-12 col-md-6 col-xl-3">
+      <%= f.label "Created After", class: "form-label" %>
+      <%= f.text_field "created_after", class: "form-control datepicker", value: @created_after %>
+    </div>
+    <div class="col-12 col-md-6 col-xl-3">
+      <%= f.label "Created Before", class: "form-label" %>
+      <%= f.text_field "created_before", class: "form-control datepicker", value: @created_before %>
+    </div>
+    <div class="col-12 col-md-6 col-xl-3">
+      <%= f.submit "Generate", class: "btn btn-primary w-100", data: { disable_with: "Processing" } %>
+    </div>
+  <% end %>
 
-      <% requests.each do |r| %>
-        <li class="list-group-item request">
-          <span class="badge"><%= r.items.size %> items</span>
-          <div class="row">
-            <div class="col-md-1 col-sm-1">
-              <%= link_to r.id, r %>
-            </div>
-            <div class="col-md-3">
-              <%= r.course.code rescue nil%>
-            </div>
-            <div class="col-md-3">
-              By <%= r.requester.name %>
-            </div>
-            <div class="col-md-2">
-              <span class="label label-default status-<%= r.status.parameterize %>">
-                <%= r.status.upcase %>
-              </span>
-            </div>
-          </div>
-        </li>
-      <% end %>
+  <div class="collapse mb-4" id="to_sql">
+    <div class="card card-body text-bg-light">
+      <p class="mb-1"><%= @courses.to_sql if @courses %></p>
+      <p class="mb-0"><%= @requests.to_sql if @requests %></p>
+    </div>
+  </div>
 
-    <% end %>
-  </ul>
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-3">
+        <h2 class="h5 mb-2 mb-md-0">Total Found: <%= @requests.size %></h2>
+        <div class="btn-group">
+          <a href="<%= requests_reports_path(params: request.query_parameters, format: "xlsx") %>" class="btn btn-outline-success btn-sm">
+            <span class="fa fa-download me-1"></span> Excel
+          </a>
+          <button class="btn btn-outline-warning btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#to_sql" aria-expanded="false" aria-controls="to_sql">
+            <span class="fa fa-database me-1"></span> SQL
+          </button>
+        </div>
+      </div>
 
+      <ul class="list-group list-group-flush">
+        <% @requests_grouped.each do |_id, requests| %>
+          <li class="list-group-item list-group-item-info d-flex justify-content-between align-items-center">
+            <span><%= requests.first.reserve_location&.name %></span>
+            <span class="badge rounded-pill text-bg-primary"><%= requests.size %> requests</span>
+          </li>
 
+          <% requests.each do |r| %>
+            <li class="list-group-item py-3">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="badge rounded-pill text-bg-secondary"><%= pluralize(r.items.size, "item") %></span>
+                <span class="badge text-bg-dark status-<%= r.status.parameterize %>"><%= r.status.upcase %></span>
+              </div>
+              <div class="row g-2 align-items-center">
+                <div class="col-12 col-sm-3 col-md-2">
+                  <%= link_to r.id, r, class: "link-primary fw-semibold" %>
+                </div>
+                <div class="col-12 col-sm-4 col-md-3">
+                  <%= r.course&.code %>
+                </div>
+                <div class="col-12 col-sm-5 col-md-4">
+                  By <%= r.requester.name %>
+                </div>
+              </div>
+            </li>
+          <% end %>
+        <% end %>
+      </ul>
+    </div>
+  </div>
 </div>
