@@ -1,23 +1,25 @@
 <% title "Loan Periods" %>
 
-<table class="table table-bordered">
-  <thead>
-    <tr>
-      <th>Duration</th>
-      <th></th> 
-    </tr>
-  </thead>
-
-  <tbody>
-    <% @loan_periods.each do |loan_period| %>
+<div class="table-responsive">
+  <table class="table table-bordered">
+    <thead>
       <tr>
-        <td><%= loan_period.duration %></td>
-     
-        <td><%= link_to 'Make Changes', edit_loan_period_path(loan_period) %></td>     
+        <th class="bg-info">Duration</th>
+        <th class="bg-info"></th> 
       </tr>
-    <% end %>
-  </tbody>
-</table>
+    </thead>
+
+    <tbody>
+      <% @loan_periods.each do |loan_period| %>
+        <tr>
+          <td><%= loan_period.duration %></td>
+      
+          <td><%= link_to 'Make Changes', edit_loan_period_path(loan_period) %></td>     
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
 
 <hr/>
 
