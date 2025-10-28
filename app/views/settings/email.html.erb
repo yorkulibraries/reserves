@@ -1,19 +1,26 @@
 <% title "Update Email Settings" %>
 
-<%= simple_form_for Setting.new, url: settings_path, method: :patch do |f| %>
+<div class="container py-2">
+  <div class="row">
+    <div class="col-lg-9 col-xl-8">
 
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <h3 class="panel-title">Email Settings</h3>
-    </div>
-    <div class="panel-body">
+      <%= simple_form_for Setting.new, url: settings_path, method: :patch do |f| %>
 
-      <%= render "email_fields", f: f %>
-
+        <div class="card-header bg-white border-0 pb-0">
+          <p class="text-muted mb-0">Set up the email server settings used to send notifications from the application.</p>
+        </div>
+        <div class="card-body">
+          <section class="mb-4 bg-light p-3">
+            <h2 class="h6 text-uppercase text-primary mb-3">Email Settings</h2>
+            <%= render "email_fields", f: f %>
+          </section>
+        </div>
+        <div class="card-footer bg-white border-0 pt-0 d-flex justify-content-between align-items-center">
+          <input type="hidden" name="return_to" value="email"/>  
+          <%= f.submit "Save Settings", class: "btn btn-primary" %>
+        </div>
+        
+      <% end %>
     </div>
   </div>
-
-  <input type="hidden" name="return_to" value="email"/>
-
-  <%= f.submit "Save Settings", class: "btn btn-success" %>
-<% end %>
+</div>

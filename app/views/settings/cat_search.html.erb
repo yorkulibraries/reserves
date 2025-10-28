@@ -1,29 +1,51 @@
 <% title "Update Catalog Search Settings" %>
 
-<%= simple_form_for Setting.new, url: settings_path, method: :patch do |f| %>
+<!-- Bootstrap 5 preview -->
+<div class="container py-2">
+  <div class="row">
+    <div class="col-lg-9 col-xl-7">
+      <%= simple_form_for Setting.new, url: settings_path, method: :patch, html: { class: "card shadow-sm border-0 mb-4" } do |f| %>
+        <div class="card-header bg-white border-0 pb-0">
+          <h1 class="h4 mb-1">Discovery Integrations</h1>
+          <p class="text-muted mb-0">Configure catalog lookup fallbacks and API access.</p>
+        </div>
+        <div class="card-body">
+          <section class="mb-4 bg-light p-3">
+            <h2 class="h6 text-uppercase text-primary mb-3">VuFind</h2>
+            <div class="row g-3">
+              <%= f.input :vufind_url,
+                          wrapper_html: { class: "col-12" },
+                          label_html: { class: "form-label" },
+                          input_html: { class: "form-control" } %>
+            </div>
+          </section>
 
-
-  <div class="panel panel-success">
-    <div class="panel-heading">
-      <h3 class="panel-title">VUFIND Settings</h3>
-    </div>
-    <div class="panel-body">
-      <%= f.input :vufind_url %>
+          <section class="mb-4 bg-light p-3">
+            <h2 class="h6 text-uppercase text-success mb-3">WorldCat</h2>
+            <div class="row g-3">
+              <%= f.input :worldcat_key,
+                          wrapper_html: { class: "col-12 col-md-6" },
+                          label_html: { class: "form-label" },
+                          input_html: { class: "form-control" } %>
+              <div class="col-12 col-md-6">
+                <%= f.input :worldcat_enable,
+                            as: :radio_buttons,
+                            label: "Use WorldCat as backup search?",
+                            label_html: { class: "form-label d-block" },
+                            collection_wrapper_tag: :div,
+                            collection_wrapper_class: "d-flex gap-3",
+                            item_wrapper_class: "form-check",
+                            item_label_class: "form-check-label",
+                            input_html: { class: "form-check-input" } %>
+              </div>
+            </div>
+          </section>
+        </div>
+        <div class="card-footer bg-white border-0 pt-0 d-flex justify-content-between align-items-center">
+          <input type="hidden" name="return_to" value="cat_search"/>
+          <%= f.submit "Save Catalog Search Settings", class: "btn btn-primary" %>
+        </div>
+      <% end %>
     </div>
   </div>
-
-
-
-  <div class="panel panel-warning">
-    <div class="panel-heading">
-      <h3 class="panel-title">WORLDCAT Settings</h3>
-    </div>
-    <div class="panel-body">
-      <%= f.input :worldcat_key %>
-      <%= f.input :worldcat_enable, as: :radio_buttons, label: "Use WORDLCAT as backup search?" %>
-    </div>
-  </div>
-
-  <input type="hidden" name="return_to" value="cat_search"/>
-  <%= f.submit "Save Catalog Search Settings", class: "btn btn-success" %>
-<% end %>
+</div>

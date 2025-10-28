@@ -1,13 +1,20 @@
 <% url = @subject.new_record? ? settings_subjects_path : settings_subject_path(@subject) %>
-<%= simple_form_for(@subject, url: url) do |f| %>
-
-
-  <div class="form-inputs">
-    <%= f.input :code %>
-    <%= f.input :name, hint: "Optional" %>
+<%= simple_form_for(@subject, url: url, html: { class: "card shadow-sm border-0" }) do |f| %>
+  <div class="card-body">
+    <div class="row g-3">
+      <%= f.input :code,
+                  
+                  label_html: { class: "form-label" },
+                  input_html: { class: "form-control text-uppercase" },
+                  required: true %>
+      <%= f.input :name,
+                  hint: "Optional",
+                  label_html: { class: "form-label" },
+                  input_html: { class: "form-control" } %>
+    </div>
   </div>
-
-  <div class="form-actions">
-    <%= f.button :submit, class: "btn btn-success" %> or <%= link_to "Cancel", settings_subjects_path, class: "" %>
+  <div class="card-footer bg-white d-flex flex-column flex-md-row gap-2 justify-content-start">
+    <%= f.button :submit, class: "btn btn-primary" %>
+    <%= link_to "Cancel", settings_subjects_path, class: "btn btn-outline-danger" %>
   </div>
 <% end %>

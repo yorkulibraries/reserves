@@ -1,24 +1,45 @@
 <% title "Course Subjects" %>
 
-<div class="text-right">
-<%= link_to 'New Course Subject', new_settings_subject_path, class: "btn btn-primary btn-sm" %>
+<div class="container py-4">
+  <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4">
+    <div>
+      <p class="text-muted mb-0">Manage subject codes available when creating or editing courses.</p>
+    </div>
+    <%= link_to "New Course Subject", new_settings_subject_path, class: "btn btn-primary" %>
+  </div>
+
+  <div class="card shadow-sm">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th scope="col">Code</th>
+              <th scope="col">Name</th>
+              <th scope="col" class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if @subjects.any? %>
+              <% @subjects.each do |subject| %>
+                <tr>
+                  <td class="fw-semibold text-uppercase"><%= subject.code %></td>
+                  <td><%= subject.name.presence || content_tag(:span, "Not provided", class: "text-muted") %></td>
+                  <td class="text-end">
+                    <%= link_to "Make Changes", edit_settings_subject_path(subject), class: "btn btn-outline-success btn-sm" %>
+                  </td>
+                </tr>
+              <% end %>
+            <% else %>
+              <tr>
+                <td colspan="3" class="text-center text-muted py-4">
+                  No course subjects found yet.
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 </div>
-
-<table class="table">
-  <thead>
-    <tr>
-      <th>Code</th>
-      <th>Name</th>
-    </tr>
-  </thead>
-
-  <tbody>
-    <% @subjects.each do |s| %>
-      <tr>
-        <td><%= s.code %></td>
-        <td><%= s.name %></td>
-        <td><%= link_to 'Make Changes', edit_settings_subject_path(s) %></td>
-      </tr>
-    <% end %>
-  </tbody>
-</table>

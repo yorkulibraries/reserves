@@ -1,49 +1,85 @@
 <% title "Update Application Settings" %>
 
-<%= simple_form_for Setting.new, url: settings_path, method: :patch do |f| %>
+<!-- Bootstrap 5 preview -->
+<div class="container py-2">
+  <div class="row ">
+    <div class="col-md-12 col-lg-12 col-xl-8">
+      <%= simple_form_for Setting.new, url: settings_path, method: :patch, html: { class: "card shadow-sm border-0" } do |f| %>
+        <div class="card-header bg-white border-0 pb-0">
+          <p class="text-muted mb-0">Review the categories below, adjust the values, and save when you are ready.</p>
+        </div>
+        <div class="card-body">
+          <section class="mb-4 bg-light p-3">
+            <h2 class="h6 text-uppercase text-primary mb-3">General Settings</h2>
+            <div class="row g-3">
+              <%= f.input :app_name,
+                          wrapper_html: { class: "col-md-6" },
+                          label_html: { class: "form-label" },
+                          input_html: { class: "form-control" } %>
+              <%= f.input :app_owner,
+                          wrapper_html: { class: "col-md-6" },
+                          label_html: { class: "form-label" },
+                          input_html: { class: "form-control" } %>
+            </div>
+          </section>
 
-	<div class="panel panel-info">
-	  <div class="panel-heading">
-	    <h3 class="panel-title">General Settings</h3>
-	  </div>
-	  <div class="panel-body">
-			<%= f.input :app_name %>
-			<%= f.input :app_owner %>
-	  </div>
-	</div>
+          <section class="mb-4 bg-light p-3">
+            <h2 class="h6 text-uppercase text-success mb-3">Expiry Notices</h2>
+            <div class="row g-3">
+              <%= f.input :request_expiry_notice_interval,
+                          collection: [["2 weeks", 2.weeks], ["3 weeks", 3.weeks], ["4 weeks", 4.weeks]],
+                          include_blank: false,
+                          wrapper_html: { class: "col-md-6 col-lg-4" },
+                          label_html: { class: "form-label" },
+                          input_html: { class: "form-select" } %>
+            </div>
+          </section>
 
-	<div class="panel panel-success">
-		<div class="panel-heading">
-			<h3 class="panel-title">Expiry Notices Settings</h3>
-		</div>
-		<div class="panel-body">
-			<%= f.input :request_expiry_notice_interval, include_blank: false, collection: [["2 weeks", 2.weeks], ["3 weeks", 3.weeks], ["4 weeks", 4.weeks]]%>
-		</div>
-	</div>
+          <section class="mb-4 bg-light p-3">
+            <h2 class="h6 text-uppercase text-dark mb-3">Reports</h2>
+            <div class="row g-3">
+              <% interval = [["30 days", 30.days], ["60 days", 60.days], ["90 days", 90.days]] %>
+              <%= f.input :reports_default_interval,
+                          collection: interval,
+                          include_blank: false,
+                          label: "Default Report Interval",
+                          wrapper_html: { class: "col-md-6" },
+                          label_html: { class: "form-label" },
+                          input_html: { class: "form-select" } %>
+              <%= f.input :reports_fiscal_year_start,
+                          label: "Fiscal Year Start",
+                          wrapper_html: { class: "col-md-6" },
+                          label_html: { class: "form-label" },
+                          input_html: { class: "form-control day_picker" } %>
+            </div>
+          </section>
 
-	<div class="panel panel-primary">
-		<div class="panel-heading">
-			<h3 class="panel-title">Reports Settings</h3>
-		</div>
-		<div class="panel-body">
-			<% interval = [["30 days", 30.days], ["60 days", 60.days], ["90 days", 90.days]] %>
-			<%= f.input :reports_default_interval, label: "Default Report Interval", include_blank: false, collection: interval %>
-			<%= f.input :reports_fiscal_year_start, label: "Fiscal Year Start", input_html: { class: "day_picker" } %>
-		</div>
-	</div>
-
-	<div class="panel panel-danger">
-		<div class="panel-heading">
-			<h3 class="panel-title">Application Maintenance Settings</h3>
-		</div>
-		<div class="panel-body">			
-			<%= f.input :app_maintenance, as: :radio_buttons %>
-			<%= f.input :app_maintenance_message %>
-		</div>
-	</div>
-
-
-	<%= f.submit "Save Settings", class: "btn btn-success" %>
-<% end %>
+          <section class="mb-4 bg-light p-3">
+            <h2 class="h6 text-uppercase text-danger mb-3">Application Maintenance</h2>
+            <div class="row g-3">
+              <div class="col-12">
+                <%= f.input :app_maintenance,
+                            as: :radio_buttons,
+                            label_html: { class: "form-label d-block" },
+                            collection_wrapper_tag: :div,
+                            collection_wrapper_class: "d-flex gap-3 flex-wrap",
+                            item_wrapper_class: "form-check",
+                            item_label_class: "form-check-label",
+                            input_html: { class: "form-check-input" } %>
+              </div>
+              <%= f.input :app_maintenance_message,
+                          wrapper_html: { class: "col-12" },
+                          label_html: { class: "form-label" },
+                          input_html: { class: "form-control", rows: 3 } %>
+            </div>
+          </section>
+        </div>
+        <div class="card-footer bg-white d-flex justify-content-start">
+          <%= f.submit "Save Settings", class: "btn btn-primary" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
 
 <!-- Nav tabs -->

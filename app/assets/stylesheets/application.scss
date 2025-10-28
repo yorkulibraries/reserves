@@ -78,3 +78,37 @@ a:active {
   text-decoration: none;
 }
 
+.dropdown-item:active a, .dropdown-item:focus a { color: white }
+
+/*** FORM STYLES ***/
+.help-block {
+  font-size: 0.875rem;
+  padding-left: 5px;
+  // color: gray;
+  color: $text-muted;
+}
+
+label {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #696969;
+    margin-bottom: 5px;
+    display: block;
+
+    abbr[title] {
+      color: #e00;
+      border-bottom: none;
+    }
+
+    abbr {
+      display: none;
+    }
+
+    &.inline_checkbox_label {
+      display: inline-block;
+      margin: 10px 10px 0 0 !important;
+    }
+
+
+  }
+/*** END OF FORM STYLES ***/

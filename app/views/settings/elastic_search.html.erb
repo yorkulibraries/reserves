@@ -1,19 +1,36 @@
 <% title "Update Elastic Search Settings" %>
 
-<%= simple_form_for Setting.new, url: settings_path, method: :patch do |f| %>
+<div class="container py-2">
+  <div class="row">
+    <div class="col-lg-9 col-xl-7">
+      <%= simple_form_for Setting.new, url: settings_path, method: :patch do |f| %>
 
+      <div class="card-header bg-white border-0 pb-0">
+        <h3 class="card-title">Elastic Search Settings</h3>
+      </div>
+      <div class="card-body">
+        <section class="mb-4 bg-light p-3">
+          <%= f.input :search_elastic_enabled, as: :radio_buttons, label: "Use Elastic Search",
+                      label_html: { class: "form-label d-block fw-semibold" },
+                      collection_wrapper_tag: :div,
+                      collection_wrapper_class: "d-flex gap-3 flex-wrap",
+                      item_wrapper_class: "form-check",
+                      item_label_class: "form-check-label",
+                      input_html: { class: "form-check-input" } %>
+          <%= f.input :search_elastic_server, 
+                    label_html: { class: "form-label mt-2" },
+                    input_html: { class: "form-control" }  %>
+          <%= f.input :search_elastic_index_prefix, 
+                    label_html: { class: "form-label mt-2" },
+                    input_html: { class: "form-control" }  %>
+        </section>
+      </div>
 
-  <div class="panel panel-success">
-    <div class="panel-heading">
-      <h3 class="panel-title">Elastic Search Settings</h3>
-    </div>
-    <div class="panel-body">
-      <%= f.input :search_elastic_enabled, as: :radio_buttons, label: "Use Elastic Search" %>
-      <%= f.input :search_elastic_server %>
-      <%= f.input :search_elastic_index_prefix %>
+      <div class="card-footer bg-white border-0 pt-0 d-flex justify-content-between align-items-center">
+        <input type="hidden" name="return_to" value="elastic_search"/>
+        <%= f.submit "Save Settings", class: "btn btn-success" %>
+      </div>
+      <% end %>
     </div>
   </div>
-
-  <input type="hidden" name="return_to" value="elastic_search"/>
-  <%= f.submit "Save Settings", class: "btn btn-success" %>
-<% end %>
+</div>

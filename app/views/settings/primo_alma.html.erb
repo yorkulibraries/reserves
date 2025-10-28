@@ -1,31 +1,82 @@
 <% title "Update Primo and Alma Settings" %>
 
-<%= simple_form_for Setting.new, url: settings_path, method: :patch do |f| %>
-  <div class="panel panel-success">
-    <div class="panel-heading">
-      <h3 class="panel-title">Primo and Alma Settings</h3>
-    </div>
-    <div class="panel-body">
+<!-- Bootstrap 5 preview -->
+<div class="container py-2">
+  <div class="row">
+    <div class="col-lg-10 col-xl-8">
+      <%= simple_form_for Setting.new, url: settings_path, method: :patch, html: { class: "card shadow-sm border-0 mb-4" } do |f| %>
+        <div class="card-header bg-white border-0 pb-0">
+          <h1 class="h4 mb-1">Primo &amp; Alma Integrations</h1>
+          <p class="text-muted mb-0">Manage API credentials and discovery configuration for library services.</p>
+        </div>
+        <div class="card-body">
+          <section class="mb-4 bg-light p-3">
+            <h2 class="h6 text-uppercase text-primary mb-3">Primo</h2>
+            <div class="row g-3">
+              <%= f.input :primo_apikey,
+                          wrapper_html: { class: "col-12" },
+                          label_html: { class: "form-label" },
+                          input_html: { class: "form-control" } %>
+              <%= f.input :primo_inst,
+                          wrapper_html: { class: "col-12 col-md-6" },
+                          label_html: { class: "form-label" },
+                          input_html: { class: "form-control" } %>
+              <%= f.input :primo_vid,
+                          wrapper_html: { class: "col-12 col-md-6" },
+                          label_html: { class: "form-label" },
+                          input_html: { class: "form-control" } %>
+              <%= f.input :primo_region,
+                          wrapper_html: { class: "col-12 col-md-6" },
+                          label_html: { class: "form-label" },
+                          input_html: { class: "form-control" } %>
+              <div class="col-12 col-md-6">
+                <%= f.input :primo_enable_loggable,
+                            as: :radio_buttons,
+                            label: "Enable Loggable?",
+                            label_html: { class: "form-label d-block" },
+                            collection_wrapper_tag: :div,
+                            collection_wrapper_class: "d-flex gap-3",
+                            item_wrapper_class: "form-check",
+                            item_label_class: "form-check-label",
+                            input_html: { class: "form-check-input" } %>
+              </div>
+              <%= f.input :primo_scope,
+                          wrapper_html: { class: "col-12 col-md-6" },
+                          label_html: { class: "form-label" },
+                          input_html: { class: "form-control" } %>
+              <div class="col-12 col-md-6">
+                <%= f.input :primo_pcavailability,
+                            as: :radio_buttons,
+                            label: "PC Availability",
+                            label_html: { class: "form-label d-block" },
+                            collection_wrapper_tag: :div,
+                            collection_wrapper_class: "d-flex gap-3",
+                            item_wrapper_class: "form-check",
+                            item_label_class: "form-check-label",
+                            input_html: { class: "form-check-input" } %>
+              </div>
+            </div>
+          </section>
 
-      <h4>Primo</h4>
-
-      <%= f.input :primo_apikey %>
-      <%= f.input :primo_inst %>
-      <%= f.input :primo_vid %>
-      <%= f.input :primo_region %>
-      <%= f.input :primo_enable_loggable, as: :radio_buttons %>
-      <%= f.input :primo_scope %>
-      <%= f.input :primo_pcavailability, as: :radio_buttons %>
-
-      <hr/>
-      <h4>Alma</h4>
-
-      <%= f.input :alma_apikey %>
-      <%= f.input :alma_region %>
-
+          <section class="mb-4 bg-light p-3">
+            <h2 class="h6 text-uppercase text-success mb-3">Alma</h2>
+            <div class="row g-3">
+              <%= f.input :alma_apikey,
+                          wrapper_html: { class: "col-12 col-md-6" },
+                          label_html: { class: "form-label" },
+                          input_html: { class: "form-control" } %>
+              <%= f.input :alma_region,
+                          wrapper_html: { class: "col-12 col-md-6" },
+                          label_html: { class: "form-label" },
+                          input_html: { class: "form-control" } %>
+            </div>
+          </section>
+        </div>
+        <div class="card-footer bg-white border-0 pt-0 d-flex justify-content-between align-items-center">
+          <input type="hidden" name="return_to" value="primo_alma"/>
+          <%= f.submit "Save Primo and Alma Settings", class: "btn btn-primary" %>
+        </div>
+      <% end %>
     </div>
   </div>
-
-  <input type="hidden" name="return_to" value="primo_alma"/>
-  <%= f.submit "Save Primo and Alma Settings", class: "btn btn-success" %>
-<% end %>
+</div>

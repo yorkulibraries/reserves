@@ -1,35 +1,81 @@
 <% title "Update Request and Item Settings" %>
 
-<%= simple_form_for Setting.new, url: settings_path, method: :patch do |f| %>
+<div class="container py-2">
+  <div class="row">
+    <div class="col-lg-10 col-xl-9">
+      <%= simple_form_for Setting.new, url: settings_path, method: :patch, html: { class: "card shadow-sm border-0 mb-4" } do |f| %>
+        <div class="card-header bg-white border-0 pb-0">
+          <p class="text-muted mb-0">Configure archival rules, cleanup workflows, and item copyright options.</p>
+        </div>
+        <div class="card-body">
+          <section class="mb-4 bg-light p-3">
+            <h2 class="h6 text-uppercase text-primary mb-3">Request Settings</h2>
+            <div class="row g-3">
+              <div class="col-12">
+                <%= f.input :request_archive_all_allow,
+                            label: "Enable Auto Archive?",
+                            as: :radio_buttons,
+                            label_html: { class: "form-label d-block fw-semibold" },
+                            collection_wrapper_tag: :div,
+                            collection_wrapper_class: "d-flex gap-3 flex-wrap",
+                            item_wrapper_class: "form-check",
+                            item_label_class: "form-check-label",
+                            input_html: { class: "form-check-input" } %>
+              </div>
+              <% archive_intervals = [["15 days", 15.days], ["30 days", 30.days], ["60 days", 60.days], ["90 days", 90.days], ["180 days", 180.days]] %>
+              <%= f.input :request_archive_all_after,
+                          label: "Archive Requests After",
+                          collection: archive_intervals,
+                          include_blank: false,
+                          wrapper_html: { class: "col-md-6 col-xl-4" },
+                          label_html: { class: "form-label" },
+                          input_html: { class: "form-select" } %>
+              <%= f.input :request_archive_all_user_id,
+                          label: "Archive as User",
+                          collection: User.admin,
+                          include_blank: false,
+                          wrapper_html: { class: "col-md-6 col-xl-4" },
+                          label_html: { class: "form-label" },
+                          input_html: { class: "form-select" } %>
+            </div>
+            <hr class="my-4">
+            <div class="row g-3">
+              <div class="col-12">
+                <%= f.input :request_remove_incomplete_allow,
+                            label: "Enable PERMANENT Removal of Incomplete Requests?",
+                            as: :radio_buttons,
+                            label_html: { class: "form-label d-block fw-semibold" },
+                            collection_wrapper_tag: :div,
+                            collection_wrapper_class: "d-flex gap-3 flex-wrap",
+                            item_wrapper_class: "form-check",
+                            item_label_class: "form-check-label",
+                            input_html: { class: "form-check-input" } %>
+              </div>
+              <% cleanup_intervals = [["90 days", 90.days], ["180 days", 180.days], ["270 days", 270.days], ["1 Year", 1.year]] %>
+              <%= f.input :request_remove_incomplete_after,
+                          label: "PERMANENTLY Remove Incomplete Requests After",
+                          collection: cleanup_intervals,
+                          include_blank: false,
+                          wrapper_html: { class: "col-md-6 col-xl-4" },
+                          label_html: { class: "form-label" },
+                          input_html: { class: "form-select" } %>
+            </div>
+          </section>
 
-  <div class="panel panel-success">
-    <div class="panel-heading">
-      <h3 class="panel-title">Request Settings</h3>
-    </div>
-    <div class="panel-body">
-      <%= f.input :request_archive_all_allow, label: "Enable Auto Archive?", as: :radio_buttons %>
-
-      <% interval = [["15 days", 15.days], ["30 days", 30.days], ["60 days", 60.days], ["90 days", 90.days], ["180 days", 180.days]] %>
-      <%= f.input :request_archive_all_after, label: "Archive Requests After", include_blank: false, collection: interval %>
-
-      <%= f.input :request_archive_all_user_id, label: "Archive as User", include_blank: false, collection: User.admin %>
-      <hr/>
-      <%= f.input :request_remove_incomplete_allow, label: "Enable PERMANENT Removal of Incomplete Requests?", as: :radio_buttons %>
-      <% interval2 = [["90 days", 90.days], ["180 days", 180.days], ["270 days", 270.days], ["1 Year", 1.year]] %>
-      <%= f.input :request_remove_incomplete_after, label: "PERMANENTLY Remove Incomplete Requests After", include_blank: false, collection: interval2 %>
+          <section class="mb-4 bg-light p-3">
+            <h2 class="h6 text-uppercase text-success mb-3">Item Settings</h2>
+            <div class="row g-3">
+              <%= f.input :item_copyright_options,
+                          as: :array,
+                          input_html: { class: "form-control mt-2"} %>
+            </div>
+          </section>
+        </div>
+        <div class="card-footer bg-white border-0 pt-0 d-flex justify-content-between align-items-center">
+          <input type="hidden" name="return_to" value="item_request"/>
+          <%= f.submit "Save Item Settings", class: "btn btn-primary" %>
+        </div>
+      <% end %>
     </div>
   </div>
-
-
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <h3 class="panel-title">Item Settings</h3>
-    </div>
-    <div class="panel-body">
-      <%= f.input :item_copyright_options, as: :array, input_html: { long_form: true } %>
-    </div>
-  </div>
-
-  <input type="hidden" name="return_to" value="item_request"/>
-  <%= f.submit "Save Item Settings", class: "btn btn-success" %>
-<% end %>
+</div>

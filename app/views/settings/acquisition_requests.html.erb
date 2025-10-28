@@ -1,42 +1,63 @@
 <% title "Update Item Settings" %>
 
-<%= simple_form_for Setting.new, url: settings_path, method: :patch do |f| %>
+<!-- Bootstrap 5 preview -->
+<div class="container py-2">
+  <div class="row">
+    <div class="col-lg-10 col-xl-9">
+      <%= simple_form_for Setting.new, url: settings_path, method: :patch, html: { class: "card shadow-sm border-0 mb-4" } do |f| %>
+        <div class="card-header bg-white border-0 pb-0">
+          <h1 class="h4 mb-1">Acquisition Workflows</h1>
+          <p class="text-muted mb-0">Adjust request pick-lists and outbound messaging to acquisitions teams.</p>
+        </div>
+        <div class="card-body">
+          <section class="mb-4 bg-light p-3">
+            <h2 class="h6 text-uppercase text-primary mb-3">Request Options</h2>
+            <div class="row g-3">
+              
+              <%= f.input :acquisition_sources,
+                          as: :array ,
+                          input_html: { class: "form-control mt-2"}
+                          %>
+              <%= f.input :acquisition_reasons,
+                          as: :array,
+                          input_html: { class: "form-control mt-2"} %> 
+            </div>
+            <p class="form-text mt-2">Press Ctrl-Shift-Del after clicking on the text box to remove an option.</p>
+          </section>
 
-  <div class="panel panel-warning">
-    <div class="panel-heading">
-      <h3 class="panel-title">Acquisition Requests Settings</h3>
-    </div>
-    <div class="panel-body">
-      <div class="row">
-        <div class="col-md-6">
-          <%= f.input :acquisition_sources, as: :array %>
+          <section class="mb-4 bg-light p-3">
+            <h2 class="h6 text-uppercase text-success mb-3">Send To Acquisitions</h2>
+            <div class="row g-3">
+              <%= f.input :email_acquisitions_to,
+                          label: "Acquisitions Email",
+                          wrapper_html: { class: "col-12 col-md-6" },
+                          label_html: { class: "form-label" },
+                          input_html: { class: "form-control" } %>
+              <%= f.input :email_acquisitions_to_bookstore,
+                          label: "Bookstore Email",
+                          wrapper_html: { class: "col-12 col-md-6" },
+                          label_html: { class: "form-label" },
+                          input_html: { class: "form-control" } %>
+              <%= f.input :email_acquisitions_subject,
+                          label: "Subject",
+                          wrapper_html: { class: "col-12" },
+                          label_html: { class: "form-label" },
+                          input_html: { class: "form-control" } %>
+              <%= f.input :email_acquisitions_body,
+                          as: :text,
+                          label: "Body",
+                          wrapper_html: { class: "col-12" },
+                          label_html: { class: "form-label" },
+                          input_html: { class: "form-control", rows: 5 } %>
+            </div>
+            <p class="form-text mt-2">Emails include acquisition request, item, and course details.</p>
+          </section>
         </div>
-        <div class="col-md-6">
-          <%= f.input :acquisition_reasons, as: :array %>
+        <div class="card-footer bg-white border-0 pt-0 d-flex justify-content-between align-items-center">
+          <input type="hidden" name="return_to" value="acquisition_requests"/>
+          <%= f.submit "Save Acquisitions Settings", class: "btn btn-primary" %>
         </div>
-      </div>
-      <p class="small">Press Ctrl-Shift-Del after clicking on the text box to remove that option.</p>
+      <% end %>
     </div>
   </div>
-
-  <div class="panel panel-info">
-    <div class="panel-heading">
-      <h3 class="panel-title">Send To Acquisitions Settings</h3>
-    </div>
-    <div class="panel-body">
-      <div class="row">
-        <div class="col-md-12">
-          <%= f.input :email_acquisitions_to, label: "Acquisitions Email" %>
-          <%= f.input :email_acquisitions_to_bookstore, label: "Bookstore Email" %>
-          <%= f.input :email_acquisitions_subject, label: "Subject" %>
-          <%= f.input :email_acquisitions_body, as: :text, label: "Body", input_html: { rows: 5 } %>
-        </div>
-      </div>
-      <p class="small">The email will be sent to the above address and inlcude Acquistion Request, Item and Course details.</p>
-    </div>
-  </div>
-
-
-  <input type="hidden" name="return_to" value="acquisition_requests"/>
-  <%= f.submit "Save Acquisitions Settings", class: "btn btn-success" %>
-<% end %>
+</div>

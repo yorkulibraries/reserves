@@ -23,6 +23,6 @@ class ArrayInput < SimpleForm::Inputs::StringInput
   end
 
   def input_html_classes
-    'form-array-control deletable'
+    %w[form-array-control deletable]
   end
 end
