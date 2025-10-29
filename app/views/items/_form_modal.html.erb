@@ -67,19 +67,21 @@
             <%# Hidden fields: single source of truth for metadata + type %>
             <%
               metadata_source =
-                if @item.item_type == Item::TYPE_BOOK
+                if @item.metadata_source.present?
+                  @item.metadata_source
+                elsif @item.item_type == Item::TYPE_BOOK
                   case @source
                   when "primo" then (defined?(Item::METADATA_PRIMO) ? Item::METADATA_PRIMO : "primo")
                   when "alma"  then (defined?(Item::METADATA_ALMA)  ? Item::METADATA_ALMA  : "alma")
                   when "citation" then (defined?(Item::METADATA_MANUAL) ? Item::METADATA_MANUAL : "manual")
                   else (defined?(Item::METADATA_MANUAL) ? Item::METADATA_MANUAL : "manual")
-                  end
-                else
-                  (defined?(Item::METADATA_MANUAL) ? Item::METADATA_MANUAL : "manual")
                 end
+              else
+                (defined?(Item::METADATA_MANUAL) ? Item::METADATA_MANUAL : "manual")
+              end
             %>
             <%= f.hidden_field :metadata_source,    value: metadata_source %>
-            <%= f.hidden_field :metadata_source_id, value: nil %>
+            <%= f.hidden_field :metadata_source_id, value: @item.metadata_source_id %>
             <%= f.hidden_field :item_type,          value: @item.item_type %>
 
             <% if @item.errors.any? %>

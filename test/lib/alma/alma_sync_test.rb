@@ -148,12 +148,15 @@ module Alma
       Rails.logger.stubs(:info)
       Rails.logger.stubs(:warn)
       Rails.logger.stubs(:error)
+      Alma::ReadingList.stubs(:get_reading_list)
+                        .returns({ status: :ok, data: { 'status' => { 'value' => 'BeingPrepared' } } })
     end
 
     teardown do
       Rails.logger.unstub(:info)
       Rails.logger.unstub(:warn)
       Rails.logger.unstub(:error)
+      Alma::ReadingList.unstub(:get_reading_list)
     end
 
     should 'skip sync when request lacks Alma identifiers' do
@@ -183,7 +186,7 @@ module Alma
 
       Alma::ReadingList.expects(:get_items_for_reading_list)
                         .with('COURSE1', 'LIST1')
-                        .returns([citation])
+                        .returns({ status: :ok, citations: [citation] })
 
       assert_difference('Item.count', 1) do
         result = ReadingListSync.sync!(request_id: @request.id, actor_id: @actor.id)
@@ -204,7 +207,7 @@ module Alma
 
       Alma::ReadingList.expects(:get_items_for_reading_list)
                         .with('COURSE1', 'LIST1')
-                        .returns([])
+                        .returns({ status: :ok, citations: [] })
 
       Alma::AlmaSync.expects(:sync_item).never
 
@@ -220,7 +223,7 @@ module Alma
 
       Alma::ReadingList.expects(:get_items_for_reading_list)
                         .with('COURSE1', 'LIST1')
-                        .returns([])
+                        .returns({ status: :ok, citations: [] })
 
       Alma::AlmaSync.expects(:sync_item).never
 
@@ -232,7 +235,33 @@ module Alma
         assert_equal 0, result[:added_remote]
       end
 
-      assert_equal Item::STATUS_DELETED, item.reload.status
+      item.reload
+      assert_equal Item::STATUS_DELETED, item.status
+      label = item.title.to_s.strip
+      label = "Item##{item.id}" if label.blank?
+      expected_comment = "Removed during Alma sync (citation missing remotely): #{label}"
+      assert_equal expected_comment, item.audits.last.comment
+    end
+
+    should 'retain local items and clear Alma identifiers when course missing remotely' do
+      item = create(:item, request: @request, alma_citation_id: 'CIT-REMOTE')
+
+      Alma::ReadingList.expects(:get_items_for_reading_list)
+                        .with('COURSE1', 'LIST1')
+                        .returns({ status: :not_found, citations: [] })
+
+      result = ReadingListSync.sync!(request_id: @request.id, actor_id: @actor.id)
+
+      assert_equal :alma_course_missing, result[:status]
+      assert_match(/Alma course missing/, result[:alert])
+
+      @request.reload
+      assert_nil @request.alma_course_id
+      assert_nil @request.alma_reading_list_id
+
+      item.reload
+      assert_nil item.alma_citation_id
+      assert_not_equal Item::STATUS_DELETED, item.status
     end
 
     should 'collect failed local creations when new item invalid' do
@@ -248,7 +277,7 @@ module Alma
         'type' => { 'value' => 'BK' }
       }
 
-      Alma::ReadingList.expects(:get_items_for_reading_list).returns([citation])
+      Alma::ReadingList.expects(:get_items_for_reading_list).returns({ status: :ok, citations: [citation] })
 
       assert_no_difference('Item.count') do
         result = ReadingListSync.sync!(request_id: @request.id, actor_id: @actor.id)
@@ -263,12 +292,33 @@ module Alma
       legacy_item = create(:item, request: @request, alma_citation_id: nil)
       legacy_item.update_column(:item_type, 'BK')
 
-      Alma::ReadingList.expects(:get_items_for_reading_list).returns([])
+      Alma::ReadingList.expects(:get_items_for_reading_list).returns({ status: :ok, citations: [] })
       Alma::AlmaSync.expects(:sync_item).never
 
       ReadingListSync.sync!(request_id: @request.id, actor_id: @actor.id)
 
       assert_equal Item::TYPE_BOOK, legacy_item.reload.item_type
+    end
+
+    should 'mark request completed when Alma reading list is complete' do
+      Alma::ReadingList.stubs(:get_items_for_reading_list).returns({ status: :ok, citations: [] })
+      Alma::ReadingList.stubs(:get_reading_list)
+                        .with(course_id: 'COURSE1', reading_list_id: 'LIST1')
+                        .returns({ status: :ok, data: { 'status' => { 'value' => 'Complete' } } })
+
+      mailer = mock('mailer')
+      mailer.expects(:deliver_now)
+      RequestMailer.expects(:status_change).with(@request, @actor).returns(mailer)
+
+      result = ReadingListSync.sync!(request_id: @request.id, actor_id: @actor.id)
+
+      assert_equal :ok, result[:status]
+      assert_includes result[:notice], 'Reading list is Complete'
+      assert_equal true, result[:status_changed]
+
+      @request.reload
+      assert_equal Request::COMPLETED, @request.status
+      assert_not_nil @request.completed_date
     end
 
     should 'return error status when Alma fetch raises' do

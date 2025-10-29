@@ -116,7 +116,8 @@ module Alma
       ReadingList.expects(:perform_get_request).returns(response)
 
       result = ReadingList.get_items_for_reading_list('COURSE1', 'LIST1')
-      assert_equal ['C1'], result.map { |c| c['id'] }
+      assert_equal :ok, result[:status]
+      assert_equal ['C1'], result[:citations].map { |c| c['id'] }
     end
 
     should 'return empty array when reading list fetch fails' do
@@ -126,7 +127,61 @@ module Alma
 
       ReadingList.expects(:perform_get_request).returns(response)
 
-      assert_equal [], ReadingList.get_items_for_reading_list('COURSE1', 'LIST1')
+      result = ReadingList.get_items_for_reading_list('COURSE1', 'LIST1')
+      assert_equal :error, result[:status]
+      assert_equal [], result[:citations]
+    end
+
+    should 'treat 400 not found responses as missing' do
+      response = Net::HTTPBadRequest.new('1.1', '400', 'Bad Request')
+      response.instance_variable_set(:@read, true)
+      response.instance_variable_set(:@body, 'Course not found')
+
+      ReadingList.expects(:perform_get_request).returns(response)
+
+      result = ReadingList.get_items_for_reading_list('COURSE1', 'LIST1')
+      assert_equal :not_found, result[:status]
+      assert_equal [], result[:citations]
+    end
+
+    should 'fetch reading list details successfully' do
+      response_body = {
+        'id' => 'LIST1',
+        'status' => { 'value' => 'BeingPrepared', 'desc' => 'Being Prepared' }
+      }.to_json
+      response = Net::HTTPSuccess.new('1.1', '200', 'OK')
+      response.instance_variable_set(:@read, true)
+      response.instance_variable_set(:@body, response_body)
+
+      ReadingList.expects(:perform_get_request).returns(response)
+
+      result = ReadingList.get_reading_list(course_id: 'COURSE1', reading_list_id: 'LIST1')
+      assert_equal :ok, result[:status]
+      assert_equal 'BeingPrepared', result[:data]['status']['value']
+    end
+
+    should 'return not_found when reading list detail fetch returns 404' do
+      response = Net::HTTPNotFound.new('1.1', '404', 'Not Found')
+      response.instance_variable_set(:@read, true)
+      response.instance_variable_set(:@body, 'missing')
+
+      ReadingList.expects(:perform_get_request).returns(response)
+
+      result = ReadingList.get_reading_list(course_id: 'COURSE1', reading_list_id: 'LIST1')
+      assert_equal :not_found, result[:status]
+      assert_nil result[:data]
+    end
+
+    should 'return not_found status when Alma responds 404' do
+      response = Net::HTTPNotFound.new('1.1', '404', 'Not Found')
+      response.instance_variable_set(:@read, true)
+      response.instance_variable_set(:@body, 'missing')
+
+      ReadingList.expects(:perform_get_request).returns(response)
+
+      result = ReadingList.get_items_for_reading_list('COURSE1', 'LIST1')
+      assert_equal :not_found, result[:status]
+      assert_equal [], result[:citations]
     end
 
     should 'return parsed citation when fetching single citation succeeds' do

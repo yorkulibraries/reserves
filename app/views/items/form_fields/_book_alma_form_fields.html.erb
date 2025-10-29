@@ -1,4 +1,1 @@
 <%= render "items/form_fields/book_form_fields", f: f, item: item %>
-
-<%= f.hidden_field :metadata_source,    value: (defined?(Item::METADATA_ALMA) ? Item::METADATA_ALMA : "alma") %>
-<%= f.hidden_field :metadata_source_id, value: nil %>

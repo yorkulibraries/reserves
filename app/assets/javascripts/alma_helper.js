@@ -4,6 +4,7 @@
         if (!modal) return;
 
         const q = (sel, root = modal) => root.querySelector(sel);
+        const locks = window.ItemFieldLocks;
 
         const input     = q('#alma_mms_id');
         const btn       = q('#alma_apply_btn');
@@ -54,6 +55,8 @@
             if (formatField && formatField.readOnly) {
                 formatField.value = formatDefaultValue;
             }
+
+            if (locks && typeof locks.unlock === 'function') locks.unlock();
         }
 
         // Remove trailing " / …" and dangling ISBD punctuation from a display title
@@ -113,6 +116,13 @@
             const formatField = findField('format');
             if (formatField && data.format) formatField.value = data.format;
 
+            if (locks && typeof locks.lockElements === 'function') {
+                locks.lockElements([
+                    findField('title'),
+                    findField('author')
+                ]);
+            }
+
             btn.textContent = 'Linked ✔';
             if (status) status.textContent = `MMS ${mms} loaded`;
 
@@ -130,10 +140,12 @@
             try {
                 modal.dispatchEvent(new CustomEvent('alma:mms-linked', { bubbles: true, detail: { mmsId: mms, payload: data } }));
             } catch (_) {}
+            if (locks && typeof locks.lock === 'function') locks.lock();
         } catch (e) {
             console.warn('[alma] lookup error', e);
             btn.textContent = 'Linked (unverified)';
             if (status) status.textContent = 'Lookup failed — fields were cleared';
+            if (locks && typeof locks.unlock === 'function') locks.unlock();
         } finally {
             setTimeout(() => { btn.disabled = false; btn.textContent = originalLabel || 'Use MMS ID'; }, 1200);
         }
