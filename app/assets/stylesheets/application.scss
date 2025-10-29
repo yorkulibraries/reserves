@@ -78,3 +78,8 @@ a:active {
   text-decoration: none;
 }
 
+input.locked-field {
+  background-color: #f8f9fa;
+  color: #6c757d;
+  cursor: not-allowed;
+}

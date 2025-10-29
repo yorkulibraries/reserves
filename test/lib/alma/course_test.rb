@@ -16,7 +16,7 @@ module Alma
 
     should 'return reading list items when list exists' do
       Alma::ReadingList.expects(:get_reading_list_for_course).with('COURSE1').returns('LIST1')
-      Alma::ReadingList.expects(:get_items_for_reading_list).with('COURSE1', 'LIST1').returns([{ 'id' => 'C1' }])
+      Alma::ReadingList.expects(:get_items_for_reading_list).with('COURSE1', 'LIST1').returns({ status: :ok, citations: [{ 'id' => 'C1' }] })
 
       items = Course.get_items_for_course('COURSE1')
       assert_equal ['C1'], items.map { |i| i['id'] }
@@ -48,8 +48,8 @@ module Alma
       Alma::ReadingList.expects(:get_items_for_reading_list)
                       .with('OLDCOURSE', 'OLDLIST')
                       .twice
-                      .returns([{ 'id' => 'CIT1' }]).then
-                      .returns([])
+                      .returns({ status: :ok, citations: [{ 'id' => 'CIT1' }] }).then
+                      .returns({ status: :ok, citations: [] })
 
       full_citation = {
         'id' => 'CIT1',

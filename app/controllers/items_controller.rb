@@ -62,6 +62,10 @@ class ItemsController < ApplicationController
     @item = @request.items.new(item_params)
     @item.status = Item::STATUS_NOT_READY
     @item.audit_comment = "Added Item: #{@item.title}"
+
+    if @item.metadata_source.blank? && @item.metadata_source_id.present?
+      @item.metadata_source = 'alma'
+    end
   
     respond_to do |format|
       # ---- Server-side fallback for "Citation" flow ----
@@ -129,6 +133,9 @@ class ItemsController < ApplicationController
       @item.audit_comment = "Updated Item: #{@item.title}"
 
       if @item.update(item_params)
+        if @item.metadata_source.blank? && @item.metadata_source_id.present?
+          @item.update_column(:metadata_source, 'alma')
+        end
         AddCitationJob.perform_later(@item.id, current_user.id) if current_user
         format.html { redirect_to [@request, @item], notice: 'Item was successfully updated.' }
         format.js

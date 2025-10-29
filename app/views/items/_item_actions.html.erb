@@ -40,8 +40,10 @@
       <span class="fa fa-cog"></span> Update Item  <span class="caret"></span>
     </button>
     <ul class="dropdown-menu" role="menu">
+      <!--
       <% if item.item_type == Item::TYPE_BOOK %>
         <li class="dropdown-item p-0">
+          
           <div class="dropdown hover-dropdown stick-on-click w-100" data-stick-on-click="true">
             <button
               class="btn btn-link dropdown-toggle w-100 text-start primary important px-3 py-2"
@@ -71,7 +73,7 @@
                             class: "dropdown-item" %>
               </li>
             </ul>
-          </div>
+          </div> 
         </li>
       <% else %>
         <li class="dropdown-item">
@@ -80,7 +82,8 @@
           <% end %>
         </li>
       <% end %>
-      <li class="dropdown-divider"></li>
+      
+      <li class="dropdown-divider"></li> -->
       <li class="dropdown-item">
         <%= link_to request_item_path(@request, item), method: :delete, data: { confirm: 'Are you sure?' }, remote: true,
         class: "red important" do %>

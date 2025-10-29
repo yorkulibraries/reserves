@@ -43,6 +43,15 @@ function searchRecords() {
    $("#item_metadata_source_id").val(my_record.id);
    $("#item_url").val(my_record.url);   // URL will not be populated.
 
+   if (window.ItemFieldLocks && typeof window.ItemFieldLocks.lockElements === 'function') {
+     window.ItemFieldLocks.lockElements([
+       document.querySelector('#item_title'),
+       document.querySelector('#item_author')
+     ]);
+   } else if (window.ItemFieldLocks && typeof window.ItemFieldLocks.lock === 'function') {
+     window.ItemFieldLocks.lock();
+   }
+
    //Remove the search results from view
    $(".search-panel").hide();
    $(".search_results ul li").each(function() {

@@ -90,16 +90,43 @@ module Alma
       uri = URI("#{base_path}/courses/#{course_id}/reading-lists/#{reading_list_id}/citations")
       response = perform_get_request(uri)
 
+      return { status: :error, citations: [] } unless response
+
       if response.is_a?(Net::HTTPSuccess)
         parsed = parse_json(response.body)
-        parsed["citation"] || [] 
+        { status: :ok, citations: parsed["citation"] || [] }
       else
-        Rails.logger.error("❌ Failed to retrieve citations...")
-        []
+        code = response.code.to_i
+        body_text = response.body.to_s
+        if code == 404 || (code == 400 && body_text.downcase.include?('not') && body_text.downcase.include?('found') && body_text.downcase.include?('course'))
+          Rails.logger.error("❌ Reading list #{reading_list_id} for Course #{course_id} not found in Alma (#{code})")
+          { status: :not_found, citations: [] }
+        else
+          Rails.logger.error("❌ Failed to retrieve citations for Course #{course_id}, List #{reading_list_id}: #{response.code} #{response.body}")
+          { status: :error, citations: [] }
+        end
       end
     rescue => e
       Rails.logger.error("Alma::ReadingList.get_items_for_reading_list failed: #{e.message}")
-      [] 
+      { status: :error, citations: [] }
+    end
+
+    def self.get_reading_list(course_id:, reading_list_id:)
+      uri = URI("#{base_path}/courses/#{course_id}/reading-lists/#{reading_list_id}")
+      response = perform_get_request(uri)
+
+      if response.is_a?(Net::HTTPSuccess)
+        { status: :ok, data: parse_json(response.body) }
+      elsif response&.code.to_i == 404
+        Rails.logger.error("❌ Reading list #{reading_list_id} for Course #{course_id} not found in Alma (404)")
+        { status: :not_found, data: nil }
+      else
+        Rails.logger.error("❌ Failed to fetch reading list #{reading_list_id} for Course #{course_id}: #{response&.code} #{response&.body}")
+        { status: :error, data: nil }
+      end
+    rescue => e
+      Rails.logger.error("Alma::ReadingList.get_reading_list failed: #{e.message}")
+      { status: :error, data: nil }
     end
 
     def self.get_reading_list_for_course(course_id)

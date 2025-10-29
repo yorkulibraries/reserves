@@ -22,75 +22,110 @@ module Alma
                 return { status: :skipped, added_local: 0, failed_local: 0, removed_local: 0, added_remote: 0 }
             end
             
+            result = nil
             Rails.logger.tagged("ReadingListSync", "Request##{@request.id}") do
-                alma_citations = fetch_alma_citations
+                fetch_result = fetch_alma_citations
+                status       = fetch_result[:status]
+                alma_citations = fetch_result[:citations] || []
                 local_items    = @request.items.active.to_a
             
                 # Repair legacy items that may have Alma codes in item_type
                 normalize_existing_item_types!(local_items)
             
+                case status
+                when :not_found
+                    alert_message = mark_request_as_missing!
+                    result = {
+                        status:        :alma_course_missing,
+                        added_local:   0,
+                        failed_local:  0,
+                        removed_local: 0,
+                        added_remote:  0,
+                        alert:         alert_message
+                    }
+                    next
+                when :error
+                    result = {
+                        status:        :error,
+                        added_local:   0,
+                        failed_local:  0,
+                        removed_local: 0,
+                        added_remote:  0
+                    }
+                    next
+                end
+
+                completion_notice = maybe_mark_request_completed
+
                 alma_index  = index_alma(alma_citations)
                 local_index = index_local(local_items)
-            
-            created_locals  = []
-            failed_locals   = []
-            removed_locals  = []
+
+                created_locals  = []
+                failed_locals   = []
+                removed_locals  = []
             
                 # --- Alma → Local (create Items that exist only in Alma)
                 ::ActiveRecord::Base.transaction do
-                alma_citations.each do |cit|
-                    key = key_for_citation(cit)
-                    next if local_index.key?(key)
-                    item = build_item_from_citation(cit)
-                    item.audit_comment = "Added from Alma sync (Request##{@request.id})"
+                    alma_citations.each do |cit|
+                        key = key_for_citation(cit)
+                        next if local_index.key?(key)
+                        item = build_item_from_citation(cit)
+                        item.audit_comment = "Added from Alma sync (Request##{@request.id})"
             
-                    begin
-                    item.save!
-                    local_index[key] = item
-                    created_locals << item
-                    rescue ActiveRecord::RecordInvalid => e
-                    # Skip this item; collect failure info and continue
-                    failed_locals << {
-                        citation_id:   (dig_any(cit, %w[id citation.id]) || "(none)"),
-                        title:         item.title,
-                        errors:        item.errors.full_messages
-                    }
-                    Rails.logger.warn(
-                        "ReadingListSync: skipping invalid item for Request##{@request.id} " \
-                        "(citation #{failed_locals.last[:citation_id]}): #{e.record.errors.full_messages.join('; ')}"
-                    )
+                        begin
+                            item.save!
+                            local_index[key] = item
+                            created_locals << item
+                        rescue ActiveRecord::RecordInvalid => e
+                            # Skip this item; collect failure info and continue
+                            failed_locals << {
+                                citation_id:   (dig_any(cit, %w[id citation.id]) || "(none)"),
+                                title:         item.title,
+                                errors:        item.errors.full_messages
+                            }
+                            Rails.logger.warn(
+                                "ReadingListSync: skipping invalid item for Request##{@request.id} " \
+                                "(citation #{failed_locals.last[:citation_id]}): #{e.record.errors.full_messages.join('; ')}"
+                            )
+                        end
                     end
-                end
                 end
             
                 # --- Local → Alma (create citations that exist only locally)
                 local_items.each do |item|
-                key = key_for_item(item)
-                next if alma_index.key?(key)
+                    key = key_for_item(item)
+                    next if alma_index.key?(key)
 
-                if item.alma_citation_id.present?
-                    Rails.logger.info("ReadingListSync: removing local Item##{item.id} (missing Alma citation #{item.alma_citation_id})")
-                    item.audit_comment = "Removed during Alma sync (citation missing remotely)"
-                    item.destroy
-                    removed_locals << item.id
-                else
-                    Rails.logger.info("ReadingListSync: skipping remote citation for Item##{item.id} (awaiting async sync)")
-                end
+                    if item.alma_citation_id.present?
+                        removal_message = removal_comment_for(item)
+                        Rails.logger.info("ReadingListSync: removing local Item##{item.id} (missing Alma citation #{item.alma_citation_id}) - #{removal_message}")
+                        item.audit_comment = removal_message
+                        item.destroy
+                        removed_locals << item.id
+                    else
+                        Rails.logger.info("ReadingListSync: skipping remote citation for Item##{item.id} (awaiting async sync)")
+                    end
                 end
             
                 Rails.logger.info(
-                "ReadingListSync done for Request##{@request.id} " \
-                "(alma→local: +#{created_locals.size}, failed: #{failed_locals.size}, local removals: #{removed_locals.size}, local→alma: +0)"
+                    "ReadingListSync done for Request##{@request.id} " \
+                    "(alma→local: +#{created_locals.size}, failed: #{failed_locals.size}, local removals: #{removed_locals.size}, local→alma: +0)"
                 )
 
-                {
+                result = {
                     status:       :ok,
                     added_local:  created_locals.size,
                     failed_local: failed_locals.size,
                     removed_local: removed_locals.size,
-                    added_remote: 0
+                    added_remote: 0,
+                    status_changed: false
                 }
+                if completion_notice.present?
+                    result[:notice] = completion_notice
+                    result[:status_changed] = true
+                end
             end
+            result || { status: :error, added_local: 0, failed_local: 0, removed_local: 0, added_remote: 0 }
             rescue => e
             Rails.logger.error("ReadingListSync error for Request##{@request.id}: #{e.class}: #{e.message}")
             { status: :error, added_local: 0, failed_local: 0, removed_local: 0, added_remote: 0 }
@@ -101,7 +136,93 @@ module Alma
         # ---------- Fetch / Index ----------
 
         def fetch_alma_citations
-            Alma::ReadingList.get_items_for_reading_list(@course_id, @list_id) || []
+            Alma::ReadingList.get_items_for_reading_list(@course_id, @list_id) || { status: :error, citations: [] }
+        end
+
+        def mark_request_as_missing!
+            message = "Alma course missing as of #{Date.current}"
+
+            ::ActiveRecord::Base.transaction do
+                @request.audit_comment = message
+                @request.update!(
+                    alma_course_id: nil,
+                    alma_reading_list_id: nil
+                )
+
+                @request.items.where.not(alma_citation_id: nil).find_each do |item|
+                    item.audit_comment = message
+                    item.update!(alma_citation_id: nil)
+                end
+            end
+
+            Rails.logger.warn("ReadingListSync: Alma course missing for Request##{@request.id}; cleared Alma identifiers.")
+            message
+        rescue => e
+            Rails.logger.error(
+                "ReadingListSync: failed to mark Request##{@request.id} as missing Alma course: #{e.class}: #{e.message}"
+            )
+            message
+        end
+
+        def maybe_mark_request_completed
+            details = Alma::ReadingList.get_reading_list(course_id: @course_id, reading_list_id: @list_id)
+            return nil unless details[:status] == :ok
+
+            raw_status = details[:data]['status']
+            status_value =
+                case raw_status
+                when Hash then raw_status['value'] || raw_status['desc']
+                else raw_status
+                end
+
+            return nil unless status_value.to_s.casecmp('Complete').zero?
+
+            mark_request_completed! ? "Reading list is Complete in Alma. Request marked as completed." : nil
+        end
+
+        def mark_request_completed!
+            return false if @request.status.in?([Request::COMPLETED, Request::CANCELLED, Request::REMOVED])
+
+            @request.audit_comment = 'Marked completed automatically from Alma reading list status'
+
+            attrs = { status: Request::COMPLETED }
+            attrs[:completed_date] = Date.today if @request.completed_date.blank?
+
+            updated = @request.update(attrs)
+            if updated
+                @request.reload
+                notify_status_change!
+            end
+            updated
+        rescue => e
+            Rails.logger.error(
+                "ReadingListSync: failed to mark Request##{@request.id} as completed: #{e.class}: #{e.message}"
+            )
+            false
+        end
+
+        def notify_status_change!
+            candidate = [@actor, @request.assigned_to, @request.requester].compact.find { |user| user&.email.present? }
+            candidate ||= User.admin.active.detect { |user| user.email.present? }
+
+            unless candidate
+                Rails.logger.warn(
+                    "ReadingListSync: no valid user found to notify status change for Request##{@request.id}"
+                )
+                return
+            end
+
+            RequestMailer.status_change(@request, candidate).deliver_now
+        rescue => e
+            Rails.logger.error(
+                "ReadingListSync: failed to enqueue status change email for Request##{@request.id}: #{e.class}: #{e.message}"
+            )
+        end
+
+        def removal_comment_for(item)
+            label = item.title.to_s.strip
+            label = "Item##{item.id}" if label.blank?
+            "Removed during Alma sync (citation missing remotely): #{label}"
         end
 
         def index_alma(citations)
@@ -133,6 +254,9 @@ module Alma
 
         def build_item_from_citation(c)
             internal_type = map_alma_type_to_internal(c)
+            mms_id = extract_mms_id(c)
+            source = mms_id.present? ? 'alma' : Item::METADATA_MANUAL
+
             @request.items.build(
                 title:            alma_title(c),
                 author:           alma_author(c),
@@ -145,7 +269,8 @@ module Alma
                 item_type:        internal_type,                  # internal app type (not BK/VM/etc.)
                 format:           derive_format(internal_type, c),# satisfies model validations
                 status:           ::Item::STATUS_NOT_READY,
-                metadata_source:  Item::METADATA_MANUAL,
+                metadata_source:  source,
+                metadata_source_id: mms_id,
                 alma_citation_id: dig_any(c, %w[id citation.id])
             )
         end
@@ -180,6 +305,14 @@ module Alma
         end
 
         # ---------- Alma field extractors ----------
+        def extract_mms_id(c)
+            dig_any(c, %w[metadata.mms_id citation.metadata.mms_id]) ||
+              dig_any(c, %w[metadata.source_record_id citation.metadata.source_record_id]) ||
+              begin
+                link = dig_any(c, %w[link])
+                link.to_s[/mms_id=([^&]+)/, 1] if link
+              end
+        end
 
         def alma_title(c)
             dig_any(c, %w[metadata.title citation.metadata.title title]) || ""

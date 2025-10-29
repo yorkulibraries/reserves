@@ -24,6 +24,7 @@
 
     const q  = (sel, root = modalEl) => root.querySelector(sel);
     const qa = (sel, root = modalEl) => Array.from(root.querySelectorAll(sel));
+    const locks = window.ItemFieldLocks;
 
     const showSpinner = () => {
       if (!spinnerEl) return;
@@ -121,8 +122,13 @@
         if (srcHidden && !srcHidden.value) srcHidden.value = 'primo';
 
         showFormCompletely();
+        if (locks && typeof locks.lock === 'function') { locks.lock(); }
         return;
       }
+    });
+
+    modalEl.addEventListener('hidden.bs.modal', () => {
+      if (locks && typeof locks.unlock === 'function') locks.unlock();
     });
 
     modalEl.addEventListener('alma:mms-linked', () => {
@@ -165,6 +171,7 @@
       if (idHidden) idHidden.value = mms;
 
       clearBiblio();
+      if (locks && typeof locks.unlock === 'function') locks.unlock();
 
       const csrf = document.querySelector('meta[name="csrf-token"]')?.content;
       btn.disabled = true;
@@ -193,8 +200,14 @@
         assign(urlEl, data.url);
         assign(descEl, data.description);
 
+        if (locks && typeof locks.lockElement === 'function') {
+          locks.lockElement(titleEl);
+          locks.lockElement(authorEl);
+        }
+
         btn.textContent = 'Linked ✔';
         if (status) status.textContent = `MMS ${mms} loaded`;
+        if (locks && typeof locks.lock === 'function') locks.lock();
         showFormCompletely();
       } catch (err) {
         console.warn('[item_modal] alma lookup error', err);
@@ -208,6 +221,7 @@
         } else {
           btn.textContent = originalLabel || 'Use MMS ID';
         }
+        if (btn.textContent !== 'Linked ✔' && locks && typeof locks.unlock === 'function') locks.unlock();
       }
     });
 
@@ -257,6 +271,7 @@
       if (!raw) { textEl?.focus(); return; }
 
       clearBiblio();
+      if (locks && typeof locks.unlock === 'function') locks.unlock();
       if (rawHidden) rawHidden.value = raw;
       setStatus('Parsing…');
 
@@ -285,12 +300,18 @@
 
         (titleEl?.value ? authorEl : titleEl)?.focus();
         setStatus('Parsed ✔'); setTimeout(() => setStatus(''), 1200);
+        if (locks && typeof locks.lock === 'function') locks.lock();
+        if (locks && typeof locks.lockElement === 'function') {
+          locks.lockElement(titleEl);
+          locks.lockElement(authorEl);
+        }
       } catch (err) {
         showFormCompletely();
         if (descEl) descEl.value = raw;
         (titleEl?.value ? authorEl : titleEl)?.focus();
         setStatus('Couldn’t parse; raw citation copied to Description.');
         console.warn('[item_modal] citation parse error', err);
+        if (locks && typeof locks.unlock === 'function') locks.unlock();
       }
     });
 

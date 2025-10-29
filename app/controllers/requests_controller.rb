@@ -175,19 +175,31 @@ class RequestsController < ApplicationController
     if @request.alma_course_id.present? && @request.alma_reading_list_id.present?
       begin
         result = Alma::ReadingListSync.sync!(request_id: @request.id, actor_id: current_user.id)
-  
+
+        if result[:status] == :alma_course_missing
+          alert_message = result[:alert].presence || "Alma course missing as of #{Date.current}"
+          flash.now[:alert] = [flash.now[:alert], alert_message].compact.join(' ')
+        end
+
         if result[:added_local].to_i > 0
-          #flash.now[:notice] = "New Items found. Synced items with Alma."
-          flash.now[:notice] = "New Items found. Synced #{result[:added_local]} item(s) with Alma."
+          message = "New Items found. Synced #{result[:added_local]} item(s) with Alma."
+          flash.now[:notice] = [flash.now[:notice], message].compact.join(' ')
         end
 
         if result[:failed_local].to_i > 0
-          flash.now[:alert] = "#{result[:failed_local]} item(s) failed to sync from Alma and were skipped."
+          message = "#{result[:failed_local]} item(s) failed to sync from Alma and were skipped."
+          flash.now[:alert] = [flash.now[:alert], message].compact.join(' ')
         end
 
         if result[:removed_local].to_i > 0
           flash.now[:notice] = [flash.now[:notice], "Removed #{result[:removed_local]} item(s) that no longer exist in Alma."].compact.join(' ')
         end
+
+        if result[:notice].present?
+          flash.now[:notice] = [flash.now[:notice], result[:notice]].compact.join(' ')
+        end
+
+        @request.reload if result[:status_changed]
       rescue => e
         Rails.logger.error("❌ Inline Alma sync failed for Request##{@request.id}: #{e.class}: #{e.message}")
         flash.now[:alert] = 'Alma sync failed; displaying existing items.'

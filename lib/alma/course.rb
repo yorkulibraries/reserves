@@ -65,7 +65,8 @@ module Alma
         return []
       end
 
-      Alma::ReadingList::get_items_for_reading_list(course_id, reading_list_id)
+      result = Alma::ReadingList.get_items_for_reading_list(course_id, reading_list_id)
+      result ? result[:citations] : []
     end
 
     def self.update_items_course_and_reading_list(new_course, old_alma_course_id)
@@ -93,7 +94,8 @@ module Alma
       end
     
 
-      old_course_items = Alma::ReadingList.get_items_for_reading_list(old_alma_course_id, old_reading_list_id)
+      old_items_result = Alma::ReadingList.get_items_for_reading_list(old_alma_course_id, old_reading_list_id)
+      old_course_items = old_items_result ? old_items_result[:citations] : []
     
       if old_course_items.blank?
         Rails.logger.warn("ℹ️ No items found to copy from old course (#{old_alma_course_id})")
@@ -139,7 +141,8 @@ module Alma
         end
       end
       # delete old reading list if now empty
-      remaining = Alma::ReadingList.get_items_for_reading_list(old_alma_course_id, old_reading_list_id)
+      remaining_result = Alma::ReadingList.get_items_for_reading_list(old_alma_course_id, old_reading_list_id)
+      remaining = remaining_result ? remaining_result[:citations] : []
       if remaining.blank?
         if Alma::ReadingList.delete(course_id: old_alma_course_id, reading_list_id: old_reading_list_id)
           Rails.logger.info("🧹 Deleted old reading list #{old_reading_list_id}")

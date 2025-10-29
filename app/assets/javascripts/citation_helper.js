@@ -4,6 +4,7 @@
     if (!modal) return;
 
     const q  = (sel, root = modal) => root.querySelector(sel);
+    const locks = window.ItemFieldLocks;
 
     const textEl    = q('#citation_text');
     const applyBtn  = q('#citation_apply_btn');
@@ -42,6 +43,7 @@
       if (!raw) { textEl?.focus(); return; }
 
       clearBiblio();
+      if (locks && typeof locks.unlock === 'function') locks.unlock();
       setStatus('Parsing…');
       if (rawHidden) rawHidden.value = raw;
 
@@ -71,6 +73,10 @@
 
         (titleEl?.value ? authorEl : titleEl)?.focus();
         setStatus('Parsed ✔'); setTimeout(() => setStatus(''), 1200);
+        if (locks && typeof locks.lock === 'function') locks.lock();
+        if (locks && typeof locks.lockElements === 'function') {
+          locks.lockElements([titleEl, authorEl]);
+        }
       } catch (e) {
         // Keep the form cleared, but stash the raw into Description
         showForm();
@@ -78,6 +84,7 @@
         (titleEl?.value ? authorEl : titleEl)?.focus();
         setStatus('Couldn’t parse; raw citation copied to Description.');
         console.warn('[citation] parse error', e);
+        if (locks && typeof locks.unlock === 'function') locks.unlock();
       }
     }
 
@@ -86,7 +93,12 @@
       applyBtn.dataset.wired = '1';
       applyBtn.addEventListener('click', applyCitation);
     }
-    clearBtn?.addEventListener('click', () => { if (textEl) textEl.value = ''; setStatus(''); textEl?.focus(); });
+    clearBtn?.addEventListener('click', () => {
+      if (textEl) textEl.value = '';
+      setStatus('');
+      textEl?.focus();
+      if (locks && typeof locks.unlock === 'function') locks.unlock();
+    });
 
     textEl?.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); applyCitation(); }

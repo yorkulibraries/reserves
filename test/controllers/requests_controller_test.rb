@@ -43,7 +43,8 @@ class RequestsControllerTest < ActionDispatch::IntegrationTest
       get request_path(request)
 
       assert_response :success
-      assert_equal 'New Items found. Synced 2 item(s) with Alma.', flash[:notice]
+      assert_not_nil flash[:notice]
+      assert_includes flash[:notice], 'New Items found. Synced 2 item(s) with Alma.'
       assert_nil flash[:alert]
     end
 
@@ -58,6 +59,49 @@ class RequestsControllerTest < ActionDispatch::IntegrationTest
 
       assert_response :success
       assert_equal '1 item(s) failed to sync from Alma and were skipped.', flash[:alert]
+    end
+
+    should 'append completion notice when Alma reading list is complete' do
+      request = create(:request, alma_course_id: 'COURSE1', alma_reading_list_id: 'LIST1')
+
+      Alma::ReadingListSync.expects(:sync!)
+                           .with(request_id: request.id, actor_id: @user.id)
+                           .returns({
+                             status:        :ok,
+                             added_local:   1,
+                             failed_local:  0,
+                             removed_local: 0,
+                             added_remote:  0,
+                             notice:        'Reading list is Complete in Alma. Request marked as completed.',
+                             status_changed: true
+                           })
+
+      get request_path(request)
+
+      assert_response :success
+      expected = 'New Items found. Synced 1 item(s) with Alma. Reading list is Complete in Alma. Request marked as completed.'
+      assert_not_nil flash[:notice]
+      assert_includes flash[:notice], expected
+    end
+
+    should 'surface alert when Alma course missing remotely' do
+      request = create(:request, alma_course_id: 'COURSE1', alma_reading_list_id: 'LIST1')
+
+      Alma::ReadingListSync.expects(:sync!)
+                           .with(request_id: request.id, actor_id: @user.id)
+                           .returns({
+                             status:        :alma_course_missing,
+                             alert:         'Alma course missing as of 2025-01-01',
+                             added_local:   0,
+                             failed_local:  0,
+                             removed_local: 0,
+                             added_remote:  0
+                           })
+
+      get request_path(request)
+
+      assert_response :success
+      assert_equal 'Alma course missing as of 2025-01-01', flash[:alert]
     end
 
     should 'handle Alma sync failure gracefully when showing request' do
