@@ -307,7 +307,7 @@ module Alma
                         .returns({ status: :ok, data: { 'status' => { 'value' => 'Complete' } } })
 
       mailer = mock('mailer')
-      mailer.expects(:deliver_later)
+      mailer.expects(:deliver_now)
       RequestMailer.expects(:status_change).with(@request, @actor).returns(mailer)
 
       result = ReadingListSync.sync!(request_id: @request.id, actor_id: @actor.id)
