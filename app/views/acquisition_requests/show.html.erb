@@ -5,7 +5,7 @@
     <h1>
       Acquisition #<%= @acquisition_request.id %>
       <small class="acquisition_request">
-        <span class="label label-default status-<%= @acquisition_request.status %>"><%= @acquisition_request.status.humanize %></span>
+        <span class="badge status-<%= @acquisition_request.status.parameterize %>"><%= @acquisition_request.status.humanize %></span>
       </small>
     </h1>
   </div>
@@ -17,11 +17,11 @@
 <h3> <a href="<%= request_path(@request)%>">Reserves Request #<%= @request.id%></a>
   <small class="request">
 
-    <a href="<%= request_path(@request)%>" class="label label-primary"><span class="fa fa-link"></span></a>
+    <a href="<%= request_path(@request)%>" class="badge bg-primary text-white"><span class="fa fa-link"></span></a>
 
 
-    <span class="label label-default status-<%= @request.status.parameterize %>"><%= @request.status.humanize %></span>
-    <span class="label label-default"><%= @request.reserve_location.name %></span>
+    <span class="badge status-<%= @request.status.parameterize %>"><%= @request.status.humanize %></span>
+    <span class="badge bg-secondary text-white fw-semibold"><%= @request.reserve_location.name %></span>
   </small>
 </h3>
 
@@ -30,11 +30,11 @@
     <%= render @item, hide_item_actions: true %>
   </div>
 
-  <div class="panel panel-success">
-    <div class="panel-heading">
-      <h3 class="panel-title">Acquisition Request Details</h3>
+  <div class="card shadow-sm border-0 mb-4">
+    <div class="card-header bg-info">
+      <h3 class="card-title mb-0">Acquisition Request Details</h3>
     </div>
-    <div class="panel-body">
+    <div class="card-body p-4 bg-light rounded-bottom">
 
       <div class="row">
         <div class="col-md-6">
@@ -92,11 +92,11 @@
     </div>
   </div>
 
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <h3 class="panel-title">Acquisition Request History</h3>
+  <div class="card shadow-sm border-0 mb-4">
+    <div class="card-header bg-info">
+      <h3 class="card-title mb-0">Acquisition Request History</h3>
     </div>
-    <div class="panel-body">
+    <div class="card-body p-4 bg-light rounded-bottom">
       <%= render partial: "history_log" %>
     </div>
   </div>

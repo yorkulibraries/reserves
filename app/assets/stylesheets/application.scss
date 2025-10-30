@@ -17,6 +17,7 @@
 @import "controllers/dashboard";
 @import "controllers/courses";
 @import "controllers/items";
+@import "controllers/acquisition_requests";
 @import "controllers/request_history";
 @import "controllers/request_wizard";
 @import "controllers/search_records";
@@ -116,4 +117,14 @@ input.locked-field {
   background-color: #f8f9fa;
   color: #6c757d;
   cursor: not-allowed;
+}
+
+.acquisition-location-heading {
+  background-color: rgba($primary, 0.08);
+  color: $primary;
+  font-weight: 600;
+  border: 1px solid rgba($primary, 0.2);
+  border-left: 4px solid $primary;
+  border-radius: 6px;
+  margin-bottom: 0.25rem;
 }

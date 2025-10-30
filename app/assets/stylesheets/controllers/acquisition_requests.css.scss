@@ -2,6 +2,28 @@
 .acquisition_requests {
   margin-bottom: 10px;
 
+  .field {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    margin: 10px 0 4px 0;
+  }
+
+  h3 {
+    font: 16px/1.4 Helvetica, arial, freesans, clean, sans-serif;
+    color: #333333;
+    margin-bottom: 0;
+  }
+
+  .left-border {
+    border-left: 1px solid rgba(0, 0, 0, 0.1);
+  }
+}
+
+.request,
+.acquisition_request,
+.acquisition_requests {
   .status-acquired {
     background-color: #5c8200 !important;
     color: #ffffff !important;
@@ -17,19 +39,4 @@
     color: #ffffff !important;
   }
 
-
-
-  .field {
-    display: block;
-    font-size: 14px;
-    font-weight: 600;
-    letter-spacing: 0.02em;
-    margin: 10px 0 4px 0;
-  }
-
-  h3 {
-    font: 16px/1.4 Helvetica, arial, freesans, clean, sans-serif;
-    color: #333333;
-    margin-bottom: 0;
-  }
 }

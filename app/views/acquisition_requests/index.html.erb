@@ -5,28 +5,33 @@
   <div role="tabpanel">
 
   <!-- Nav tabs -->
-  <ul class="nav nav-pills" role="tablist">
-    <li role="presentation" class="active">
-      <a href="#open" aria-controls="home" role="tab" data-bs-toggle="tab">Open</a>
+  <ul class="nav nav-pills mb-3" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="open-tab" data-bs-toggle="pill" data-bs-target="#open" type="button" role="tab" aria-controls="open" aria-selected="true">
+        Open
+      </button>
     </li>
-    <li role="presentation">
-      <a href="#acquired" aria-controls="profile" role="tab" data-bs-toggle="tab">Acquired</a>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="acquired-tab" data-bs-toggle="pill" data-bs-target="#acquired" type="button" role="tab" aria-controls="acquired" aria-selected="false">
+        Acquired
+      </button>
     </li>
-    <li role="presentation">
-      <a href="#cancelled" aria-controls="messages" role="tab" data-bs-toggle="tab">Cancelled</a>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="cancelled-tab" data-bs-toggle="pill" data-bs-target="#cancelled" type="button" role="tab" aria-controls="cancelled" aria-selected="false">
+        Cancelled
+      </button>
     </li>
-
   </ul>
 
   <!-- Tab panes -->
   <div class="tab-content">
-    <div role="tabpanel" class="tab-pane active" id="open">
+    <div role="tabpanel" class="tab-pane fade show active" id="open" aria-labelledby="open-tab">
       <%= render "open_requests" %>
     </div>
-    <div role="tabpanel" class="tab-pane" id="acquired">
+    <div role="tabpanel" class="tab-pane fade" id="acquired" aria-labelledby="acquired-tab">
       <%= render "acquired_requests" %>
     </div>
-    <div role="tabpanel" class="tab-pane" id="cancelled">
+    <div role="tabpanel" class="tab-pane fade" id="cancelled" aria-labelledby="cancelled-tab">
       <%= render "cancelled_requests" %>
     </div>
   </div>
