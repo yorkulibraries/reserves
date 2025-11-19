@@ -1,0 +1,10 @@
+#!/bin/bash -l
+
+RAKE_TASK=$1
+
+if [ "$RAKE_TASK" = "" ]; then
+  echo "Usage: $0 rake_task"
+  exit
+fi
+
+cd ~/$USER && RAILS_ENV=production DATABASE_URL=$DATABASE_URL bundle exec rake $RAKE_TASK 

@@ -5,7 +5,13 @@ namespace :admin do
       Request.reindex
       Item.reindex
       Course.reindex
+      CourseInfo.reindex
       Location.reindex
+  end
+
+  task reindex_courses: :environment do
+      Course.reindex
+      CourseInfo.reindex
   end
 
   desc "List invalid users"
