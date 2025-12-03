@@ -58,16 +58,74 @@ class CoursesController < ApplicationController
     allowed_years  = [academic_start.to_s, (academic_start + 1).to_s]
 
     term = params[:term].to_s.strip
+    subject_and_number = parse_subject_and_number(term)
+    courses = nil
+
+    if subject_and_number
+      subj, num = subject_and_number
+      subj_norm = subj.gsub(/[^A-Z]/, '')
+      num_norm  = num.gsub(/[^0-9A-Z]/, '')
+
+      subject_fields = %w[subject_course subject_abrev subject_abrev2]
+      number_fields  = %w[course_number]
+
+      es_query = {
+        bool: {
+          must: [
+            {
+              multi_match: {
+                query:    subj_norm,
+                fields:   subject_fields,
+                operator: 'or',
+                type:     'phrase'
+              }
+            },
+            {
+              multi_match: {
+                query:    num_norm,
+                fields:   number_fields,
+                operator: 'or',
+                type:     'phrase'
+              }
+            }
+          ],
+          filter: [
+            { terms: { academic_year: allowed_years } }
+          ]
+        }
+      }
+
+      courses = CourseInfo.search(
+        '*',
+        body: { query: es_query },
+        load: true,
+        limit: 100
+      )
+
+      if courses.blank?
+        es_query_no_year = es_query.deep_dup
+        es_query_no_year[:bool][:filter] = []
+
+        courses = CourseInfo.search(
+          '*',
+          body: { query: es_query_no_year },
+          load: true,
+          limit: 100
+        )
+      end
+    end
+
     courses = CourseInfo.search(
       term,
       fields: %i[
-        subject_abrev subject course_number course_title instructor_name faculty_abrev faculty_short
+        subject_course subject_abrev subject course_number course_title instructor_name faculty_abrev faculty_short
       ],
-      match:  :word_start,
-      where:  { academic_year: allowed_years },
-      load:   true,
-      limit:  100
-    )
+      match:    :word_start,
+      operator: 'and',        # require all query terms (e.g., PSYC 2030)
+      where:    { academic_year: allowed_years },
+      load:     true,
+      limit:    100
+    ) if courses.blank?
 
     render json: courses.map { |c|
       parts = info_parts(c)
@@ -153,6 +211,13 @@ class CoursesController < ApplicationController
   def build_code_from_info(info, p)
     return nil if p.blank?
     [p[:year], p[:faculty], p[:subject], p[:term], p[:number]].join('_') + "__#{p[:credits]}_#{p[:section]}"
+  end
+
+  # Attempt to split a query like "PSYC 2030" or "psyc-2030" into ["PSYC", "2030"]
+  def parse_subject_and_number(term)
+    m = term.to_s.upcase.strip.match(/\A\s*([A-Z]+)[\s\-]*([0-9A-Z]+)\s*\z/)
+    return nil unless m
+    [m[1], m[2]]
   end
 
   def display_instructor(name)

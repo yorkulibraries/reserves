@@ -4,7 +4,7 @@ class CourseInfo < ApplicationRecord
 
   searchkick word_start: %i[
     subject subject_abrev subject_abrev2 course_number course_title instructor_name
-    faculty_abrev faculty_short faculty
+    faculty_abrev faculty_short faculty subject_course
   ], stem: false, callbacks: :async
 
   def search_data
@@ -19,7 +19,8 @@ class CourseInfo < ApplicationRecord
       faculty_abrev:    faculty_abrev,
       faculty_short:    faculty_short,
       academic_year:    academic_year, # used for filtering in where:
-      study_session:    study_session
+      study_session:    study_session,
+      subject_course:   subject_course_tokens
     }
   end
 
@@ -45,5 +46,24 @@ class CourseInfo < ApplicationRecord
 
   def self.unique_study_sessions
     where.not(subject: nil).distinct.pluck(:study_session)
+  end
+
+  private
+
+  # Build tokens that combine subject abbreviations and course number so a single query
+  # like "PSYC 2030" can match instead of requiring per-field matches.
+  def subject_course_tokens
+    abbreviations = [
+      subject_abrev,
+      subject_abrev2,
+      subject
+    ].map { |s| s.to_s.upcase.gsub(/[^A-Z]/, '') }.reject(&:blank?).uniq
+
+    number = course_number.to_s.upcase.gsub(/[^0-9A-Z]/, '')
+    return [] if abbreviations.empty? || number.blank?
+
+    abbreviations.flat_map do |abbr|
+      ["#{abbr} #{number}", "#{abbr}#{number}", "#{abbr}-#{number}"]
+    end
   end
 end

@@ -41,6 +41,25 @@ class CourseInfoTest < ActiveSupport::TestCase
     assert course.save, "Expected valid course to save"
   end
 
+  test "search data includes combined subject and course number tokens" do
+    course = CourseInfo.new(
+      subject: "Psychology",
+      subject_abrev: "PSYC",
+      subject_abrev2: "PSY",
+      course_title: "Intro to Psychology",
+      course_number: "2030"
+    )
+
+    tokens = course.search_data[:subject_course]
+
+    assert_includes tokens, "PSYC 2030"
+    assert_includes tokens, "PSYC2030"
+    assert_includes tokens, "PSYC-2030"
+    assert_includes tokens, "PSY 2030"
+    assert_includes tokens, "PSY2030"
+    assert_includes tokens, "PSY-2030"
+  end
+
   # Class method tests
   test "unique_subjects returns unique subject values" do
     subjects = CourseInfo.unique_subjects
